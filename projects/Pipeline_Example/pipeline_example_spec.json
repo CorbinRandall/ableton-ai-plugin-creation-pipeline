@@ -1,0 +1,116 @@
+{
+  "name": "Pipeline_Example",
+  "description": "Minimal Max for Live MIDI effect for pipeline tutorials (MIDI pass-through + a few live.* parameters).",
+  "device_type": "midi_effect",
+  "devicewidth": 250.0,
+  "boxes": [
+    {
+      "box": {
+        "id": "obj-1",
+        "maxclass": "midiin",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "outlettype": [""],
+        "patching_rect": [30.0, 30.0, 80.0, 22.0]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-2",
+        "maxclass": "midiout",
+        "numinlets": 1,
+        "numoutlets": 0,
+        "patching_rect": [30.0, 250.0, 80.0, 22.0]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-10",
+        "maxclass": "live.dial",
+        "numinlets": 1,
+        "numoutlets": 2,
+        "outlettype": ["", "float"],
+        "parameter_enable": 1,
+        "patching_rect": [30.0, 100.0, 41.0, 48.0],
+        "presentation": 1,
+        "presentation_rect": [20.0, 35.0, 41.0, 48.0],
+        "textcolor": [0.811764705882353, 0.811764705882353, 0.827450980392157, 1.0],
+        "showname": 1,
+        "shownumber": 1,
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Rate",
+            "parameter_shortname": "Rate",
+            "parameter_type": 0,
+            "parameter_mmin": 0.0,
+            "parameter_mmax": 100.0,
+            "parameter_initial_enable": 1,
+            "parameter_initial": [50.0],
+            "parameter_unitstyle": 1
+          }
+        }
+      }
+    },
+    {
+      "box": {
+        "id": "obj-11",
+        "maxclass": "live.dial",
+        "numinlets": 1,
+        "numoutlets": 2,
+        "outlettype": ["", "float"],
+        "parameter_enable": 1,
+        "patching_rect": [100.0, 100.0, 41.0, 48.0],
+        "presentation": 1,
+        "presentation_rect": [75.0, 35.0, 41.0, 48.0],
+        "textcolor": [0.811764705882353, 0.811764705882353, 0.827450980392157, 1.0],
+        "showname": 1,
+        "shownumber": 1,
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Depth",
+            "parameter_shortname": "Depth",
+            "parameter_type": 0,
+            "parameter_mmin": 0.0,
+            "parameter_mmax": 1.0,
+            "parameter_initial_enable": 1,
+            "parameter_initial": [0.5],
+            "parameter_unitstyle": 1
+          }
+        }
+      }
+    },
+    {
+      "box": {
+        "id": "obj-20",
+        "maxclass": "live.toggle",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "outlettype": [""],
+        "parameter_enable": 1,
+        "patching_rect": [170.0, 100.0, 24.0, 24.0],
+        "presentation": 1,
+        "presentation_rect": [130.0, 42.0, 24.0, 24.0],
+        "textcolor": [0.811764705882353, 0.811764705882353, 0.827450980392157, 1.0],
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Active",
+            "parameter_shortname": "Active",
+            "parameter_type": 2,
+            "parameter_mmin": 0.0,
+            "parameter_mmax": 1.0,
+            "parameter_initial_enable": 1,
+            "parameter_initial": [1.0]
+          }
+        }
+      }
+    }
+  ],
+  "lines": [
+    {
+      "patchline": {
+        "destination": ["obj-2", 0],
+        "source": ["obj-1", 0]
+      }
+    }
+  ]
+}

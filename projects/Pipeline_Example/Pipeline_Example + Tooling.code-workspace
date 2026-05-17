@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "name": "Repository root",
+      "path": "../.."
+    },
+    {
+      "name": "Pipeline Example",
+      "path": "."
+    }
+  ],
+  "settings": {}
+}

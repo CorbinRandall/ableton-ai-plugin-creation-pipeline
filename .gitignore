@@ -1,0 +1,27 @@
+# Nested clone / export scratch (never commit)
+ableton-plugin-pipeline/
+
+__pycache__/
+*.py[cod]
+.DS_Store
+.venv/
+venv/
+.bootstrap_cache/
+*.amxd
+
+# --- Local plugin sandboxes (see projects/workspace/README.md) ---
+# Everything under workspace/ is yours; git pull will not remove untracked builds here.
+projects/workspace/*
+!projects/workspace/README.md
+
+# Tutorial version folders + binaries are build artifacts (regenerated locally).
+projects/Pipeline_Example/Pipeline_Example */
+
+# Local secrets / env (never publish)
+.env
+.env.*
+!.env.example
+
+# Keys / OS cruft
+*.pem
+Thumbs.db
