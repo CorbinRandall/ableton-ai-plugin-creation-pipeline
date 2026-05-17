@@ -1,6 +1,6 @@
 # GitHub repository metadata (public checklist)
 
-Use this when configuring **[github.com/CorbinRandall/m4l-pipeline-public](https://github.com/CorbinRandall/m4l-pipeline-public)** (or a fork you intend to publish).
+Use this when configuring **[github.com/CorbinRandall/ableton-plugin-pipeline](https://github.com/CorbinRandall/ableton-plugin-pipeline)** (or a fork you intend to publish).
 
 ## Visibility → Public
 
@@ -59,4 +59,4 @@ git branch -M main
 git push -u origin main
 ```
 
-For **this** canonical tree, **`origin`** is expected to be **`https://github.com/CorbinRandall/m4l-pipeline-public.git`**.
+For **this** canonical tree, **`origin`** is expected to be **`https://github.com/CorbinRandall/ableton-plugin-pipeline.git`**.

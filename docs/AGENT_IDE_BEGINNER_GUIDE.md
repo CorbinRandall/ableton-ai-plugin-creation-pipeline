@@ -10,7 +10,7 @@ This guide is for people who have **never** used an “agentic” IDE before. Yo
 
 ## One-time pipeline bootstrap (terminal or agent)
 
-From the **cloned folder root** (`m4l-pipeline-public`):
+From the **cloned folder root** (`ableton-plugin-pipeline`):
 
 - **macOS / Linux:**  
   `chmod +x bootstrap.sh` then `./bootstrap.sh`
@@ -46,7 +46,7 @@ You want **`M4L_SETUP_VERIFY_OK`**. If something fails, read the message and [`S
 
 ## Using Cursor (or similar) as a beginner
 
-1. **File → Open Folder** and choose the **`m4l-pipeline-public`** directory (the repo root, not only `projects/`).
+1. **File → Open Folder** and choose the **`ableton-plugin-pipeline`** directory (the repo root, not only `projects/`).
 2. Open the **Chat / Agent** panel (name varies by product).
 3. Say something concrete, for example:
    - *“Run `./bootstrap.sh` from the repo root and show me the output.”*

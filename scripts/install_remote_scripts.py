@@ -81,7 +81,7 @@ def install_abletonmcp(base_dir: Path, zip_path_cache: Path, url: str) -> Path:
         if not src.is_dir():
             raise RuntimeError(
                 f"No AbletonMCP_Remote_Script inside {root.name}; "
-                "upstream layout may have changed — open an issue on m4l-pipeline-public."
+                "upstream layout may have changed — open an issue on ableton-plugin-pipeline."
             )
         shutil.move(str(src), str(target))
     return target
@@ -140,7 +140,7 @@ def patch_abletonmcp_create_audio_track(abletonmcp_dir: Path) -> bool:
         '            raise\n'
         '    \n'
         '    def _create_audio_track(self, index):\n'
-        '        """Create a new audio track (m4l-pipeline-public bootstrap patch)."""\n'
+        '        """Create a new audio track (ableton-plugin-pipeline bootstrap patch)."""\n'
         '        try:\n'
         '            self._song.create_audio_track(index)\n'
         '            new_track_index = len(self._song.tracks) - 1 if index == -1 else index\n'

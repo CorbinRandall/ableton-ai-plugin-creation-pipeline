@@ -11,7 +11,7 @@ You need Live **Suite** or **Standard + Max for Live** to run this device (**REA
 
 ## Build + load (recommended)
 
-From the **cloned `m4l-pipeline-public` repo root** (after **`./bootstrap.sh`** so **`venv`** exists), with **Live open** and **AbletonMCP** enabled:
+From the **cloned `ableton-plugin-pipeline` repo root** (after **`./bootstrap.sh`** so **`venv`** exists), with **Live open** and **AbletonMCP** enabled:
 
 ```bash
 ./venv/bin/python projects/Pipeline_Example/build_pipeline_example.py

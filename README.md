@@ -1,7 +1,7 @@
 # Ableton + Max for Live — AI-friendly pipeline
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Sanity CI](https://github.com/CorbinRandall/m4l-pipeline-public/actions/workflows/sanity.yml/badge.svg)](https://github.com/CorbinRandall/m4l-pipeline-public/actions/workflows/sanity.yml)
+[![Sanity CI](https://github.com/CorbinRandall/ableton-plugin-pipeline/actions/workflows/sanity.yml/badge.svg)](https://github.com/CorbinRandall/ableton-plugin-pipeline/actions/workflows/sanity.yml)
 
 **Clone → bootstrap → build `.amxd` devices from JSON specs → deploy to your Ableton User Library → load on a new track via [AbletonMCP](https://github.com/ahujasid/ableton-mcp)** (optional **[AbletonOSC](https://github.com/ideoforms/AbletonOSC)** checks).
 
@@ -24,8 +24,8 @@ Use this repo from any terminal or **agent-style IDE**: describe a device, gener
 **`venv/` is not in git** — each clone creates it locally via bootstrap.
 
 ```bash
-git clone https://github.com/CorbinRandall/m4l-pipeline-public.git
-cd m4l-pipeline-public
+git clone https://github.com/CorbinRandall/ableton-plugin-pipeline.git
+cd ableton-plugin-pipeline
 chmod +x bootstrap.sh    # macOS / Linux
 ./bootstrap.sh           # or: powershell -ExecutionPolicy Bypass -File .\bootstrap.ps1
 ```

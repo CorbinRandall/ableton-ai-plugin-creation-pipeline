@@ -147,7 +147,7 @@ Keep **`midiin` / `midiout` / `plugout~`** patch-only unless you intentionally w
 
 ## Pipeline roadmap (for contributors)
 
-Suggested additions to **`m4l-pipeline-public`**:
+Suggested additions to **`ableton-plugin-pipeline`**:
 
 | Priority | Item | Benefit |
 |----------|------|---------|
