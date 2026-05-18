@@ -1,0 +1,42 @@
+---
+description: Ableton M4L pipeline — onboarding and build rules for Cursor
+globs: ["**/*.py", "**/*.amxd", "**/*.json", "tooling/**", "projects/**", "scripts/**"]
+alwaysApply: true
+---
+
+# Ableton + Max for Live — Pipeline Rules
+
+Follow **[`AGENTS.md`](../../AGENTS.md)** for the full onboarding sequence (steps 1–5) and **[`docs/AGENT_TOOLS.md`](../../docs/AGENT_TOOLS.md)** for available shell commands.
+
+## Quick rules
+
+- First setup: `./run` with Ableton **closed**, then guide user through AbletonOSC + AbletonMCP in Live Preferences, then `./run --live` after confirmation.
+- **Never hand-edit `.amxd` files** — they are compiled outputs from `build_*.py` scripts.
+- Personal plugins go in **`projects/workspace/`** (gitignored) — do not commit them.
+- **AbletonMCP** (Live Control Surface, TCP 9877) is **not** a Cursor MCP server — they are unrelated.
+
+## Build loop
+
+```bash
+# From repo root
+./venv/bin/python tooling/m4l_pipeline.py all path/to/spec.json
+```
+
+Or for workspace plugins with their own build script:
+
+```bash
+python3 "projects/workspace/<Plugin>/build_<plugin>.py" [variant]
+```
+
+Versioning, deploy to User Library, and Live load are all handled by the script.
+
+## Key paths
+
+| Path | Role |
+|------|------|
+| `./run` | First-time setup (Ableton closed) |
+| `./run --live` | Connect pipeline after AbletonOSC + AbletonMCP enabled |
+| `tooling/m4l_pipeline.py` | Core builder API |
+| `projects/workspace/` | Gitignored personal plugins |
+| `docs/AGENT_TOOLS.md` | Full tool reference |
+| `docs/AGENTIC_IDES.md` | IDE-specific notes |
