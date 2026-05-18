@@ -1,5 +1,7 @@
 # Automated bootstrap (Ableton MCP + AbletonOSC)
 
+**Fast path after clone:** run **`./run`** from the repo root ([**`RUN.md`**](RUN.md)). It calls the steps below, runs preflight, and optionally verifies Live. Use **`./bootstrap.sh`** directly only when debugging one layer.
+
 This repo installs **AbletonOSC** (`ideoforms/AbletonOSC`, default branch `master` ZIP) and the **AbletonMCP remote script** (`ahujasid/ableton-mcp`, default branch `main` ZIP, folder `AbletonMCP_Remote_Script/` → **`AbletonMCP`**) into:
 
 | OS | Folder |

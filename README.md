@@ -3,9 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Sanity CI](https://github.com/CorbinRandall/ableton-plugin-pipeline/actions/workflows/sanity.yml/badge.svg)](https://github.com/CorbinRandall/ableton-plugin-pipeline/actions/workflows/sanity.yml)
 
-**Clone → bootstrap → build `.amxd` devices from JSON specs → deploy to your Ableton User Library → load on a new track via [AbletonMCP](https://github.com/ahujasid/ableton-mcp)** (optional **[AbletonOSC](https://github.com/ideoforms/AbletonOSC)** checks).
+**Clone → `./run` → build `.amxd` devices from JSON specs → deploy to your Ableton User Library → load on a new track via [AbletonMCP](https://github.com/ahujasid/ableton-mcp)** (optional **[AbletonOSC](https://github.com/ideoforms/AbletonOSC)** checks).
 
-Use this repo from any terminal or **agent-style IDE**: describe a device, generate a spec, run **`tooling/m4l_pipeline.py`**, and iterate in **Live** without hand-dragging files from Finder/Explorer.
+Use this repo from any terminal or **agent-style IDE**: after clone, say **“run”** (or execute **`./run`**) to install the stack; then describe a device, generate a spec, and iterate in **Live** without hand-dragging files from Finder/Explorer. Agents: see **[`AGENTS.md`](AGENTS.md)**.
 
 ---
 
@@ -21,36 +21,37 @@ Use this repo from any terminal or **agent-style IDE**: describe a device, gener
 
 ## Quick start
 
-**`venv/` is not in git** — each clone creates it locally via bootstrap.
+**`venv/` is not in git** — each clone runs **`./run`** to create it locally.
 
 ```bash
 git clone https://github.com/CorbinRandall/ableton-plugin-pipeline.git
 cd ableton-plugin-pipeline
-chmod +x bootstrap.sh    # macOS / Linux
-./bootstrap.sh           # or: powershell -ExecutionPolicy Bypass -File .\bootstrap.ps1
+chmod +x run bootstrap.sh    # macOS / Linux
+./run                        # setup + preflight + tutorial build (no Live socket)
 ```
+
+**With Ableton Live open** (after one-time Control Surface setup below):
+
+```bash
+./run --live                 # waits for MCP, builds tutorial, loads on new track, verifies
+```
+
+Windows: `powershell -ExecutionPolicy Bypass -File .\run.ps1` (add `-Live` for full stack).
+
+### One-time in Ableton (manual)
 
 1. **Quit Live completely**, reopen.
 2. **Preferences → Link / Tempo / MIDI** → Control Surface: **AbletonOSC**, **AbletonMCP** (see [**`docs/SETUP_AUTOMATED.md`**](docs/SETUP_AUTOMATED.md)).
 
-**Preflight** (no Live needed):
+Details, flags, and agent behavior: [**`docs/RUN.md`**](docs/RUN.md) · [**`AGENTS.md`**](AGENTS.md).
 
-```bash
-./venv/bin/python scripts/verify_setup.py --preflight
-```
+### Individual commands (if a step fails)
 
-**Full check** (Live running):
-
-```bash
-./venv/bin/python scripts/verify_setup.py --wait-mcp 120
-```
-
-**Tutorial build + verify**:
-
-```bash
-./venv/bin/python projects/Pipeline_Example/build_pipeline_example.py
-./venv/bin/python scripts/m4l_verify.py
-```
+| Step | Command |
+|------|---------|
+| Preflight only | `./venv/bin/python scripts/verify_setup.py --preflight` |
+| Live health | `./venv/bin/python scripts/verify_setup.py --wait-mcp 120` |
+| Tutorial + load | `./venv/bin/python projects/Pipeline_Example/build_pipeline_example.py` |
 
 Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projects/workspace/…`** with **`M4L_PROJECTS_PREFIX=workspace`**). **`m4l_pipeline.py all`** / **`build_deploy_load`** **deploy** to User Library **Imported/** and by default **insert the device on a new Live track** via AbletonMCP (**`all --no-live`** or **`M4L_SKIP_LIVE=1`** skips Live). **`build`** only writes **`.amxd`**. Track type (**MIDI** vs **audio**) follows **`device_type`**. See **`projects/workspace/README.md`**.
 
@@ -60,6 +61,8 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 
 | Doc | Purpose |
 |-----|---------|
+| [**`docs/RUN.md`**](docs/RUN.md) | **`./run`** entry point — clone → automated setup |
+| [**`AGENTS.md`**](AGENTS.md) | What AI agents should do when the user says **run** |
 | [**`docs/SETUP_AUTOMATED.md`**](docs/SETUP_AUTOMATED.md) | Bootstrap, Remote Scripts, MCP patch, troubleshooting |
 | [**`docs/AGENT_IDE_BEGINNER_GUIDE.md`**](docs/AGENT_IDE_BEGINNER_GUIDE.md) | First-time setup with Cursor / similar agents |
 | [**`docs/REFERENCE_HEADER_AND_IMPORT.md`**](docs/REFERENCE_HEADER_AND_IMPORT.md) | Donor `.amxd`, **`M4L_REFERENCE_AMXD`**, extra **`projects/*`** layouts |
@@ -73,7 +76,8 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 
 | Path | Role |
 |------|------|
-| **`bootstrap.sh`** / **`bootstrap.ps1`** | Python → **`venv`** → AbletonOSC + AbletonMCP → template helpers |
+| **`run`** / **`run.ps1`** | **Start here** — bootstrap + env + preflight + optional Live tutorial |
+| **`bootstrap.sh`** / **`bootstrap.ps1`** | Lower-level install (called by **`./run`**) |
 | **`requirements.txt`** | **`python-osc`** |
 | **`scripts/install_remote_scripts.py`** | Download/install Remote Scripts (patches MCP for **`create_audio_track`**) |
 | **`scripts/verify_setup.py`** | MCP + OSC health (**`--preflight`** = filesystem only) |

@@ -8,22 +8,23 @@ This guide is for people who have **never** used an “agentic” IDE before. Yo
 2. **Suite**, or **Standard + Max for Live add-on** — not Lite/Intro for building/running M4L devices ([`README.md`](../README.md) → *Max for Live and your Ableton edition*).
 3. **Internet** for the first bootstrap (downloads AbletonOSC + AbletonMCP archives, and may install Python).
 
-## One-time pipeline bootstrap (terminal or agent)
+## One command: `./run`
 
 From the **cloned folder root** (`ableton-plugin-pipeline`):
 
-- **macOS / Linux:**  
-  `chmod +x bootstrap.sh` then `./bootstrap.sh`
-- **Windows (PowerShell):**  
-  `powershell -ExecutionPolicy Bypass -File .\bootstrap.ps1`
+- **macOS / Linux:** `chmod +x run && ./run`
+- **Windows:** `powershell -ExecutionPolicy Bypass -File .\run.ps1`
+- **Live open + full tutorial load:** add **`--live`** (or **`-Live`** on Windows)
 
-What this does (high level):
+That single script runs bootstrap (venv, **AbletonOSC**, **AbletonMCP**, template helpers), creates **`.env`**, preflight checks, and the tutorial build. See **[`RUN.md`](RUN.md)** and **[`AGENTS.md`](../AGENTS.md)**.
 
-- Ensures **Python 3.10+** (Homebrew on macOS, `winget` on Windows when needed).
-- Creates **`venv/`** and installs **`python-osc`**.
-- Installs **AbletonOSC** + **AbletonMCP** remote scripts into your **User Library**.
-- Optionally sets default template / `Library.cfg` (see [`SETUP_AUTOMATED.md`](SETUP_AUTOMATED.md)).
-- **Does not** auto-select **Control Surfaces** — you still do that once in Live (below).
+What it automates:
+
+- **Python 3.10+** + **`venv/`** + **`python-osc`**
+- **AbletonOSC** + **AbletonMCP** under **User Library → Remote Scripts** (MCP includes **`create_audio_track`** patch)
+- Optional default Live template / `Library.cfg` (see [`SETUP_AUTOMATED.md`](SETUP_AUTOMATED.md))
+
+**Still manual once in Live:** Control Surfaces in Preferences (below). Tools cannot toggle those for you.
 
 ## Ableton checklist (manual but quick)
 
@@ -49,9 +50,9 @@ You want **`M4L_SETUP_VERIFY_OK`**. If something fails, read the message and [`S
 1. **File → Open Folder** and choose the **`ableton-plugin-pipeline`** directory (the repo root, not only `projects/`).
 2. Open the **Chat / Agent** panel (name varies by product).
 3. Say something concrete, for example:
-   - *“Run `./bootstrap.sh` from the repo root and show me the output.”*
-   - *“Run `./venv/bin/python scripts/verify_setup.py --wait-mcp 120` with Live open.”*
-   - *“Run `./venv/bin/python projects/Pipeline_Example/build_pipeline_example.py` with Live open.”*
+   - *“**Run**”* or *“Run `./run` from the repo root.”* (preferred — one command)
+   - *“Run `./run --live` with Ableton open.”*
+   - If a step failed: *“Run `./venv/bin/python scripts/verify_setup.py --wait-mcp 120` and show the error.”*
 
 The assistant should **run commands for you** and paste results. If it only “suggests” commands, look for a **“Run”** or **terminal** action in the UI, or paste the command into the integrated terminal yourself.
 

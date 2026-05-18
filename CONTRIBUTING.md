@@ -5,8 +5,8 @@ Thanks for helping improve this pipeline.
 ## Getting started
 
 1. **Fork** the repository (or clone directly if you have write access).
-2. Run **`./bootstrap.sh`** (macOS/Linux) or **`bootstrap.ps1`** (Windows) so **`venv/`** and dependencies exist locally.
-3. Run **`./venv/bin/python scripts/verify_setup.py --preflight`** — confirm **`tooling/donors/*.amxd`** exist; install Remote Scripts with **`./bootstrap.sh`** when you have Ableton (see **`docs/SETUP_AUTOMATED.md`**).
+2. Run **`./run`** (macOS/Linux) or **`.\run.ps1`** (Windows) from the repo root — or **`./bootstrap.sh`** when debugging install only.
+3. Confirm **`M4L_RUN_OK`** (or **`./venv/bin/python scripts/verify_setup.py --preflight`** — donors + Remote Scripts; see **`docs/RUN.md`**).
 
 ## Pull requests
 
