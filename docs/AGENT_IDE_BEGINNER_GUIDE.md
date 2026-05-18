@@ -86,7 +86,7 @@ If Live is closed or MCP is down, use **`--no-live`** on the example builder; yo
 ## What to do after the tutorial
 
 - Change **`pipeline_example_spec.json`** or duplicate **`Pipeline_Example`** into **`projects/workspace/MyPlugin/`** (recommended: set **`M4L_PROJECTS_PREFIX=workspace`** — see **[`projects/workspace/README.md`](../projects/workspace/README.md)**).
-- **`m4l_pipeline`** needs a header **donor** `.amxd` on disk (`M4L_REFERENCE_AMXD` or default under Imported — see **[`REFERENCE_HEADER_AND_IMPORT.md`](REFERENCE_HEADER_AND_IMPORT.md)**).
+- **`m4l_pipeline`** uses in-repo header donors under **`tooling/donors/`** (or **`M4L_REFERENCE_AMXD`** if you override — see **[`REFERENCE_HEADER_AND_IMPORT.md`](REFERENCE_HEADER_AND_IMPORT.md)**).
 - Run **`./venv/bin/python tooling/m4l_pipeline.py all projects/MyThing/spec.json`**  
   Omit the track argument to **create a new track** (type follows ``device_type``); pass **`0`** to load on the first track.
 - Read [`VERIFY_GUIDE.md`](VERIFY_GUIDE.md) and [`LIVE_API_PATTERNS.md`](LIVE_API_PATTERNS.md) when you add real device logic.
