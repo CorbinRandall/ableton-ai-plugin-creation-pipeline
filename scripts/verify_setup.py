@@ -151,7 +151,7 @@ def preflight(skip_imports: bool) -> int:
             if not exists:
                 ok = False
                 print(
-                    "[preflight] FAIL: copy Reference_Donor.amxd to Imported/, "
+                    "[preflight] FAIL: copy a compatible .amxd to Imported/Reference_Donor.amxd, "
                     "or set M4L_REFERENCE_AMXD — docs/REFERENCE_HEADER_AND_IMPORT.md"
                 )
         except Exception as exc:

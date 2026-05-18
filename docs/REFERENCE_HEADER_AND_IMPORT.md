@@ -10,11 +10,11 @@ The donor’s **presentation layout is not your UI** — only the wrapper shape 
 
 - **`ABLETON_HOME`** defaults to **`~/Music/Ableton`** (macOS) or **`~/Documents/Ableton`** (Windows).
 
-You normally get this file when you purchase/import the **Reference Reference** M4L pack into your library. Other **mmmmmmeta**‑style MIDI effects may work only if they share the same on-disk wrapper shape — when in doubt, use the Reference device.
+You normally get this file by importing a compatible **mmmmm/meta**‑style MIDI effect into your library. When in doubt, use a known working donor device.
 
 ### Fresh machine / wiped User Library
 
-1. Copy **`Reference_Donor.amxd`** from a backup Mac or from your old Ableton **`User Library/.../Imported/`** folder into the same **Imported/** path above, **or**
+1. Copy a compatible **`.amxd`** from a backup into the same **Imported/Reference_Donor.amxd** path above, **or**
 2. Point the tooling at **any accessible path**:
 
 ```bash

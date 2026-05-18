@@ -286,8 +286,8 @@ def _get_reference() -> tuple[bytes, bytes, dict, bytes]:
     if not path.is_file():
         raise FileNotFoundError(
             f"Reference .amxd not found: {path}\n"
-            "Copy Reference_Donor.amxd (mmmmm/meta donor) under "
-            "User Library … Max MIDI Effect … Imported/, or set M4L_REFERENCE_AMXD to its absolute path "
+            "Copy a compatible .amxd (mmmmm/meta donor) under "
+            "User Library … Max MIDI Effect … Imported/Reference_Donor.amxd, or set M4L_REFERENCE_AMXD to its absolute path "
             "(see docs/REFERENCE_HEADER_AND_IMPORT.md)."
         )
     data = path.read_bytes()
