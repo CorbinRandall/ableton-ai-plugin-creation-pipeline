@@ -153,9 +153,11 @@ Suggested additions to **`ableton-plugin-pipeline`**:
 |----------|------|---------|
 | Done | `_ensure_presentation_boxes` in `build_amxd` | Controls on device face when spec only has `patching_rect` |
 | Done | `_apply_live_ui_contrast` + `scripts/check_spec_ui.py` | Readable labels on dark backgrounds |
-| High | `build_deploy_load` optionally call `build_adv` | Richer Live device chain metadata (`.adv`) where needed |
-| High | Preflight: warn if zero boxes have `presentation: 1` | Catch blank UI before Live |
-| Medium | `scripts/export_spec_from_amxd.py` | Max → JSON spec for agents |
+| Done | `build_deploy_load` + `--with-adv` / `M4L_BUILD_ADV` | `.adv` preset alongside `.amxd` |
+| Done | `scripts/validate_spec.py` + `tooling/spec.schema.json` | Schema + UI validation before build |
+| Done | `scripts/export_spec_from_amxd.py` | Max → JSON spec for agents — see [`MAX_TO_SPEC.md`](MAX_TO_SPEC.md) |
+| Done | `tooling/templates/` + `scripts/scaffold_plugin.py` | Agent scaffolding |
+| Phase 2 | Audio / generalized `m4l_verify` | See [`ROADMAP.md`](ROADMAP.md) |
 | Medium | Document trailing-resource embedding | Custom SVG / skins |
 | Low | Presentation layout linter (overlapping rects) | QA for dense UIs |
 

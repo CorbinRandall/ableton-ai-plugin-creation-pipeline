@@ -1,8 +1,8 @@
 # Getting started (humans) — clone to device on a Live track
 
-Step-by-step with an **agentic IDE** (Cursor, etc.) or on your own.
+Step-by-step with an **agentic IDE** (Cursor, Claude Code, Copilot, Windsurf, …) or on your own.
 
-Technical reference: **[`RUN.md`](RUN.md)** · Agent rules: **[`AGENTS.md`](../AGENTS.md)**
+Technical reference: **[`RUN.md`](RUN.md)** · Agent rules: **[`AGENTS.md`](../AGENTS.md)** · **By editor:** **[`AGENTIC_IDES.md`](AGENTIC_IDES.md)**
 
 ---
 
@@ -46,11 +46,11 @@ No API keys for the tutorial pipeline.
 
 | App | Open? |
 |-----|-------|
-| **IDE** (repo root) | Yes |
+| **Agentic IDE** (repo root) | Yes — [Cursor, Claude, Copilot, …](AGENTIC_IDES.md) |
 | **Ableton Live** | **No** |
 
 1. Clone the repository.  
-2. **File → Open Folder** → repo root (folder with **`run`**).  
+2. **Open folder** in your editor → repo root (contains **`run`**, **`AGENTS.md`**).  
 3. Tell the agent: **“Run”** or **“Run `./run` from the repo root.”**
 
 Wait for **`M4L_RUN_OK`**. The agent should **not** run **`--live`** yet.
@@ -121,6 +121,23 @@ Step 4: Agent → ./run --live  (Live open) → M4L_PIPELINE_READY
        ▼
 Step 5: Agent asks what .amxd you want → specs / workspace builds
 ```
+
+---
+
+## Step 5 — Build your plugin
+
+After **`M4L_PIPELINE_READY`**, tell the agent the device type (**MIDI effect**, **audio effect**, **instrument**).
+
+Typical commands (repo root):
+
+```bash
+./venv/bin/python scripts/scaffold_plugin.py --name MyPlugin --type midi_effect
+./venv/bin/python scripts/validate_spec.py projects/workspace/my_plugin/my_plugin_spec.json
+export M4L_PROJECTS_PREFIX=workspace
+./venv/bin/python tooling/m4l_pipeline.py all projects/workspace/my_plugin/my_plugin_spec.json
+```
+
+See **[`AGENT_TOOLS.md`](AGENT_TOOLS.md)**, **[`MAX_TO_SPEC.md`](MAX_TO_SPEC.md)**, **[`PRIVATE_PLUGINS.md`](PRIVATE_PLUGINS.md)**.
 
 ---
 

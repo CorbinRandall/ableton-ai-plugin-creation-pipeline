@@ -2,7 +2,11 @@
 
 Automated Max for Live **build + deploy + Live load** pipeline. Prefer **`./run`** over ad‑hoc shell recipes.
 
+**Works in any agentic IDE** (Cursor, Claude Code, Copilot, Windsurf, Zed, …) that can run shell commands in the repo root. IDE-specific setup: **[`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md)** · Cursor rules: [`.cursor/rules/m4l-pipeline.mdc`](.cursor/rules/m4l-pipeline.mdc).
+
 Human checklist: **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)**.
+
+**AbletonMCP** (Live Control Surface, TCP 9877) is **not** the same as optional **IDE MCP server** configs (e.g. `~/.cursor/mcp.json`). This repo’s Python tools connect to Live directly.
 
 ---
 
@@ -86,7 +90,25 @@ Describe the plugin in plain language (controls, sound, workflow). Personal proj
 
 ---
 
-Then help them write a spec and run **`tooling/m4l_pipeline.py`** when they are ready.
+Then help them write a spec and run **`tooling/m4l_pipeline.py`** when they are ready:
+
+1. **Scaffold** (optional): `./venv/bin/python scripts/scaffold_plugin.py --name MyPlugin --type midi_effect`
+2. **Validate**: `./venv/bin/python scripts/validate_spec.py path/to/spec.json`
+3. **Build + load**: `export M4L_PROJECTS_PREFIX=workspace` then `./venv/bin/python tooling/m4l_pipeline.py all path/to/spec.json`
+
+Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
+
+---
+
+## Tools (quick reference)
+
+| Intent | Command |
+|--------|---------|
+| Validate spec | `./venv/bin/python scripts/validate_spec.py spec.json` |
+| Scaffold workspace | `./venv/bin/python scripts/scaffold_plugin.py --name X --type midi_effect` |
+| Export `.amxd` → spec | `./venv/bin/python scripts/export_spec_from_amxd.py device.amxd -o spec.json` |
+| Build + deploy + load | `./venv/bin/python tooling/m4l_pipeline.py all spec.json` |
+| Templates | [`tooling/templates/`](tooling/templates/) |
 
 ---
 
@@ -96,6 +118,8 @@ Then help them write a spec and run **`tooling/m4l_pipeline.py`** when they are 
 |------|------|
 | **`--no-live`** | Same as default step 2 |
 | **`--setup-only`** | Bootstrap + preflight only |
+| **`m4l_pipeline all --with-adv`** | Also build/deploy `.adv` preset |
+| **`m4l_pipeline all --skip-validate`** | Skip spec schema/UI validation |
 
 ## Do not
 

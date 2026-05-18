@@ -22,17 +22,18 @@ Building here does **not** require the Max standalone app — but Live must be a
 edition (**Suite**, or **Standard + M4L add-on**) to open these devices (see **`README.md`**, Ableton KB).
 
 Usage:
-    python3 m4l_pipeline.py build   spec.json [output.amxd]    # .amxd only — no Ableton
+    python3 m4l_pipeline.py build   spec.json [output.amxd] [--skip-validate]    # .amxd only — no Ableton
     python3 m4l_pipeline.py deploy  path.amxd [device_type]
     python3 m4l_pipeline.py load    track_index device_name [device_type]
     python3 m4l_pipeline.py info    track_index
     python3 m4l_pipeline.py session
-    python3 m4l_pipeline.py all     spec.json [track_index|new] [--no-live] [--with-adv]
+    python3 m4l_pipeline.py all     spec.json [track_index|new] [--no-live] [--skip-validate] [--with-adv]
         # Default: versioned build → deploy → NEW Live track + load (AbletonMCP).
         # Omit track or pass ``new`` for a new track; pass ``0`` etc. for an existing track.
         # ``--no-live``: skip MCP (artifacts + deploy only). Env ``M4L_SKIP_LIVE=1`` same effect.
         # ``--with-adv``: build/deploy .adv (preset) alongside .amxd; also copied next to .amxd under Imported/.
         # Env ``M4L_BUILD_ADV=1`` enables .adv from Python callers of ``build_deploy_load``.
+        # ``--skip-validate``: skip schema/UI checks (``build`` / ``all``).
 """
 
 from __future__ import annotations
@@ -50,6 +51,8 @@ from pathlib import Path
 # ── Paths ────────────────────────────────────────────────────────────────────
 
 WORKSPACE = Path(__file__).resolve().parent
+if str(WORKSPACE) not in sys.path:
+    sys.path.insert(0, str(WORKSPACE))
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -403,11 +406,20 @@ def _apply_live_ui_contrast(boxes: list) -> list:
     return out
 
 
-def build_amxd(spec: dict, output: Path | None = None) -> Path:
+def build_amxd(
+    spec: dict,
+    output: Path | None = None,
+    *,
+    skip_validate: bool = False,
+) -> Path:
     """Build an .amxd from a device spec dict.
 
     Returns the path to the generated file.
     """
+    if not skip_validate and os.environ.get("M4L_SKIP_VALIDATE") != "1":
+        from spec_validate import require_valid_spec
+
+        require_valid_spec(spec)
     device_type = spec.get("device_type", "midi_effect")
     header_32, subheader_16, ref_root, trailing = _get_reference(device_type)
     patch = deepcopy(ref_root.get("patcher", {}))
@@ -959,6 +971,7 @@ def build_deploy_load(
     track_index: int | None = None,
     *,
     skip_live: bool = False,
+    skip_validate: bool = False,
     with_adv: bool = False,
 ) -> dict:
     """Build into ``projects/<slug>/{name X.Y}/``, deploy to Imported/, load in Live.
@@ -975,7 +988,7 @@ def build_deploy_load(
     vdir, ver = allocate_version_directory(spec)
     amxd_file = amxd_filename_for_spec(name)
     built = vdir / amxd_file
-    build_amxd(spec, built)
+    build_amxd(spec, built, skip_validate=skip_validate)
     (vdir / "spec.json").write_text(
         json.dumps(spec, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
@@ -1052,10 +1065,16 @@ def _cli():
     cmd = sys.argv[1]
 
     if cmd == "build":
-        spec_path = Path(sys.argv[2])
-        output = Path(sys.argv[3]) if len(sys.argv) > 3 else None
-        spec = json.loads(spec_path.read_text())
-        build_amxd(spec, output)
+        argv_tail = sys.argv[2:]
+        skip_validate = "--skip-validate" in argv_tail
+        filtered = [a for a in argv_tail if a != "--skip-validate"]
+        if not filtered:
+            print("usage: m4l_pipeline.py build <spec.json> [output.amxd] [--skip-validate]", file=sys.stderr)
+            sys.exit(1)
+        spec_path = Path(filtered[0])
+        output = Path(filtered[1]) if len(filtered) > 1 else None
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        build_amxd(spec, output, skip_validate=skip_validate)
         out = output or (WORKSPACE / f"{spec.get('name', 'Untitled')}.amxd")
         print(
             "\nNOTE: No Ableton Live step ran. To deploy + insert on a NEW track (default):\n"
@@ -1087,18 +1106,22 @@ def _cli():
     elif cmd == "all":
         argv_tail = sys.argv[2:]
         skip_live = False
+        skip_validate = False
         with_adv = False
         filtered: list[str] = []
         for a in argv_tail:
             if a in ("--no-live", "--skip-live"):
                 skip_live = True
+            elif a == "--skip-validate":
+                skip_validate = True
             elif a == "--with-adv":
                 with_adv = True
             else:
                 filtered.append(a)
         if not filtered:
             print(
-                "usage: m4l_pipeline.py all <spec.json> [track_index|new] [--no-live] [--with-adv]",
+                "usage: m4l_pipeline.py all <spec.json> [track_index|new] "
+                "[--no-live] [--skip-validate] [--with-adv]",
                 file=sys.stderr,
             )
             sys.exit(1)
@@ -1109,7 +1132,13 @@ def _cli():
             if raw not in ("new", "auto", "-1"):
                 track = int(filtered[1])
         spec = json.loads(spec_path.read_text(encoding="utf-8"))
-        result = build_deploy_load(spec, track, skip_live=skip_live, with_adv=with_adv)
+        result = build_deploy_load(
+            spec,
+            track,
+            skip_live=skip_live,
+            skip_validate=skip_validate,
+            with_adv=with_adv,
+        )
         print(json.dumps(result, indent=2, default=str))
         if not skip_live:
             lr = result.get("load_result") or {}

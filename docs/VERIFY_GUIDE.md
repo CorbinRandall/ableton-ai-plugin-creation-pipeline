@@ -1,6 +1,6 @@
 # Verify guide (`m4l_verify.py`)
 
-End-to-end check that your **Cursor / AI + Ableton** stack can:
+End-to-end check that your **agentic IDE + Ableton** stack can:
 
 1. **Build** (unless `--skip-build`) — tutorial **`Pipeline_Example`** or **`--spec`** via **`build_deploy_load(..., with_adv=True)`**, which copies a sibling **`.adv`** next to the **`.amxd`** under **`Imported/`**. Without that preset wrapper, Live often exposes only **Device On** to OSC/automation for Max devices.
 2. **Load** in Live via **AbletonMCP** — **`load_browser_item_by_browser_path`** prefers **`{stem}.adv`** when present, then **`{stem}.amxd`**.

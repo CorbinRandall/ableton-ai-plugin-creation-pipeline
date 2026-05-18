@@ -1,0 +1,64 @@
+{
+  "name": "MyMidiEffect",
+  "description": "MIDI pass-through with a few live.* controls (template).",
+  "device_type": "midi_effect",
+  "devicewidth": 220.0,
+  "openinpresentation": 1,
+  "boxes": [
+    {
+      "box": {
+        "id": "obj-1",
+        "maxclass": "midiin",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "outlettype": [""],
+        "patching_rect": [30.0, 30.0, 80.0, 22.0]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-2",
+        "maxclass": "midiout",
+        "numinlets": 1,
+        "numoutlets": 0,
+        "patching_rect": [30.0, 200.0, 80.0, 22.0]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-10",
+        "maxclass": "live.dial",
+        "numinlets": 1,
+        "numoutlets": 2,
+        "outlettype": ["", "float"],
+        "parameter_enable": 1,
+        "patching_rect": [30.0, 100.0, 41.0, 48.0],
+        "presentation": 1,
+        "presentation_rect": [20.0, 40.0, 41.0, 48.0],
+        "textcolor": [0.811764705882353, 0.811764705882353, 0.827450980392157, 1.0],
+        "showname": 1,
+        "shownumber": 1,
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Amount",
+            "parameter_shortname": "Amount",
+            "parameter_type": 0,
+            "parameter_mmin": 0.0,
+            "parameter_mmax": 100.0,
+            "parameter_initial_enable": 1,
+            "parameter_initial": [50.0],
+            "parameter_unitstyle": 1
+          }
+        }
+      }
+    }
+  ],
+  "lines": [
+    {
+      "patchline": {
+        "destination": ["obj-2", 0],
+        "source": ["obj-1", 0]
+      }
+    }
+  ]
+}

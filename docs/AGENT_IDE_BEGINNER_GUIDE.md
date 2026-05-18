@@ -1,8 +1,10 @@
-# First-time setup with an AI coding assistant (Cursor / similar)
+# First-time setup with an agentic IDE
 
 **Quit Ableton → clone → “run” → agent guides Live setup → “continue” → pipeline ready → describe your plugin.**
 
-**Full checklist:** **[`GETTING_STARTED.md`](GETTING_STARTED.md)**
+Works the same in **Cursor, Claude Code, GitHub Copilot, Windsurf, Zed**, or any tool that can run terminal commands in the project folder.
+
+**Full checklist:** [`GETTING_STARTED.md`](GETTING_STARTED.md) · **By editor:** [`AGENTIC_IDES.md`](AGENTIC_IDES.md) · **Commands:** [`AGENT_TOOLS.md`](AGENT_TOOLS.md)
 
 ---
 
@@ -12,9 +14,9 @@
 |------|---------|-----|
 | **1** | **Closed** | You quit Live |
 | **2** | **Closed** | You clone + **“Run”**; agent runs **`./run`** |
-| **3** | Open (you) | **Agent** explains OSC/MCP; you say **“continue”** when done |
+| **3** | Open (you) | **Agent** explains OSC/MCP in Live; you say **“continue”** |
 | **4** | **Open** | Agent runs **`./run --live`** |
-| **5** | **Open** | Agent confirms **pipeline ready**; asks what **`.amxd`** you want |
+| **5** | **Open** | Agent asks what **`.amxd`** you want |
 
 ---
 
@@ -26,9 +28,10 @@ Quit Live fully before step 2.
 
 ## Step 2 — Clone and “run”
 
-1. Clone → open **repo root** in the IDE.  
-2. Say **“Run”**.  
-3. Wait for **`M4L_RUN_OK`**.
+1. Clone → open **repo root** in your editor (folder with **`run`** and **`AGENTS.md`**).  
+2. Open the **agent / chat** panel (name varies by IDE).  
+3. Say **“Run”** or **“Run `./run` from the repo root.”**  
+4. Wait for **`M4L_RUN_OK`**.
 
 ---
 
@@ -55,14 +58,43 @@ Look for **`M4L_PIPELINE_READY`**.
 
 ## Step 5 — Build your plugin
 
-The agent should celebrate the connected pipeline and ask what device type you want (**MIDI effect**, **audio effect**, **instrument**).
+The agent should confirm the pipeline is connected and ask what device type you want.
 
-Use **`projects/workspace/`** for personal work — **[`PRIVATE_PLUGINS.md`](PRIVATE_PLUGINS.md)**.
+Use **`projects/workspace/`** for personal work — [`PRIVATE_PLUGINS.md`](PRIVATE_PLUGINS.md).
 
 ---
 
-## Cursor tips
+## Tips by IDE
 
-- Open the **repo root**.  
-- **“Run”** → later **“Continue”** → then describe your plugin.  
-- No passwords needed for the tutorial.
+### Cursor
+
+- **File → Open Folder** → repo root.  
+- Rules load from [`.cursor/rules/m4l-pipeline.mdc`](../.cursor/rules/m4l-pipeline.mdc).  
+- Approve terminal when the agent runs **`./run`**.
+
+### Claude Code
+
+- Open repo root; [`CLAUDE.md`](../CLAUDE.md) points to **`AGENTS.md`**.
+
+### GitHub Copilot (VS Code, etc.)
+
+- Open repo root; see [`.github/copilot-instructions.md`](../.github/copilot-instructions.md).  
+- Use integrated terminal or let Copilot run commands.
+
+### Other agents
+
+Paste once if needed:
+
+> Read `AGENTS.md` and run `./run` from the repo root. Ableton should be quit first.
+
+---
+
+## Common mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| Opened a subfolder only (`projects/…`) | Open **repo root** |
+| Confused **Cursor MCP** with **AbletonMCP** | Enable **AbletonMCP** in **Live** Preferences |
+| Ran `--live` before Control Surfaces | Finish step 3, then **Continue** |
+
+No passwords needed for the tutorial.

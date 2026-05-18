@@ -10,11 +10,15 @@ import sys
 import urllib.request
 from pathlib import Path
 
+# Pinned upstream commits (verified 2026-05-18). Re-pin if bootstrap breaks.
+# Override with BOOTSTRAP_ABLETON_OSC_ARCHIVE / BOOTSTRAP_ABLETON_MCP_ARCHIVE.
+ABLETON_OSC_UPSTREAM_COMMIT = "0ca68214bd62c9b5cb641ca34006cfd70ba94430"
+ABLETON_MCP_UPSTREAM_COMMIT = "e0083285426dedb5c93ce8a532ecfbb25ae9a3ca"
 DEFAULT_ABLETON_OSC_ARCHIVE = (
-    "https://github.com/ideoforms/AbletonOSC/archive/refs/heads/master.zip"
+    f"https://github.com/ideoforms/AbletonOSC/archive/{ABLETON_OSC_UPSTREAM_COMMIT}.zip"
 )
 DEFAULT_ABLETON_MCP_ARCHIVE = (
-    "https://github.com/ahujasid/ableton-mcp/archive/refs/heads/main.zip"
+    f"https://github.com/ahujasid/ableton-mcp/archive/{ABLETON_MCP_UPSTREAM_COMMIT}.zip"
 )
 
 # Shown after bootstrap / preflight. Sources: Ableton Help + Live manual (edition rules).

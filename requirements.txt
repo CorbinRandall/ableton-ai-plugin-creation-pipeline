@@ -1,2 +1,3 @@
 # Host-side tooling for m4l_pipeline OSC checks and bootstrap verification.
 python-osc>=1.9.3,<2
+jsonschema>=4.23,<5

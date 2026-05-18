@@ -43,7 +43,7 @@ See **`docs/SETUP_AUTOMATED.md`** if remote scripts are not installed yet.
 
 **First-time / AI IDE:** **`docs/AGENT_IDE_BEGINNER_GUIDE.md`**
 
-Open **`Pipeline_Example + Tooling.code-workspace`** (repo root + this project folder) in Cursor.
+Optional: open **`Pipeline_Example + Tooling.code-workspace`** (repo root + this folder) in VS Code / Cursor. Any agentic IDE can use the repo root alone — see **`docs/AGENTIC_IDES.md`**.
 
 ## Files
 
