@@ -10,8 +10,13 @@ venv/
 *.amxd
 !tooling/donors/*.amxd
 
-# --- Local plugin sandboxes (see projects/workspace/README.md) ---
-# Everything under workspace/ is yours; git pull will not remove untracked builds here.
+# --- projects/ : public tutorial only; everything else is local (any plugin name) ---
+# Sibling folders (e.g. builds without M4L_PROJECTS_PREFIX=workspace) must never be committed.
+projects/*/
+!projects/Pipeline_Example/
+!projects/workspace/
+
+# Local plugin sandboxes (see projects/workspace/README.md)
 projects/workspace/*
 !projects/workspace/README.md
 
