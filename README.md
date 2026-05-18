@@ -15,7 +15,7 @@ Use this repo from any terminal or **agent-style IDE**: describe a device, gener
 |-------------|--------|
 | **Ableton Live** | **Suite**, or **Standard + [Max for Live add-on](https://help.ableton.com/hc/en-us/articles/206407124-Buying-Max-for-Live)** — not Lite/Intro ([Ableton Help](https://help.ableton.com/hc/en-us/articles/360000036850-Max-for-Live-bundled-in-Live)). |
 | **Python** | **3.10+** — ensured by **`bootstrap.sh`** / **`bootstrap.ps1`** when possible. |
-| **Header donor `.amxd`** | Pipeline packs JSON into an existing device wrapper ([**`docs/REFERENCE_HEADER_AND_IMPORT.md`**](docs/REFERENCE_HEADER_AND_IMPORT.md)). Default path uses **`Reference_Donor.amxd`** or set **`M4L_REFERENCE_AMXD`**. |
+| **Header donor `.amxd`** | Pipeline packs JSON into an existing device wrapper ([**`docs/REFERENCE_HEADER_AND_IMPORT.md`**](docs/REFERENCE_HEADER_AND_IMPORT.md)). Generic starters are included in **`tooling/donors/`**. |
 
 ---
 

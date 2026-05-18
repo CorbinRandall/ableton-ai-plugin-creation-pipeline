@@ -4,23 +4,27 @@ Python **`tooling/m4l_pipeline.build_amxd`** does not synthesize an `.amxd` from
 
 The donor’s **presentation layout is not your UI** — only the wrapper shape is reused. For visible knobs in Live, each control in your spec needs **`presentation: 1`** and **`presentation_rect`** (see **[`M4L_FRONTEND_AND_BACKEND.md`](M4L_FRONTEND_AND_BACKEND.md)**).
 
-## Default donor path
+## Default donor paths
 
-``${ABLETON_HOME}/User Library/Presets/MIDI Effects/Max MIDI Effect/Imported/Reference_Donor.amxd``
+The pipeline now includes generic starter donors in the repository:
 
-- **`ABLETON_HOME`** defaults to **`~/Music/Ableton`** (macOS) or **`~/Documents/Ableton`** (Windows).
+- **MIDI Effect**: `tooling/donors/midi_effect.amxd`
+- **Audio Effect**: `tooling/donors/audio_effect.amxd`
+- **Instrument**: `tooling/donors/instrument.amxd`
 
-You normally get this file when you purchase/import the **Reference Reference** M4L pack into your library. Other **mmmmmmeta**‑style MIDI effects may work only if they share the same on-disk wrapper shape — when in doubt, use the Reference device.
+These are used automatically based on the `device_type` in your spec.
 
-### Fresh machine / wiped User Library
+### Custom donor path
 
-1. Copy **`Reference_Donor.amxd`** from a backup Mac or from your old Ableton **`User Library/.../Imported/`** folder into the same **Imported/** path above, **or**
-2. Point the tooling at **any accessible path**:
+If you want to use a specific device as a donor (e.g. to reuse a complex UI layout or specific binary resources):
 
-```bash
-export M4L_REFERENCE_AMXD="$HOME/MyBackups/Reference_Donor.amxd"
-./venv/bin/python projects/Pipeline_Example/build_pipeline_example.py
-```
+1. Set the **`M4L_REFERENCE_AMXD`** environment variable to the absolute path of your donor:
+   ```bash
+   export M4L_REFERENCE_AMXD="$HOME/MyBackups/MyComplexDevice.amxd"
+   ./venv/bin/python projects/Pipeline_Example/build_pipeline_example.py
+   ```
+2. Or place a file named **`Reference_Donor.amxd`** in your Ableton User Library:
+   `User Library/Presets/MIDI Effects/Max MIDI Effect/Imported/Reference_Donor.amxd`
 
 `./bootstrap.sh` does **not** download this donor (third‑party commercial/pack-specific).
 

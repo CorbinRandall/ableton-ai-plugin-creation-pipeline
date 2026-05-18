@@ -138,18 +138,25 @@ def _ableton_home() -> Path:
     return Path.home() / "Music" / "Ableton"
 
 
-def reference_amxd_path() -> Path:
+def reference_amxd_path(device_type: str = "midi_effect") -> Path:
     """Header donor for packed .amxd (mmmmm/meta JSON slice).
 
-    Default: ``$ABLETON_HOME/User Library/.../Imported/Reference_Donor.amxd``.
+    Default: ``tooling/donors/<device_type>.amxd``.
 
     Override with **M4L_REFERENCE_AMXD** (absolute path to any compatible .amxd) when you store
-    the donor outside User Library — required for Python builds on a clean machine otherwise.
+    the donor outside the repo.
     """
 
     env = os.environ.get("M4L_REFERENCE_AMXD")
     if env:
         return Path(env)
+
+    # Local in-repo donors
+    local = REPO_ROOT / "tooling" / "donors" / f"{device_type}.amxd"
+    if local.is_file():
+        return local
+
+    # Fallback to User Library (legacy behavior)
     return (
         _ableton_home()
         / "User Library/Presets/MIDI Effects/Max MIDI Effect/Imported/"
@@ -280,15 +287,14 @@ def _pack_amxd(header_32: bytes, subheader_16: bytes, root: dict,
     return bytes(hdr) + bytes(sub) + json_padded + dlst
 
 
-def _get_reference() -> tuple[bytes, bytes, dict, bytes]:
+def _get_reference(device_type: str = "midi_effect") -> tuple[bytes, bytes, dict, bytes]:
     """Load and parse the reference .amxd file."""
-    path = reference_amxd_path()
+    path = reference_amxd_path(device_type)
     if not path.is_file():
         raise FileNotFoundError(
             f"Reference .amxd not found: {path}\n"
-            "Copy Reference_Donor.amxd (mmmmm/meta donor) under "
-            "User Library … Max MIDI Effect … Imported/, or set M4L_REFERENCE_AMXD to its absolute path "
-            "(see docs/REFERENCE_HEADER_AND_IMPORT.md)."
+            f"Could not find local donor for {device_type} or legacy Reference_Donor.amxd.\n"
+            "See docs/REFERENCE_HEADER_AND_IMPORT.md."
         )
     data = path.read_bytes()
     return _extract_amxd_parts(data)
@@ -400,7 +406,8 @@ def build_amxd(spec: dict, output: Path | None = None) -> Path:
 
     Returns the path to the generated file.
     """
-    header_32, subheader_16, ref_root, trailing = _get_reference()
+    device_type = spec.get("device_type", "midi_effect")
+    header_32, subheader_16, ref_root, trailing = _get_reference(device_type)
     patch = deepcopy(ref_root.get("patcher", {}))
 
     # Override with spec content

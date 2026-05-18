@@ -8,6 +8,7 @@ __pycache__/
 venv/
 .bootstrap_cache/
 *.amxd
+!tooling/donors/*.amxd
 
 # --- Local plugin sandboxes (see projects/workspace/README.md) ---
 # Everything under workspace/ is yours; git pull will not remove untracked builds here.
