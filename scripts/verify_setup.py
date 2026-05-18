@@ -145,15 +145,17 @@ def preflight(skip_imports: bool) -> int:
         try:
             from m4l_pipeline import reference_amxd_path  # noqa: E402
 
-            refp = reference_amxd_path()
-            exists = refp.is_file()
-            print(f"[preflight] Pipeline header donor (.amxd) exists: {exists} ({refp})")
-            if not exists:
-                ok = False
-                print(
-                    "[preflight] FAIL: copy a compatible .amxd to Imported/Reference_Donor.amxd, "
-                    "or set M4L_REFERENCE_AMXD — docs/REFERENCE_HEADER_AND_IMPORT.md"
-                )
+            # Check all three types
+            for dt in ("midi_effect", "audio_effect", "instrument"):
+                refp = reference_amxd_path(dt)
+                exists = refp.is_file()
+                print(f"[preflight] Pipeline donor ({dt}) exists: {exists} ({refp})")
+                if not exists:
+                    ok = False
+                    print(
+                        f"[preflight] FAIL: missing donor for {dt}. "
+                        "Check tooling/donors/ or docs/REFERENCE_HEADER_AND_IMPORT.md"
+                    )
         except Exception as exc:
             ok = False
             print(f"[preflight] FAIL: tooling/m4l_pipeline import error — {exc}")
