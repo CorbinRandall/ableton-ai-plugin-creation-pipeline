@@ -1,24 +1,24 @@
 # Examples
 
-## Agentic IDEs (all editors)
+## Agentic IDEs + platforms
 
-Start with **[`docs/AGENTIC_IDES.md`](../docs/AGENTIC_IDES.md)** — Cursor, Claude Code, Copilot, Windsurf, terminal-only, etc.
+- **[`docs/AGENTIC_IDES.md`](../docs/AGENTIC_IDES.md)** — any editor  
+- **[`docs/CROSS_PLATFORM.md`](../docs/CROSS_PLATFORM.md)** — macOS / Windows / Linux  
+- **[`docs/AGENT_TOOLS.md`](../docs/AGENT_TOOLS.md)** — shell commands  
 
-This pipeline does **not** require a repo-bundled IDE MCP config. Agents run Python/shell from **[`docs/AGENT_TOOLS.md`](../docs/AGENT_TOOLS.md)**.
+Agents run Python/shell directly — no repo-bundled IDE MCP config required.
 
-### Cursor-only
+## sdk-run-setup (optional automation)
 
-- Rules: [`.cursor/rules/m4l-pipeline.mdc`](../.cursor/rules/m4l-pipeline.mdc)
-- Do **not** let bootstrap overwrite `~/.cursor/mcp.json` (see [`scripts/m4l_fresh_reset_backup_and_restore.md`](../scripts/m4l_fresh_reset_backup_and_restore.md))
+**[`sdk-run-setup/`](sdk-run-setup/)** — wrappers that call `./run` or `run.ps1` from CI or scripts. Optional Node + Cursor SDK example; not required.
 
-### Claude Code
+## Optional editor pointer files
 
-- [`CLAUDE.md`](../CLAUDE.md) at repo root
+| Editor | File |
+|--------|------|
+| Any | [`AGENTS.md`](../AGENTS.md) |
+| Cursor | [`.cursor/rules/m4l-pipeline.mdc`](../.cursor/rules/m4l-pipeline.mdc) |
+| Claude Code | [`CLAUDE.md`](../CLAUDE.md) |
+| GitHub Copilot | [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) |
 
-### GitHub Copilot
-
-- [`.github/copilot-instructions.md`](../.github/copilot-instructions.md)
-
-## Cursor SDK (Phase 3, optional)
-
-A minimal `@cursor/sdk` runner that executes `./run` on a clone may be added under `sdk-run-setup/` later. See [`docs/ROADMAP.md`](../docs/ROADMAP.md). Not required for normal IDE agent use.
+Do **not** overwrite personal IDE config from bootstrap — see [`scripts/m4l_fresh_reset_backup_and_restore.md`](../scripts/m4l_fresh_reset_backup_and_restore.md).

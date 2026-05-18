@@ -131,11 +131,14 @@ After **`M4L_PIPELINE_READY`**, tell the agent the device type (**MIDI effect**,
 Typical commands (repo root):
 
 ```bash
-./venv/bin/python scripts/scaffold_plugin.py --name MyPlugin --type midi_effect
-./venv/bin/python scripts/validate_spec.py projects/workspace/my_plugin/my_plugin_spec.json
-export M4L_PROJECTS_PREFIX=workspace
-./venv/bin/python tooling/m4l_pipeline.py all projects/workspace/my_plugin/my_plugin_spec.json
+# macOS/Linux — use ./venv/bin/python; Windows: .\venv\Scripts\python.exe
+python scripts/scaffold_plugin.py --name MyPlugin --type midi_effect
+python scripts/validate_spec.py projects/workspace/my_plugin/my_plugin_spec.json
+export M4L_PROJECTS_PREFIX=workspace   # Windows: $env:M4L_PROJECTS_PREFIX = "workspace"
+python tooling/m4l_pipeline.py all projects/workspace/my_plugin/my_plugin_spec.json
 ```
+
+See **[`CROSS_PLATFORM.md`](CROSS_PLATFORM.md)** for platform-specific commands.
 
 See **[`AGENT_TOOLS.md`](AGENT_TOOLS.md)**, **[`MAX_TO_SPEC.md`](MAX_TO_SPEC.md)**, **[`PRIVATE_PLUGINS.md`](PRIVATE_PLUGINS.md)**.
 

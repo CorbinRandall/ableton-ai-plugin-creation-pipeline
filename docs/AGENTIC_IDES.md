@@ -1,19 +1,19 @@
 # Agentic IDEs — setup by editor
 
-This repo works with **any agentic coding environment** that can run terminal commands in the project folder. You do **not** need a special IDE plugin to build Max for Live devices.
+This repo works with **any agentic coding environment** that can run terminal commands in the project folder. You do **not** need a specific IDE or IDE MCP server to build Max for Live devices.
 
-**Shared agent contract:** [`AGENTS.md`](../AGENTS.md) · **Command reference:** [`AGENT_TOOLS.md`](AGENT_TOOLS.md) · **Human steps:** [`GETTING_STARTED.md`](GETTING_STARTED.md)
+**Shared contract:** [`AGENTS.md`](../AGENTS.md) · **Commands:** [`AGENT_TOOLS.md`](AGENT_TOOLS.md) · **OS notes:** [`CROSS_PLATFORM.md`](CROSS_PLATFORM.md)
 
 ---
 
-## Two different “MCP” meanings (read this once)
+## Two different “MCP” meanings
 
 | Name | What it is | Required? |
 |------|------------|-----------|
-| **AbletonMCP** (Remote Script) | Ableton **Control Surface** in Live; TCP **9877** inside Live | **Yes** for `./run --live` and loading devices |
-| **IDE MCP servers** | Optional extras in Cursor / Claude Desktop / etc. (`~/.cursor/mcp.json`, …) | **No** for this pipeline |
+| **AbletonMCP** (Remote Script) | Ableton **Control Surface** in Live; TCP **9877** | **Yes** for `./run --live` |
+| **IDE MCP servers** | Optional extras in some editors’ global config | **No** for this pipeline |
 
-Python tools in this repo talk to **AbletonMCP in Live** directly. They do **not** require wiring the ahujasid **Cursor MCP server** package unless you want separate IDE features.
+Python tools talk to **AbletonMCP in Live** directly.
 
 ---
 
@@ -21,78 +21,48 @@ Python tools in this repo talk to **AbletonMCP in Live** directly. They do **not
 
 1. Open the **repository root** (folder containing `run`, `AGENTS.md`, `tooling/`).
 2. Give the agent **terminal / shell** access.
-3. Say **“run”** → agent runs **`./run`** (Ableton **quit** first).
-4. After **`M4L_RUN_OK`**, complete step 3 in Live (surfaces), then **“continue”** → **`./run --live`**.
-5. Use commands from [`AGENT_TOOLS.md`](AGENT_TOOLS.md) for validate / scaffold / build.
+3. Say **“run”** → agent runs **`./run`** (macOS/Linux) or **`.\run.ps1`** (Windows). **Quit Ableton** first.
+4. After **`M4L_RUN_OK`**, complete step 3 in Live → reply **“continue”** → **`./run --live`**.
+5. Use [`AGENT_TOOLS.md`](AGENT_TOOLS.md) for validate / scaffold / build.
 
-**Prompts that work in any IDE:** `Run`, `Continue`, `Run ./run --live`, `Validate my spec`, `Scaffold a midi effect called MyPlugin`.
-
----
-
-## IDE-specific notes
-
-### Cursor
-
-| Item | Location |
-|------|----------|
-| Auto-loaded rules | [`.cursor/rules/m4l-pipeline.mdc`](../.cursor/rules/m4l-pipeline.mdc) |
-| Agent instructions | [`AGENTS.md`](../AGENTS.md) (also read by other tools) |
-| Optional global MCP | `~/.cursor/mcp.json` — **merge manually**; bootstrap must **not** overwrite it |
-
-**Cursor tips:** Use **Agent** mode with the repo root open. Approve terminal runs for `./run`. See [`AGENT_IDE_BEGINNER_GUIDE.md`](AGENT_IDE_BEGINNER_GUIDE.md).
-
-**Do not** confuse Cursor’s MCP settings with **AbletonMCP** in Live Preferences.
-
-### Claude Code (CLI / desktop)
-
-| Item | Location |
-|------|----------|
-| Project instructions | [`CLAUDE.md`](../CLAUDE.md) → points to `AGENTS.md` |
-| Same terminal flow | `./run`, `./run --live`, `tooling/m4l_pipeline.py` |
-
-### GitHub Copilot (VS Code, JetBrains, …)
-
-| Item | Location |
-|------|----------|
-| Repo instructions | [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) |
-| Open folder | Repo root in VS Code / compatible editor |
-
-Use **Copilot Chat** with workspace context; ask it to run `./run` from the integrated terminal.
-
-### Windsurf, Zed, Continue, Cody, etc.
-
-No extra config required. Open the repo root, ensure the agent can execute shell commands, and reference **`AGENTS.md`** in chat if the tool does not auto-load it:
-
-> Follow `AGENTS.md` in this repo. Run `./run` from the repo root.
-
-### Terminal only (no agent IDE)
-
-```bash
-./run
-# … configure Live …
-./run --live
-./venv/bin/python tooling/m4l_pipeline.py all path/to/spec.json
-```
+**Prompts:** `Run`, `Continue`, `Run ./run --live`, `Validate my spec`.
 
 ---
 
-## Files agents may auto-discover
+## Optional per-editor pointers
 
-| File | Typical readers |
-|------|-----------------|
-| [`AGENTS.md`](../AGENTS.md) | Cursor, many agents, GitHub |
-| [`CLAUDE.md`](../CLAUDE.md) | Claude Code |
-| [`.cursor/rules/*.mdc`](../.cursor/rules/) | Cursor only |
-| [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) | GitHub Copilot |
+These files **duplicate nothing** — they point agents at `AGENTS.md`.
 
-Content is intentionally **short pointers** to one source of truth (`AGENTS.md` + `AGENT_TOOLS.md`) so we do not maintain five diverging copies.
+| Editor | Extra file (optional) |
+|--------|------------------------|
+| **Any** | [`AGENTS.md`](../AGENTS.md) |
+| **Cursor** | [`.cursor/rules/m4l-pipeline.mdc`](../.cursor/rules/m4l-pipeline.mdc) |
+| **Claude Code** | [`CLAUDE.md`](../CLAUDE.md) |
+| **GitHub Copilot** | [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) |
+| **Windsurf, Zed, Continue, Cody, …** | Paste: “Follow `AGENTS.md` and run `./run` from repo root.” |
+
+### Cursor (optional)
+
+- Open **repo root**; rules load from `.cursor/rules/`.
+- Approve terminal for `./run` or `.\run.ps1`.
+- Do **not** confuse **Cursor MCP settings** with **AbletonMCP** in Live.
+
+### Claude Code (optional)
+
+- [`CLAUDE.md`](../CLAUDE.md) at repo root.
+
+### GitHub Copilot (optional)
+
+- [`.github/copilot-instructions.md`](../.github/copilot-instructions.md).
+
+### Terminal only
+
+No IDE required — see [`CROSS_PLATFORM.md`](CROSS_PLATFORM.md).
 
 ---
 
-## What we do not ship per IDE
+## What we do not ship
 
-- No required **Cursor MCP server** manifest in this repo (avoids clobbering `~/.cursor/mcp.json`).
-- No Windsurf / Zed proprietary config beyond universal docs.
-- No Max application automation — see [`MAX_TO_SPEC.md`](MAX_TO_SPEC.md).
-
-Optional automation examples (e.g. Cursor SDK) may appear under [`examples/`](../examples/) — still optional.
+- No required IDE MCP manifest in this repo.
+- No editor-specific lock-in for build/deploy.
+- Optional automation: [`examples/sdk-run-setup/`](../examples/sdk-run-setup/) (shell + optional Cursor SDK).

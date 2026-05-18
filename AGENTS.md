@@ -2,7 +2,7 @@
 
 Automated Max for Live **build + deploy + Live load** pipeline. Prefer **`./run`** over ad‑hoc shell recipes.
 
-**Works in any agentic IDE** (Cursor, Claude Code, Copilot, Windsurf, Zed, …) that can run shell commands in the repo root. IDE-specific setup: **[`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md)** · Cursor rules: [`.cursor/rules/m4l-pipeline.mdc`](.cursor/rules/m4l-pipeline.mdc).
+**Works in any agentic IDE** with shell access (Cursor, Claude Code, Copilot, Windsurf, Zed, terminal-only, …). **[`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md)** · **[`docs/CROSS_PLATFORM.md`](docs/CROSS_PLATFORM.md)** (macOS / Windows / Linux).
 
 Human checklist: **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)**.
 
@@ -16,12 +16,10 @@ Human checklist: **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)**.
 
 From the **repo root**:
 
-```bash
-chmod +x run bootstrap.sh 2>/dev/null || true
-./run
-```
-
-Windows: `powershell -ExecutionPolicy Bypass -File .\run.ps1`
+| Platform | Command |
+|----------|---------|
+| **macOS / Linux** | `chmod +x run bootstrap.sh 2>/dev/null; ./run` |
+| **Windows** | `powershell -ExecutionPolicy Bypass -File .\run.ps1` |
 
 Wait for **`M4L_RUN_OK`**. Do **not** pass **`--live`** yet.
 
@@ -58,13 +56,10 @@ I will connect the pipeline and load the tutorial device on a new track.
 
 ## Step 4 — User says “continue” / “ready” / surfaces done
 
-Run:
-
-```bash
-./run --live
-```
-
-Windows: `powershell -ExecutionPolicy Bypass -File .\run.ps1 -Live`
+| Platform | Command |
+|----------|---------|
+| **macOS / Linux** | `./run --live` |
+| **Windows** | `powershell -ExecutionPolicy Bypass -File .\run.ps1 -Live` |
 
 Wait for **`M4L_RUN_OK`** and **`M4L_PIPELINE_READY`**.
 

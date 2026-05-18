@@ -11,8 +11,14 @@ Thanks for helping improve this pipeline.
 ### Spec validation
 
 ```bash
-./venv/bin/python scripts/validate_spec.py projects/Pipeline_Example/pipeline_example_spec.json
+# macOS/Linux: ./venv/bin/python …   Windows: .\venv\Scripts\python.exe …
+python scripts/validate_spec.py projects/Pipeline_Example/pipeline_example_spec.json
+python scripts/check_spec_layout.py projects/Pipeline_Example/pipeline_example_spec.json
 ```
+
+Live verify (Mac/PC with Ableton only): see [`docs/VERIFY_GUIDE.md`](docs/VERIFY_GUIDE.md).
+
+Platform table: [`docs/CROSS_PLATFORM.md`](docs/CROSS_PLATFORM.md). Any agentic IDE: [`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md).
 
 ### Readable diffs on `.amxd` (optional)
 

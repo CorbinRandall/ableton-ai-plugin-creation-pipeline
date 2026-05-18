@@ -4,9 +4,9 @@ globs:
 alwaysApply: true
 ---
 
-# M4L pipeline (Cursor)
+# M4L pipeline (Cursor rule — optional; other IDEs use AGENTS.md)
 
-Follow **[`AGENTS.md`](../../AGENTS.md)** for the full 5-step onboarding and tool commands.
+Follow **[`AGENTS.md`](../../AGENTS.md)**. Same flow on macOS/Windows: **[`docs/CROSS_PLATFORM.md`](../../docs/CROSS_PLATFORM.md)**.
 
 ## Quick rules
 

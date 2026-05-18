@@ -29,6 +29,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("spec", type=Path, help="Path to device spec JSON")
     ap.add_argument("--structure-only", action="store_true", help="JSON Schema + graph hints only")
     ap.add_argument("--ui-only", action="store_true", help="Presentation / textcolor checks only")
+    ap.add_argument("--no-layout", action="store_true", help="Skip presentation overlap checks")
     args = ap.parse_args(argv)
 
     if not args.spec.is_file():
@@ -41,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: invalid JSON: {e}", file=sys.stderr)
         return 1
 
-    if args.structure_only and args.ui_only:
+    if sum([args.structure_only, args.ui_only]) > 1:
         print("ERROR: use at most one of --structure-only, --ui-only", file=sys.stderr)
         return 1
 
@@ -50,7 +51,7 @@ def main(argv: list[str] | None = None) -> int:
     elif args.ui_only:
         errors, warnings = validate_ui(spec)
     else:
-        errors, warnings = validate_spec(spec)
+        errors, warnings = validate_spec(spec, include_layout=not args.no_layout)
 
     for w in warnings:
         print(f"WARN: {w}")

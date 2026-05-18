@@ -79,6 +79,17 @@ def validate_structure(spec: dict) -> tuple[list[str], list[str]]:
     return errors, warnings
 
 
+def validate_layout(spec: dict) -> tuple[list[str], list[str]]:
+    import sys
+
+    scripts = Path(__file__).resolve().parent.parent / "scripts"
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    from check_spec_layout import check_layout  # noqa: WPS433
+
+    return check_layout(spec)
+
+
 def validate_ui(spec: dict) -> tuple[list[str], list[str]]:
     """Presentation UI checks (same rules as scripts/check_spec_ui.py)."""
     import sys
@@ -95,6 +106,7 @@ def validate_spec(
     spec: dict,
     *,
     check_ui: bool = True,
+    include_layout: bool = True,
 ) -> tuple[list[str], list[str]]:
     """Full validation. Returns merged (errors, warnings)."""
     errors, warnings = validate_structure(spec)
@@ -102,6 +114,10 @@ def validate_spec(
         ui_errors, ui_warnings = validate_ui(spec)
         errors.extend(ui_errors)
         warnings.extend(ui_warnings)
+    if include_layout:
+        lay_errors, lay_warnings = validate_layout(spec)
+        errors.extend(lay_errors)
+        warnings.extend(lay_warnings)
     return errors, warnings
 
 

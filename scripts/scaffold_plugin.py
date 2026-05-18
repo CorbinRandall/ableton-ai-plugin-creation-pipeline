@@ -4,7 +4,7 @@
 Usage:
 
   ./venv/bin/python scripts/scaffold_plugin.py --name HumanTempo --type midi_effect
-  ./venv/bin/python scripts/scaffold_plugin.py --name MyFx --type audio_effect --template audio_effect_stub
+  python scripts/scaffold_plugin.py --name MyFx --type audio_effect --template audio_effect_stub
 """
 from __future__ import annotations
 
@@ -143,10 +143,10 @@ Artifacts-only:
 ./venv/bin/python projects/workspace/{slug}/build_{slug.lower()}.py --no-live
 ```
 
-Validate spec:
+Validate spec (use venv Python — see docs/CROSS_PLATFORM.md):
 
 ```bash
-./venv/bin/python scripts/validate_spec.py projects/workspace/{slug}/{spec_path.name}
+python scripts/validate_spec.py projects/workspace/{slug}/{spec_path.name}
 ```
 """
 
