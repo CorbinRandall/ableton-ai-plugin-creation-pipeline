@@ -6,7 +6,7 @@ Thanks for helping improve this pipeline.
 
 1. **Fork** the repository (or clone directly if you have write access).
 2. Run **`./bootstrap.sh`** (macOS/Linux) or **`bootstrap.ps1`** (Windows) so **`venv/`** and dependencies exist locally.
-3. Run **`./venv/bin/python scripts/verify_setup.py --preflight`** — fix missing donor **`.amxd`** / Remote Scripts per **`docs/SETUP_AUTOMATED.md`**.
+3. Run **`./venv/bin/python scripts/verify_setup.py --preflight`** — confirm **`tooling/donors/*.amxd`** exist; install Remote Scripts with **`./bootstrap.sh`** when you have Ableton (see **`docs/SETUP_AUTOMATED.md`**).
 
 ## Pull requests
 

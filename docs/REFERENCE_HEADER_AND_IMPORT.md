@@ -23,12 +23,10 @@ If you want to use a specific device as a donor (e.g. to reuse a complex UI layo
    export M4L_REFERENCE_AMXD="$HOME/MyBackups/MyComplexDevice.amxd"
    ./venv/bin/python projects/Pipeline_Example/build_pipeline_example.py
    ```
-2. Or place a file named **`Reference_Donor.amxd`** in your Ableton User Library:
+2. Or use the legacy fallback path in User Library (only if in-repo donors are missing):
    `User Library/Presets/MIDI Effects/Max MIDI Effect/Imported/Reference_Donor.amxd`
 
-`./bootstrap.sh` does **not** download this donor (third‑party commercial/pack-specific).
-
-**Preflight:** `./venv/bin/python scripts/verify_setup.py --preflight` checks that this file exists whenever `tooling/m4l_pipeline.py` imports cleanly.
+**Preflight:** `./venv/bin/python scripts/verify_setup.py --preflight` checks that all three files under **`tooling/donors/`** exist. Remote Script checks fail until you run **`./bootstrap.sh`** on a machine with Ableton — that is expected on a **coding-only** clone (builds still work with **`--no-live`**).
 
 ---
 

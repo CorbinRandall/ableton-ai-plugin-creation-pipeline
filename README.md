@@ -63,6 +63,7 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 | [**`docs/SETUP_AUTOMATED.md`**](docs/SETUP_AUTOMATED.md) | Bootstrap, Remote Scripts, MCP patch, troubleshooting |
 | [**`docs/AGENT_IDE_BEGINNER_GUIDE.md`**](docs/AGENT_IDE_BEGINNER_GUIDE.md) | First-time setup with Cursor / similar agents |
 | [**`docs/REFERENCE_HEADER_AND_IMPORT.md`**](docs/REFERENCE_HEADER_AND_IMPORT.md) | Donor `.amxd`, **`M4L_REFERENCE_AMXD`**, extra **`projects/*`** layouts |
+| [**`docs/PRIVATE_PLUGINS.md`**](docs/PRIVATE_PLUGINS.md) | Keep personal / commercial devices out of this public repo (generic allowlist) |
 | [**`docs/M4L_FRONTEND_AND_BACKEND.md`**](docs/M4L_FRONTEND_AND_BACKEND.md) | **Presentation vs patching**, `textcolor` / label contrast, UI checklist |
 | [**`docs/GITHUB_CREATE_REPO.md`**](docs/GITHUB_CREATE_REPO.md) | GitHub **About** text, topics, visibility (**Public**) checklist |
 
