@@ -9,7 +9,7 @@ Put **your own** Max for Live projects here — one folder per plugin (spec JSON
 
 The canonical **tutorial** stays in **`projects/Pipeline_Example/`** (tracked source only). Generated **`Pipeline_Example */`** folders there are **ignored** too.
 
-Personal plugins (specs, **`build_*.py`**, **`versions/`**) stay **only** under **`workspace/`** — they never ship with this repo and **`git pull`** will not remove them.
+Personal plugins (specs, **`build_*.py`**, **`versions/`**) stay **only** under **`workspace/`** — they never ship with this repo and **`git pull`** will not remove them. See **[`docs/PRIVATE_PLUGINS.md`](../docs/PRIVATE_PLUGINS.md)** for guardrails (no secret names in public config).
 
 ### Private builders: deploy **and** load in Live
 

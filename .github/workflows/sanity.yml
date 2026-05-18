@@ -15,3 +15,4 @@ jobs:
           python-version: "3.11"
       - run: pip install python-osc
       - run: python -m compileall -q scripts tooling projects
+      - run: python scripts/check_projects_allowlist.py
