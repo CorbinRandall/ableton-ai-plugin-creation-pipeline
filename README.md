@@ -5,7 +5,9 @@
 
 **Clone → `./run` → build `.amxd` devices from JSON specs → deploy to your Ableton User Library → load on a new track via [AbletonMCP](https://github.com/ahujasid/ableton-mcp)** (optional **[AbletonOSC](https://github.com/ideoforms/AbletonOSC)** checks).
 
-Use this repo from any terminal or **agent-style IDE**: after clone, say **“run”** (or execute **`./run`**) to install the stack; then describe a device, generate a spec, and iterate in **Live** without hand-dragging files from Finder/Explorer. Agents: see **[`AGENTS.md`](AGENTS.md)**.
+Use this repo from any terminal or **agent-style IDE**: after clone, say **“run”** (or execute **`./run`**) to install the stack; then describe a device, generate a spec, and iterate in **Live** without hand-dragging files from Finder/Explorer.
+
+**Human walkthrough (what to open when):** **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)** · Agents: **[`AGENTS.md`](AGENTS.md)**
 
 ---
 
@@ -23,27 +25,27 @@ Use this repo from any terminal or **agent-style IDE**: after clone, say **“ru
 
 **`venv/` is not in git** — each clone runs **`./run`** to create it locally.
 
+| Step | Ableton | What you do |
+|------|---------|-------------|
+| **1** | **Closed** | **Quit Live** completely |
+| **2** | **Closed** | Clone → open in IDE → say **“run”** |
+| **3** | Open | **Agent** guides **AbletonOSC** + **AbletonMCP** → you say **“continue”** |
+| **4** | **Open** | Agent runs **`./run --live`** — tutorial on a new track |
+| **5** | **Open** | **Pipeline ready** — tell the agent what **`.amxd`** you want |
+
 ```bash
+# Step 1: quit Ableton first
 git clone https://github.com/CorbinRandall/ableton-plugin-pipeline.git
 cd ableton-plugin-pipeline
 chmod +x run bootstrap.sh    # macOS / Linux
-./run                        # setup + preflight + tutorial build (no Live socket)
+./run                        # step 2 — Live closed
+# step 3: agent guides OSC/MCP → you say "continue"
+./run --live                 # step 4 — agent (or you) after step 3
 ```
 
-**With Ableton Live open** (after one-time Control Surface setup below):
+Windows: `powershell -ExecutionPolicy Bypass -File .\run.ps1` (add `-Live` for step 4).
 
-```bash
-./run --live                 # waits for MCP, builds tutorial, loads on new track, verifies
-```
-
-Windows: `powershell -ExecutionPolicy Bypass -File .\run.ps1` (add `-Live` for full stack).
-
-### One-time in Ableton (manual)
-
-1. **Quit Live completely**, reopen.
-2. **Preferences → Link / Tempo / MIDI** → Control Surface: **AbletonOSC**, **AbletonMCP** (see [**`docs/SETUP_AUTOMATED.md`**](docs/SETUP_AUTOMATED.md)).
-
-Details, flags, and agent behavior: [**`docs/RUN.md`**](docs/RUN.md) · [**`AGENTS.md`**](AGENTS.md).
+Step-by-step (permissions, coding-only Mac, agent prompts): **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)**. Flags: [**`docs/RUN.md`**](docs/RUN.md) · [**`AGENTS.md`**](AGENTS.md).
 
 ### Individual commands (if a step fails)
 
@@ -61,10 +63,11 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 
 | Doc | Purpose |
 |-----|---------|
-| [**`docs/RUN.md`**](docs/RUN.md) | **`./run`** entry point — clone → automated setup |
+| [**`docs/GETTING_STARTED.md`**](docs/GETTING_STARTED.md) | **Start here (humans)** — phases 1–4, what to open when |
+| [**`docs/RUN.md`**](docs/RUN.md) | **`./run`** flags and behavior |
 | [**`AGENTS.md`**](AGENTS.md) | What AI agents should do when the user says **run** |
+| [**`docs/AGENT_IDE_BEGINNER_GUIDE.md`**](docs/AGENT_IDE_BEGINNER_GUIDE.md) | Cursor / similar — links to getting started |
 | [**`docs/SETUP_AUTOMATED.md`**](docs/SETUP_AUTOMATED.md) | Bootstrap, Remote Scripts, MCP patch, troubleshooting |
-| [**`docs/AGENT_IDE_BEGINNER_GUIDE.md`**](docs/AGENT_IDE_BEGINNER_GUIDE.md) | First-time setup with Cursor / similar agents |
 | [**`docs/REFERENCE_HEADER_AND_IMPORT.md`**](docs/REFERENCE_HEADER_AND_IMPORT.md) | Donor `.amxd`, **`M4L_REFERENCE_AMXD`**, extra **`projects/*`** layouts |
 | [**`docs/PRIVATE_PLUGINS.md`**](docs/PRIVATE_PLUGINS.md) | Keep personal / commercial devices out of this public repo (generic allowlist) |
 | [**`docs/M4L_FRONTEND_AND_BACKEND.md`**](docs/M4L_FRONTEND_AND_BACKEND.md) | **Presentation vs patching**, `textcolor` / label contrast, UI checklist |

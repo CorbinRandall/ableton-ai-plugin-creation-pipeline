@@ -42,6 +42,23 @@ fi
 VENV="${M4L_VENV:-$ROOT/venv}"
 PY="$VENV/bin/python"
 
+print_phase_banner() {
+  if [[ "$LIVE" -eq 1 ]]; then
+    echo ""
+    echo "=== Step 4: ./run --live (Ableton OPEN) ==="
+    echo "    Live must be running with AbletonOSC + AbletonMCP (step 3)."
+    echo "    See docs/GETTING_STARTED.md if you have not done step 3 yet."
+    echo ""
+  else
+    echo ""
+    echo "=== Steps 1–2: quit Ableton, then ./run ==="
+    echo "    Step 1: Quit Live completely before this script runs."
+    echo "    Step 2: This run installs tools + deploys the tutorial (Live stays closed)."
+    echo "    After M4L_RUN_OK → docs/GETTING_STARTED.md (steps 3–4)"
+    echo ""
+  fi
+}
+
 run_bootstrap() {
   if [[ "$SKIP_BOOTSTRAP" -eq 1 ]]; then
     return 0
@@ -76,6 +93,7 @@ load_env() {
   fi
 }
 
+print_phase_banner
 run_bootstrap
 ensure_env
 load_env
@@ -91,10 +109,11 @@ if [[ "$LIVE" -eq 1 ]]; then
   "$PY" "$ROOT/scripts/verify_setup.py" --wait-mcp 120
 elif [[ "$NO_LIVE" -eq 0 ]]; then
   echo ""
-  echo "==> Live not checked (pass --live when Ableton is running with AbletonOSC + AbletonMCP)."
-  echo "    1. Quit Live completely, reopen."
-  echo "    2. Preferences → Link / Tempo / MIDI → Control Surface: AbletonOSC, AbletonMCP"
-  echo "    3. Re-run: ./run --live"
+  echo "=== Next: Step 3 (your IDE agent guides Ableton setup) ==="
+  echo "  Agent should walk you through AbletonOSC + AbletonMCP, then wait for you to say:"
+  echo "    \"Continue\" (or \"Ready\") when both are enabled and Live is open."
+  echo "  Then step 4: agent runs ./run --live"
+  echo "  See docs/GETTING_STARTED.md and AGENTS.md"
   echo ""
 fi
 
@@ -106,7 +125,10 @@ fi
 if [[ "$NO_LIVE" -eq 1 || "$LIVE" -eq 0 ]]; then
   echo "==> Tutorial build (deploy only; --no-live)"
   "$PY" "$ROOT/projects/Pipeline_Example/build_pipeline_example.py" --no-live
-  echo "M4L_RUN_OK"
+  echo ""
+  echo "M4L_RUN_OK (step 2 complete)"
+  echo "  → Step 3: Ask your IDE agent for AbletonOSC + AbletonMCP steps; reply \"Continue\" when done."
+  echo "  → Step 4–5: Agent runs ./run --live, then helps you design your .amxd."
   exit 0
 fi
 
@@ -116,4 +138,11 @@ echo "==> Tutorial build + load on new Live track"
 echo "==> Tutorial verify (MCP + OSC)"
 "$PY" "$ROOT/scripts/m4l_verify.py"
 
-echo "M4L_RUN_OK"
+echo ""
+echo "M4L_RUN_OK (step 4 complete)"
+echo "M4L_PIPELINE_READY"
+echo ""
+echo "  Pipeline connected to Ableton Live."
+echo "  Tutorial device should be on a new track."
+echo "  Step 5: Tell your IDE agent what type of .amxd you want to create"
+echo "          (midi effect, audio effect, or instrument)."

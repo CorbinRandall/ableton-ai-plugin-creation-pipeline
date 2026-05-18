@@ -1,66 +1,129 @@
 # Instructions for AI coding agents
 
-This repository is an **automated Max for Live build + deploy + Live load** pipeline. Minimize manual steps: prefer **one entry command** over ad‑hoc shell recipes.
+Automated Max for Live **build + deploy + Live load** pipeline. Prefer **`./run`** over ad‑hoc shell recipes.
 
-## When the user says “run” (or similar)
+Human checklist: **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)**.
 
-Phrases: **run**, **set up**, **bootstrap**, **get started**, **install MCP**, **wire up Ableton**.
+---
 
-**Do this from the repo root:**
+## Step 2 — User says “run” (first time after clone)
+
+**Ableton must be closed.** If Live might be open, ask them to **quit Live** (step 1) before continuing.
+
+From the **repo root**:
 
 ```bash
 chmod +x run bootstrap.sh 2>/dev/null || true
 ./run
 ```
 
-Windows:
+Windows: `powershell -ExecutionPolicy Bypass -File .\run.ps1`
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\run.ps1
+Wait for **`M4L_RUN_OK`**. Do **not** pass **`--live`** yet.
+
+---
+
+## Step 3 — Guide Ableton setup (required after step 2)
+
+**Do not run terminal commands.** Send instructions like this (adapt wording, keep the same facts):
+
+---
+
+**Step 3 — Enable control in Ableton (about 2 minutes)**
+
+Setup on disk is done. Next you configure Live once:
+
+1. **Quit Ableton completely**, then **reopen** it.  
+2. Open **Preferences → Link / Tempo / MIDI** (or **Link, Tempo & MIDI**).  
+3. **Control Surface** (first row) → **AbletonOSC**  
+   - **Input** and **Output**: leave **None** / blank.  
+4. **Control Surface** (second row) → **AbletonMCP**  
+5. **Leave Live open** with both surfaces enabled.
+
+When **AbletonOSC** and **AbletonMCP** are on and Live is still running, reply:
+
+**`Continue`** (or **`Ready`** / **`OSC and MCP are set`**)
+
+I will connect the pipeline and load the tutorial device on a new track.
+
+---
+
+**Wait** for that confirmation before step 4. If they already had surfaces enabled and Live is open, you may proceed when they say so explicitly.
+
+---
+
+## Step 4 — User says “continue” / “ready” / surfaces done
+
+Run:
+
+```bash
+./run --live
 ```
 
-- **Live open + load tutorial on a track:** `./run --live` (or `.\run.ps1 -Live`).
-- **Build only, no Ableton:** `./run --no-live`.
-- **Setup only:** `./run --setup-only`.
+Windows: `powershell -ExecutionPolicy Bypass -File .\run.ps1 -Live`
 
-Wait for **`M4L_RUN_OK`** in the output. If missing, read stderr and **[`docs/RUN.md`](docs/RUN.md)** / **[`docs/SETUP_AUTOMATED.md`](docs/SETUP_AUTOMATED.md)**.
+Wait for **`M4L_RUN_OK`** and **`M4L_PIPELINE_READY`**.
+
+---
+
+## Step 5 — Pipeline ready (required after step 4)
+
+**Do not** jump straight into building without acknowledging success. Say something like:
+
+---
+
+**Pipeline connected**
+
+Ableton is linked (OSC + MCP), and the tutorial Max for Live device is on a track in Live.
+
+**What would you like to build next?** Tell me the type of device:
+
+- **MIDI effect** (`midi_effect`)  
+- **Audio effect** (`audio_effect`)  
+- **Instrument** (`instrument`)  
+
+Describe the plugin in plain language (controls, sound, workflow). Personal projects go in **`projects/workspace/`** — see **[`docs/PRIVATE_PLUGINS.md`](docs/PRIVATE_PLUGINS.md)**.
+
+---
+
+Then help them write a spec and run **`tooling/m4l_pipeline.py`** when they are ready.
+
+---
+
+## Other flags
+
+| Flag | When |
+|------|------|
+| **`--no-live`** | Same as default step 2 |
+| **`--setup-only`** | Bootstrap + preflight only |
 
 ## Do not
 
-- Run **`bootstrap.sh`** and five other commands when **`./run`** covers the same ground (unless a step failed and you are fixing one layer).
-- Commit anything under **`projects/`** except the public tutorial sources (see **`scripts/check_projects_allowlist.py`**).
-- Put **private / commercial plugin names** in **`.gitignore`**, docs, or CI in this public repo — use **`projects/workspace/`** locally (**[`docs/PRIVATE_PLUGINS.md`](docs/PRIVATE_PLUGINS.md)**).
+- **Open a pull request** unless the user explicitly asks.  
+- Run **`--live`** before step 3 is confirmed (unless they clearly already finished Control Surfaces).  
+- Skip step 3 instructions after step 2 — always guide them and wait for **continue**.  
+- Commit under **`projects/`** except public tutorial sources.  
+- Put **private plugin names** in tracked files — use **`projects/workspace/`**.
 
 ## Key paths
 
 | Path | Role |
 |------|------|
-| **`./run`** | Post-clone setup + verify + optional tutorial |
-| **`tooling/m4l_pipeline.py`** | Spec → `.amxd`, deploy, MCP load |
-| **`tooling/donors/*.amxd`** | In-repo header donors (no external pack) |
-| **`projects/Pipeline_Example/`** | Public tutorial only |
+| **`./run`** | Step 2 (Ableton closed) |
+| **`./run --live`** | Step 4 |
+| **`tooling/m4l_pipeline.py`** | Spec → `.amxd`, deploy, load |
 | **`projects/workspace/`** | Gitignored personal plugins |
 
-## Ableton MCP / OSC (after `./run`)
+## Ports
 
-| Component | Port | Enable in Live |
-|-----------|------|----------------|
-| **AbletonOSC** | UDP 11000 / replies 11001 | Control Surface → AbletonOSC |
-| **AbletonMCP** | TCP **9877** | Control Surface → AbletonMCP |
+| Component | Port |
+|-----------|------|
+| **AbletonOSC** | UDP 11000 |
+| **AbletonMCP** | TCP **9877** |
 
-Scripts are installed under **`User Library/Remote Scripts/`** by bootstrap / **`./run`**.
+## Markers (grep)
 
-## Common follow-ups
-
-| User intent | Command |
-|-------------|---------|
-| Verify Live connection | `./venv/bin/python scripts/verify_setup.py --wait-mcp 120` |
-| Build tutorial with Live load | `./venv/bin/python projects/Pipeline_Example/build_pipeline_example.py` |
-| Build custom spec | `./venv/bin/python tooling/m4l_pipeline.py all path/to/spec.json` |
-| Personal plugin work | `export M4L_PROJECTS_PREFIX=workspace` — build under **`projects/workspace/`** |
-
-## More documentation
-
-- **[`docs/RUN.md`](docs/RUN.md)** — `./run` flags and behavior  
-- **[`docs/AGENT_IDE_BEGINNER_GUIDE.md`](docs/AGENT_IDE_BEGINNER_GUIDE.md)** — human-oriented IDE walkthrough  
-- **[`README.md`](README.md)** — overview and requirements  
+| Marker | Meaning |
+|--------|---------|
+| **`M4L_RUN_OK`** | Step 2 or 4 command finished successfully |
+| **`M4L_PIPELINE_READY`** | Step 4 complete — Live connected, tutorial loaded |

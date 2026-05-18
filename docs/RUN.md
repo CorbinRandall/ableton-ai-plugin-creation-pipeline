@@ -1,6 +1,10 @@
 # `./run` — one command after clone
 
+**Human checklist (Ableton open or not, agent prompts):** **[`GETTING_STARTED.md`](GETTING_STARTED.md)**.
+
 This repo is meant to be **agent-friendly**: after cloning, you or your IDE assistant should only need to say **“run”** (or run one script) to set up Python, install **AbletonOSC** + **AbletonMCP** into your User Library, copy local env defaults, and verify the stack.
+
+**Step 1:** quit Ableton. **Step 2:** `./run`. **Step 3:** agent guides Control Surfaces; user says **continue**. **Step 4:** `./run --live`. **Step 5:** **`M4L_PIPELINE_READY`** — describe your plugin. See **[`GETTING_STARTED.md`](GETTING_STARTED.md)**.
 
 ## Command
 
@@ -21,7 +25,12 @@ From the **repository root**:
 | **`--setup-only`** | Bootstrap + preflight **only** (no tutorial build) |
 | **`--skip-bootstrap`** | Skip bootstrap / script refresh (venv must already exist) |
 
-Success ends with **`M4L_RUN_OK`** on stdout (agents can grep for it).
+Success markers on stdout (agents can grep):
+
+| Marker | When |
+|--------|------|
+| **`M4L_RUN_OK`** | Step 2 or 4 command finished |
+| **`M4L_PIPELINE_READY`** | Step 4 — Live connected, tutorial loaded |
 
 ## What gets installed (automated)
 
@@ -30,17 +39,9 @@ Success ends with **`M4L_RUN_OK`** on stdout (agents can grep for it).
 3. **`.env`** from **`.env.example`** if missing (`M4L_PROJECTS_PREFIX=workspace` for personal plugins).
 4. **Preflight**: donors in **`tooling/donors/`**, imports, Remote Script folders.
 
-## What you still do once in Ableton (manual)
+## Step 3 in Ableton (manual — agent guides you)
 
-Live does not let tools flip Control Surfaces from the command line. After **`./run`**:
-
-1. **Quit Live completely**, reopen.
-2. **Preferences → Link / Tempo / MIDI**
-3. **Control Surface** → **AbletonOSC** (port **11000**).
-4. Second row → **AbletonMCP** (TCP **9877**).
-5. Run again with Live open: **`./run --live`**
-
-See **[`SETUP_AUTOMATED.md`](SETUP_AUTOMATED.md)** for ports and troubleshooting.
+Live cannot enable Control Surfaces from the CLI. After step 2, your **IDE agent** should walk you through **AbletonOSC** + **AbletonMCP**, then wait for **“continue”** before **`./run --live`**. Details: **[`GETTING_STARTED.md`](GETTING_STARTED.md)** · ports: **[`SETUP_AUTOMATED.md`](SETUP_AUTOMATED.md)**.
 
 ## Coding-only machine (no Ableton)
 
@@ -54,17 +55,17 @@ Preflight should pass after bootstrap. Live/MCP steps are skipped or print guida
 
 ## For AI agents (Cursor, Claude, etc.)
 
-When the user says **run**, **set up**, **bootstrap the pipeline**, or **get this working**:
+When the user says **run** (first time after clone):
 
-1. **Working directory:** repository root (folder containing **`run`** and **`bootstrap.sh`**).
-2. **Execute:** `./run` (macOS/Linux) or `.\run.ps1` (Windows).
-3. If they mention **Live is open** or want **load device on track**: `./run --live`.
-4. **Do not** ask them to run five separate commands unless a step failed — use flags above.
-5. On success, look for **`M4L_RUN_OK`**.
+1. **Step 1:** Ableton **closed**.
+2. **Step 2:** `./run` from repo root → **`M4L_RUN_OK`**.
+3. **Step 3:** **Do not run commands** — guide OSC/MCP setup; ask them to reply **continue** when done.
+4. **Step 4:** On **continue** / **ready**: `./run --live` → **`M4L_PIPELINE_READY`**.
+5. **Step 5:** Confirm pipeline connected; ask what **midi_effect** / **audio_effect** / **instrument** they want.
 
-Full agent contract: **[`AGENTS.md`](../AGENTS.md)**.
+Agent contract: **[`AGENTS.md`](../AGENTS.md)**.
 
-## After `M4L_RUN_OK`
+## After `M4L_PIPELINE_READY` (step 5)
 
 - Personal plugins: **`projects/workspace/`** + **`M4L_PROJECTS_PREFIX=workspace`** — **[`PRIVATE_PLUGINS.md`](PRIVATE_PLUGINS.md)**.
 - Custom devices: **`tooling/m4l_pipeline.py`**, specs under **`projects/workspace/<YourPlugin>/`**.

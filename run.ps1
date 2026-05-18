@@ -22,6 +22,21 @@ if ($Live -and $NoLive) {
 $venv = if ($env:M4L_VENV) { $env:M4L_VENV } else { Join-Path $Root 'venv' }
 $py = Join-Path $venv 'Scripts\python.exe'
 
+if ($Live) {
+  Write-Host ''
+  Write-Host '=== Step 4: -Live (Ableton OPEN) ==='
+  Write-Host '    Live must be running with AbletonOSC + AbletonMCP (step 3).'
+  Write-Host '    See docs/GETTING_STARTED.md if you have not done step 3 yet.'
+  Write-Host ''
+} else {
+  Write-Host ''
+  Write-Host '=== Steps 1-2: quit Ableton, then run.ps1 ==='
+  Write-Host '    Step 1: Quit Live completely.'
+  Write-Host '    Step 2: This run installs tools + deploys the tutorial (Live closed).'
+  Write-Host '    After M4L_RUN_OK -> docs/GETTING_STARTED.md (steps 3-4)'
+  Write-Host ''
+}
+
 if (-not $SkipBootstrap) {
   if (-not (Test-Path $py)) {
     Write-Host '==> No venv yet — running bootstrap.ps1'
@@ -60,8 +75,10 @@ if ($Live) {
   & $py (Join-Path $Root 'scripts\verify_setup.py') --wait-mcp 120
 } elseif (-not $NoLive) {
   Write-Host ''
-  Write-Host '==> Live not checked. Quit/reopen Live, enable AbletonOSC + AbletonMCP, then:'
-  Write-Host '    powershell -ExecutionPolicy Bypass -File .\run.ps1 -Live'
+  Write-Host '=== Next: Step 3 (IDE agent guides Ableton setup) ==='
+  Write-Host '  Agent walks you through AbletonOSC + AbletonMCP; say Continue when done.'
+  Write-Host '  Step 4: agent runs run.ps1 -Live'
+  Write-Host '  See docs/GETTING_STARTED.md and AGENTS.md'
   Write-Host ''
 }
 
@@ -73,7 +90,10 @@ if ($SetupOnly) {
 if ($NoLive -or -not $Live) {
   Write-Host '==> Tutorial build (--no-live)'
   & $py (Join-Path $Root 'projects\Pipeline_Example\build_pipeline_example.py') --no-live
-  Write-Host 'M4L_RUN_OK'
+  Write-Host ''
+  Write-Host 'M4L_RUN_OK (step 2 complete)'
+  Write-Host '  -> Step 3: Ask IDE agent for OSC/MCP steps; reply Continue when done.'
+  Write-Host '  -> Steps 4-5: agent runs -Live, then helps you design your .amxd.'
   exit 0
 }
 
@@ -83,4 +103,9 @@ Write-Host '==> Tutorial build + load'
 Write-Host '==> Tutorial verify'
 & $py (Join-Path $Root 'scripts\m4l_verify.py')
 
-Write-Host 'M4L_RUN_OK'
+Write-Host ''
+Write-Host 'M4L_RUN_OK (step 4 complete)'
+Write-Host 'M4L_PIPELINE_READY'
+Write-Host ''
+Write-Host '  Pipeline connected to Ableton Live.'
+Write-Host '  Step 5: Tell your IDE agent what type of .amxd you want to create.'
