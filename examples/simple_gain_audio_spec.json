@@ -1,0 +1,102 @@
+{
+  "name": "SimpleGain",
+  "description": "Minimal stereo-ish gain utility: one Live dial scales audio with *~ + sig~ (first-build smoke test).",
+  "device_type": "audio_effect",
+  "devicewidth": 220.0,
+  "openinpresentation": 1,
+  "boxes": [
+    {
+      "box": {
+        "id": "obj-in",
+        "maxclass": "plugin~",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "outlettype": ["signal"],
+        "patching_rect": [30.0, 40.0, 80.0, 22.0]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-mul",
+        "maxclass": "*~",
+        "numinlets": 2,
+        "numoutlets": 1,
+        "outlettype": ["signal"],
+        "patching_rect": [140.0, 40.0, 37.0, 22.0]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-sig",
+        "maxclass": "sig~",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "outlettype": ["signal"],
+        "patching_rect": [140.0, 90.0, 37.0, 22.0]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-out",
+        "maxclass": "plugout~",
+        "numinlets": 1,
+        "numoutlets": 0,
+        "patching_rect": [250.0, 40.0, 80.0, 22.0]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-dial",
+        "maxclass": "live.dial",
+        "numinlets": 1,
+        "numoutlets": 2,
+        "outlettype": ["", "float"],
+        "parameter_enable": 1,
+        "patching_rect": [30.0, 120.0, 41.0, 48.0],
+        "presentation": 1,
+        "presentation_rect": [24.0, 36.0, 41.0, 48.0],
+        "textcolor": [0.811764705882353, 0.811764705882353, 0.827450980392157, 1.0],
+        "showname": 1,
+        "shownumber": 1,
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Gain",
+            "parameter_shortname": "Gain",
+            "parameter_type": 0,
+            "parameter_mmin": 0.0,
+            "parameter_mmax": 2.0,
+            "parameter_initial_enable": 1,
+            "parameter_initial": [1.0],
+            "parameter_unitstyle": 1
+          }
+        }
+      }
+    }
+  ],
+  "lines": [
+    {
+      "patchline": {
+        "source": ["obj-in", 0],
+        "destination": ["obj-mul", 0]
+      }
+    },
+    {
+      "patchline": {
+        "source": ["obj-sig", 0],
+        "destination": ["obj-mul", 1]
+      }
+    },
+    {
+      "patchline": {
+        "source": ["obj-mul", 0],
+        "destination": ["obj-out", 0]
+      }
+    },
+    {
+      "patchline": {
+        "source": ["obj-dial", 1],
+        "destination": ["obj-sig", 0]
+      }
+    }
+  ]
+}

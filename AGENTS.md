@@ -83,6 +83,8 @@ Ableton is linked (OSC + MCP), and the tutorial Max for Live device is on a trac
 
 Describe the plugin in plain language (controls, sound, workflow). Personal projects go in **`projects/workspace/`** — see **[`docs/PRIVATE_PLUGINS.md`](docs/PRIVATE_PLUGINS.md)**.
 
+**Smoke-test suggestion:** point them at the tracked example **`examples/simple_gain_audio_spec.json`** first (*“build and load SimpleGain from `examples/simple_gain_audio_spec.json` with `--with-adv`”*) — it is CI-validated (gain knob on an audio effect).
+
 ---
 
 Then help them write a spec and run **`tooling/m4l_pipeline.py`** when they are ready:

@@ -1,5 +1,18 @@
 # Examples
 
+## SimpleGain (first-build smoke test)
+
+**[`simple_gain_audio_spec.json`](simple_gain_audio_spec.json)** — minimal **audio effect** with one **Gain** dial (`plugin~` → `*~` → `plugout~`). Validated and built in **[`.github/workflows/sanity.yml`](../.github/workflows/sanity.yml)**.
+
+```bash
+./venv/bin/python scripts/validate_spec.py examples/simple_gain_audio_spec.json
+./venv/bin/python tooling/m4l_pipeline.py all examples/simple_gain_audio_spec.json --with-adv
+```
+
+See the **[README](../README.md)** “First device to build” section for context.
+
+---
+
 ## Agentic IDEs + platforms
 
 - **[`docs/AGENTIC_IDES.md`](../docs/AGENTIC_IDES.md)** — any editor  
