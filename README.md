@@ -36,6 +36,14 @@ From the **repo root** (after **`./run`** created **`venv/`**):
 
 Use **`all --no-live`** if Live is closed (artifacts + deploy only). Personal forks of this idea belong under **`projects/workspace/`** — see **[`docs/PRIVATE_PLUGINS.md`](docs/PRIVATE_PLUGINS.md)**.
 
+**If SimpleGain (or any `audio_effect`) shows a generic Max error in Live:** you were probably missing **`create_audio_track`** in the **running** AbletonMCP (script updates require a **full Live restart**). The pipeline no longer loads audio effects onto MIDI tracks as a fallback. Fix: **`install_remote_scripts.py` → quit Live completely → reopen**, then verify:
+
+```bash
+./venv/bin/python scripts/verify_setup.py --wait-mcp 120 --assert-create-audio-track
+```
+
+Then **`m4l_pipeline.py all examples/simple_gain_audio_spec.json --with-adv`** again. See **`docs/LIVE_API_PATTERNS.md`**.
+
 Natural-language prompts work once the agent knows the workflow: *validate → `m4l_pipeline.py all …`* for **`examples/simple_gain_audio_spec.json`** (or a copy you edit). See **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 
 ---

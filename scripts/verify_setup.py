@@ -136,6 +136,28 @@ def preflight(skip_imports: bool) -> int:
         ok = False
         print("[preflight] FAIL: Remote scripts missing — run bootstrap.sh")
 
+    init_py = mcp / "__init__.py"
+    if mcp.is_dir():
+        if init_py.is_file():
+            txt = init_py.read_text(encoding="utf-8", errors="replace")
+            has_audio = (
+                "create_audio_track" in txt
+                and "_create_audio_track" in txt
+                and "def _create_audio_track" in txt
+            )
+            print(
+                f"[preflight] AbletonMCP create_audio_track patch present (on disk): {has_audio}"
+            )
+            if not has_audio:
+                ok = False
+                print(
+                    "[preflight] FAIL: reinstall/patch AbletonMCP — "
+                    "scripts/install_remote_scripts.py (needed for audio_effect devices)."
+                )
+        else:
+            ok = False
+            print(f"[preflight] FAIL: missing {init_py}")
+
     tooling_dir = REPO_ROOT / "tooling"
     if tooling_dir.is_dir():
         tpath = str(tooling_dir)
@@ -188,9 +210,12 @@ def main() -> int:
         help="Before MCP checks: wait up to this many seconds for TCP 9877 (default off).",
     )
     ap.add_argument(
-        "--launch-ableton",
+        "--assert-create-audio-track",
         action="store_true",
-        help="macOS: try `open -a 'Ableton Live …'` once before waiting (best-effort).",
+        help=(
+            "After MCP connects: send create_audio_track once. Fails if Live runs an old AbletonMCP "
+            "(requires restart after install_remote_scripts). Creates one empty audio track on success."
+        ),
     )
     args = ap.parse_args()
 
@@ -225,6 +250,27 @@ def main() -> int:
     if status != "success":
         print(f"[verify] Full payload: {pong}")
         return 2
+
+    if args.assert_create_audio_track:
+        print("[verify] Probing create_audio_track (creates one audio track if OK)…")
+        probe = _ableton_cmd("create_audio_track", {"index": -1})
+        if probe.get("status") != "success":
+            print(
+                "[verify] FAIL: create_audio_track unavailable — Live is likely running an old "
+                "AbletonMCP. Quit Live completely, reopen, then retry.\n"
+                f"  Raw reply: {probe}",
+                file=sys.stderr,
+            )
+            return 5
+        inner = probe.get("result")
+        if isinstance(inner, str):
+            inner = json.loads(inner)
+        idx = (inner or {}).get("index")
+        print(
+            f"[verify] create_audio_track OK (new audio track index={idx!r}). "
+            "Delete the empty track in Live if you do not want it."
+        )
+        print("M4L_AUDIO_MCP_OK")
 
     try:
         if not _live_test_udp():

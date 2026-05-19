@@ -125,7 +125,8 @@ Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 - Run **`--live`** before step 3 is confirmed (unless they clearly already finished Control Surfaces).  
 - Skip step 3 instructions after step 2 — always guide them and wait for **continue**.  
 - Commit under **`projects/`** except public tutorial sources.  
-- Put **private plugin names** in tracked files — use **`projects/workspace/`**.
+- Put **private plugin names** in tracked files — use **`projects/workspace/`**.  
+- Tell the user an **`audio_effect`** is “loaded and working” in Live **without** either (a) **`scripts/m4l_verify.py`** / pipeline **`all`** succeeding **after** AbletonMCP exposes **`create_audio_track`**, or (b) the user confirming in Live. Agents **cannot see the Ableton UI** — after **`install_remote_scripts`**, remind them to **quit Live fully** before **`create_audio_track`** works.
 
 ## Key paths
 

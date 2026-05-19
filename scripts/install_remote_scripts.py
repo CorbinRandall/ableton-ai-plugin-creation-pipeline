@@ -295,6 +295,11 @@ def main() -> int:
         '\n Control Surface → pick "AbletonOSC" (and optionally "AbletonMCP"; input/output = blank).'
     )
     print("Remote script ports: MCP TCP 9877; OSC UDP 11000→11001 (see docs/SETUP_AUTOMATED.md).")
+    print(
+        "\nIf AbletonMCP was patched (create_audio_track): Live MUST restart before loading "
+        "**audio_effect** specs — otherwise MCP still runs the old script and Max Audio Effects "
+        "fail when inserted from this pipeline."
+    )
     return 0
 
 

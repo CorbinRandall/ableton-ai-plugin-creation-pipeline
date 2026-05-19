@@ -814,16 +814,37 @@ def _create_new_track_for_device_type(device_type: str) -> tuple[int, str]:
     """Create an empty Live track appropriate for ``device_type``.
 
     Returns ``(track_index, track_kind)`` where ``track_kind`` is ``\"midi\"`` or ``\"audio\"``.
+
+    **Important:** ``audio_effect`` requires AbletonMCP to expose ``create_audio_track`` (this repo
+    patches it in ``install_remote_scripts.py``). Loading a Max **audio** device on a **MIDI** track
+    usually breaks the device in Live (often a generic Max error such as “error 6”). We therefore
+    **do not** fall back to MIDI unless ``M4L_ALLOW_AUDIO_ON_MIDI=1`` (debug only).
     """
     if device_type == "audio_effect":
         try:
             return _create_audio_track_index(), "audio"
         except RuntimeError as exc:
-            print(
-                f"WARN: Could not create audio track ({exc}). "
-                "Re-run bootstrap (patches AbletonMCP) or upgrade MCP; falling back to MIDI track."
-            )
-            return _create_midi_track_index(), "midi"
+            if os.environ.get("M4L_ALLOW_AUDIO_ON_MIDI") == "1":
+                print(
+                    "WARN: M4L_ALLOW_AUDIO_ON_MIDI=1 — loading audio_effect onto a MIDI track "
+                    "(unsupported; expect Live/Max errors).",
+                    file=sys.stderr,
+                )
+                return _create_midi_track_index(), "midi"
+            raise RuntimeError(
+                "AbletonMCP does not support create_audio_track — cannot load audio_effect safely.\n\n"
+                "Common cause: Live was still running while Remote Scripts were updated; the control "
+                "surface keeps the old MCP until you restart Live.\n\n"
+                "Fix:\n"
+                "  1. ./venv/bin/python scripts/install_remote_scripts.py\n"
+                "  2. Quit Ableton Live completely, then reopen.\n"
+                "  3. Confirm MCP exposes the command:\n"
+                "       ./venv/bin/python scripts/verify_setup.py --wait-mcp 120 "
+                "--assert-create-audio-track\n\n"
+                "Debug-only escape hatch (will likely break Max Audio Effects): "
+                "M4L_ALLOW_AUDIO_ON_MIDI=1\n\n"
+                f"Underlying error: {exc}"
+            ) from exc
     return _create_midi_track_index(), "midi"
 
 
