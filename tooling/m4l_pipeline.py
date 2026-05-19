@@ -27,10 +27,12 @@ Usage:
     python3 m4l_pipeline.py load    track_index device_name [device_type]
     python3 m4l_pipeline.py info    track_index
     python3 m4l_pipeline.py session
-    python3 m4l_pipeline.py all     spec.json [track_index|new] [--no-live]
+    python3 m4l_pipeline.py all     spec.json [track_index|new] [--no-live] [--with-adv]
         # Default: versioned build → deploy → NEW Live track + load (AbletonMCP).
         # Omit track or pass ``new`` for a new track; pass ``0`` etc. for an existing track.
         # ``--no-live``: skip MCP (artifacts + deploy only). Env ``M4L_SKIP_LIVE=1`` same effect.
+        # ``--with-adv``: build/deploy .adv (preset) alongside .amxd; also copied next to .amxd under Imported/.
+        # Env ``M4L_BUILD_ADV=1`` enables .adv from Python callers of ``build_deploy_load``.
 """
 
 from __future__ import annotations
@@ -704,11 +706,13 @@ def _coerce_dict(blob: dict | str | None) -> dict:
 
 
 def _normalize_browser_leaf(name: str) -> str:
-    """Strip ``.amxd`` for comparisons — Live browser names usually include the suffix."""
+    """Strip ``.amxd`` / ``.adv`` for comparisons — Live browser names include a suffix."""
     n = (name or "").strip()
     lower = n.lower()
     if lower.endswith(".amxd"):
         n = n[:-5].strip()
+    elif lower.endswith(".adv"):
+        n = n[:-4].strip()
     return n
 
 
@@ -725,9 +729,15 @@ def load_browser_item_by_browser_path(track_index: int, path: str) -> dict:
     leaf = parts[-1]
     parent = "/".join(parts[:-1])
 
-    path_attempts = [path]
-    if not leaf.lower().endswith(".amxd"):
+    low_leaf = leaf.lower()
+    path_attempts: list[str] = []
+    if low_leaf.endswith(".adv") or low_leaf.endswith(".amxd"):
+        path_attempts.append(path)
+    else:
+        # Prefer sibling .adv (Ableton preset wrapping the .amxd) so automation/OSC see parameters.
+        path_attempts.append(f"{parent}/{leaf}.adv")
         path_attempts.append(f"{parent}/{leaf}.amxd")
+        path_attempts.append(path)
 
     last_at: dict = {}
     for trial_path in path_attempts:
@@ -949,6 +959,7 @@ def build_deploy_load(
     track_index: int | None = None,
     *,
     skip_live: bool = False,
+    with_adv: bool = False,
 ) -> dict:
     """Build into ``projects/<slug>/{name X.Y}/``, deploy to Imported/, load in Live.
 
@@ -978,6 +989,16 @@ def build_deploy_load(
     amxd_deploy = imported_dir / built.name
     shutil.copy2(built, amxd_deploy)
     print(f"Deployed .amxd → {amxd_deploy}")
+
+    build_adv_flag = with_adv or os.environ.get("M4L_BUILD_ADV") == "1"
+    if build_adv_flag:
+        adv_built = vdir / f"{name}.adv"
+        build_adv(spec, amxd_deploy, adv_built)
+        adv_deploy = deploy_adv(adv_built, device_type)
+        print(f"Deployed .adv → {adv_deploy}")
+        adv_imported = imported_dir / adv_built.name
+        shutil.copy2(adv_built, adv_imported)
+        print(f"Deployed .adv → {adv_imported}")
 
     result: dict = {
         "version": ver,
@@ -1066,14 +1087,20 @@ def _cli():
     elif cmd == "all":
         argv_tail = sys.argv[2:]
         skip_live = False
+        with_adv = False
         filtered: list[str] = []
         for a in argv_tail:
             if a in ("--no-live", "--skip-live"):
                 skip_live = True
+            elif a == "--with-adv":
+                with_adv = True
             else:
                 filtered.append(a)
         if not filtered:
-            print("usage: m4l_pipeline.py all <spec.json> [track_index|new] [--no-live]", file=sys.stderr)
+            print(
+                "usage: m4l_pipeline.py all <spec.json> [track_index|new] [--no-live] [--with-adv]",
+                file=sys.stderr,
+            )
             sys.exit(1)
         spec_path = Path(filtered[0])
         track: int | None = None
@@ -1082,7 +1109,7 @@ def _cli():
             if raw not in ("new", "auto", "-1"):
                 track = int(filtered[1])
         spec = json.loads(spec_path.read_text(encoding="utf-8"))
-        result = build_deploy_load(spec, track, skip_live=skip_live)
+        result = build_deploy_load(spec, track, skip_live=skip_live, with_adv=with_adv)
         print(json.dumps(result, indent=2, default=str))
         if not skip_live:
             lr = result.get("load_result") or {}

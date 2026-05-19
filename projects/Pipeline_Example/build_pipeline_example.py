@@ -49,7 +49,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         # Tutorial output always uses projects/Pipeline_Example/, not projects/workspace/.
         os.environ.pop("M4L_PROJECTS_PREFIX", None)
-        result = build_deploy_load(spec, args.track, skip_live=args.no_live)
+        # Deploy sibling .adv so Live/AbletonOSC expose parameters (not only "Device On").
+        result = build_deploy_load(spec, args.track, skip_live=args.no_live, with_adv=True)
     except OSError as e:
         print(f"ERROR: network/socket to AbletonMCP failed: {e}", file=sys.stderr)
         print("  Fix: open Live, enable AbletonMCP control surface, or pass --no-live.", file=sys.stderr)
