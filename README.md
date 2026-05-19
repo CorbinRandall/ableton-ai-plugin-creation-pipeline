@@ -3,6 +3,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Sanity CI](https://github.com/CorbinRandall/ableton-plugin-pipeline/actions/workflows/sanity.yml/badge.svg)](https://github.com/CorbinRandall/ableton-plugin-pipeline/actions/workflows/sanity.yml)
 
+The purpose of this tool is so that you can create Max For Live pluins with AI. 
+To do so, it sets up an agentic IDE (Cursor, Claude, Antigravity, etc.) so it's connected to Ableton and Max For Live. 
+Once the pipeline is set up, you can tell it to create plugins through natural language ie. "Create a gain volume plugin knob"
+
 Complete in 5 min steps-
 | Step | Ableton | What you do |
 |------|---------|-------------|
