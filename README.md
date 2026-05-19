@@ -3,6 +3,15 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Sanity CI](https://github.com/CorbinRandall/ableton-plugin-pipeline/actions/workflows/sanity.yml/badge.svg)](https://github.com/CorbinRandall/ableton-plugin-pipeline/actions/workflows/sanity.yml)
 
+Complete in 5 min steps-
+| Step | Ableton | What you do |
+|------|---------|-------------|
+| **1** | **Closed** | **Quit Live** completely |
+| **2** | **Closed** | Clone this Repo → open in Agentic IDE (Cursor, Claude, Antigravity, etc.) → say **“run”** |
+| **3** | Open | **Agent** guides **AbletonOSC** + **AbletonMCP** steps (you had these two as Controllers in Ableton (like a midi controller) → after you're finished you say **“continue”** |
+| **4** | **Open** | Agent runs **`./run --live`** — tutorial on a new track |
+| **5** | **Open** | **Pipeline Complete** — tell the agent what **`.amxd`** you want ie. "Create a gain volume plugin knob" |
+
 **Clone → `./run` → build `.amxd` devices from JSON specs → deploy to your Ableton User Library → load on a new track via [AbletonMCP](https://github.com/ahujasid/ableton-mcp)** (optional **[AbletonOSC](https://github.com/ideoforms/AbletonOSC)** checks).
 
 Use this repo from any terminal or **agent-style IDE**: after clone, say **“run”** (or execute **`./run`**) to install the stack; then describe a device, generate a spec, and iterate in **Live** without hand-dragging files from Finder/Explorer.
@@ -25,13 +34,7 @@ Use this repo from any terminal or **agent-style IDE**: after clone, say **“ru
 
 **`venv/` is not in git** — each clone runs **`./run`** to create it locally.
 
-| Step | Ableton | What you do |
-|------|---------|-------------|
-| **1** | **Closed** | **Quit Live** completely |
-| **2** | **Closed** | Clone → open in IDE → say **“run”** |
-| **3** | Open | **Agent** guides **AbletonOSC** + **AbletonMCP** → you say **“continue”** |
-| **4** | **Open** | Agent runs **`./run --live`** — tutorial on a new track |
-| **5** | **Open** | **Pipeline ready** — tell the agent what **`.amxd`** you want |
+
 
 ```bash
 # Step 1: quit Ableton first
