@@ -27,7 +27,7 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 
 | User intent | Command |
 |-------------|---------|
-| First validated custom device (gain knob, audio) | `scripts/validate_spec.py examples/simple_gain_audio_spec.json` then `tooling/m4l_pipeline.py all examples/simple_gain_audio_spec.json --with-adv` |
+| First validated custom device (Gain dial, audio FX shell) | `scripts/validate_spec.py examples/simple_gain_audio_spec.json` then `tooling/m4l_pipeline.py all examples/simple_gain_audio_spec.json --with-adv` |
 | Validate spec (schema + UI + layout) | `scripts/validate_spec.py path/to/spec.json` |
 | UI only | `scripts/check_spec_ui.py …` |
 | Layout overlaps | `scripts/check_spec_layout.py …` |

@@ -25,7 +25,7 @@ Steps **2–4** match **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)** a
 
 This path is **validated in CI**: schema/UI/layout checks plus **`m4l_pipeline.py build`**.
 
-**SimpleGain** — one **Gain** knob on an **audio effect** (`plugin~` → `*~` → `plugout~`, dial drives `sig~`).
+**SimpleGain** — one **Gain** knob on an **audio effect** using the same **dry audio path** as our CI template (`plugin~` → `plugout~`). The knob is real in Live (automation/MIDI map); wire it to `*~` / `line~` in Max when you want audible level control—see **`tooling/templates/audio_effect_stub.json`**.
 
 From the **repo root** (after **`./run`** created **`venv/`**):
 
