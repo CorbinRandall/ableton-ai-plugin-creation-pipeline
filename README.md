@@ -8,7 +8,7 @@ Complete in 5 min steps-
 |------|---------|-------------|
 | **1** | **Closed** | **Quit Live** completely |
 | **2** | **Closed** | Clone this Repo → open in Agentic IDE (Cursor, Claude, Antigravity, etc.) → say **“run”** |
-| **3** | Open | **Agent** guides **AbletonOSC** + **AbletonMCP** steps (you had these two as Controllers in Ableton (like a midi controller) → after you're finished you say **“continue”** |
+| **3** | Open | **Agent** guides **AbletonOSC** + **AbletonMCP** steps (you add these two as Controllers in Ableton (like a midi controller) → after you're finished you say **“continue”** |
 | **4** | **Open** | Agent runs **`./run --live`** — tutorial on a new track |
 | **5** | **Open** | **Pipeline Complete** — tell the agent what **`.amxd`** you want ie. "Create a gain volume plugin knob" |
 
