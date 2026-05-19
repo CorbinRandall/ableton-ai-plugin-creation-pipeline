@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CorbinRandall/ableton-ai-plugin-creation-pipeline/tooling/spec.schema.json",
+  "title": "Max for Live device spec",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["name", "device_type", "boxes", "lines"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "description": { "type": "string" },
+    "device_type": {
+      "type": "string",
+      "enum": ["midi_effect", "audio_effect", "instrument"]
+    },
+    "devicewidth": { "type": "number", "minimum": 40 },
+    "openinpresentation": { "type": "integer", "enum": [0, 1] },
+    "bgcolor": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 4,
+      "items": { "type": "number" }
+    },
+    "parameters": { "type": "object" },
+    "boxes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/boxEntry" }
+    },
+    "lines": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/lineEntry" }
+    }
+  },
+  "$defs": {
+    "boxEntry": {
+      "type": "object",
+      "required": ["box"],
+      "additionalProperties": true,
+      "properties": {
+        "box": {
+          "type": "object",
+          "required": ["maxclass"],
+          "additionalProperties": true,
+          "properties": {
+            "id": { "type": "string" },
+            "maxclass": { "type": "string", "minLength": 1 },
+            "patching_rect": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": { "type": "number" }
+            },
+            "presentation_rect": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": { "type": "number" }
+            },
+            "presentation": { "type": "integer", "enum": [0, 1] },
+            "parameter_enable": { "type": "integer", "enum": [0, 1] }
+          }
+        }
+      }
+    },
+    "lineEntry": {
+      "type": "object",
+      "required": ["patchline"],
+      "additionalProperties": true,
+      "properties": {
+        "patchline": {
+          "type": "object",
+          "required": ["source", "destination"],
+          "additionalProperties": true,
+          "properties": {
+            "source": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "destination": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        }
+      }
+    }
+  }
+}

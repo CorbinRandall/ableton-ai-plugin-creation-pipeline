@@ -73,9 +73,9 @@ Use your real folder slug locally; do not commit that file to the public repo.
 
 Remote Script / Ableton checks may fail without Live; donor + allowlist checks should pass.
 
-## Cursor / agent sessions
+## Agentic IDE sessions (Cursor, Claude, Copilot, …)
 
-If you use an AI assistant in this repo, keep **private device names and specs** in:
+If you use an AI coding assistant in this repo, keep **private device names and specs** in:
 
 - `projects/workspace/` (gitignored), or
 - A **separate private repository**, or

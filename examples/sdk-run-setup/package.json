@@ -1,0 +1,12 @@
+{
+  "name": "m4l-pipeline-run-setup",
+  "private": true,
+  "description": "Optional Cursor SDK wrapper — not required for the pipeline",
+  "type": "module",
+  "scripts": {
+    "setup": "node run-setup.mjs"
+  },
+  "optionalDependencies": {
+    "@cursor/sdk": "^0.1.0"
+  }
+}

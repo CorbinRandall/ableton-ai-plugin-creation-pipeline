@@ -2,7 +2,11 @@
 
 Automated Max for Live **build + deploy + Live load** pipeline. Prefer **`./run`** over ad‑hoc shell recipes.
 
+**Works in any agentic IDE** with shell access (Cursor, Claude Code, Copilot, Windsurf, Zed, terminal-only, …). **[`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md)** · **[`docs/CROSS_PLATFORM.md`](docs/CROSS_PLATFORM.md)** (macOS / Windows / Linux).
+
 Human checklist: **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)**.
+
+**AbletonMCP** (Live Control Surface, TCP 9877) is **not** the same as optional **IDE MCP server** configs (e.g. `~/.cursor/mcp.json`). This repo’s Python tools connect to Live directly.
 
 ---
 
@@ -12,12 +16,10 @@ Human checklist: **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)**.
 
 From the **repo root**:
 
-```bash
-chmod +x run bootstrap.sh 2>/dev/null || true
-./run
-```
-
-Windows: `powershell -ExecutionPolicy Bypass -File .\run.ps1`
+| Platform | Command |
+|----------|---------|
+| **macOS / Linux** | `chmod +x run bootstrap.sh 2>/dev/null; ./run` |
+| **Windows** | `powershell -ExecutionPolicy Bypass -File .\run.ps1` |
 
 Wait for **`M4L_RUN_OK`**. Do **not** pass **`--live`** yet.
 
@@ -54,13 +56,10 @@ I will connect the pipeline and load the tutorial device on a new track.
 
 ## Step 4 — User says “continue” / “ready” / surfaces done
 
-Run:
-
-```bash
-./run --live
-```
-
-Windows: `powershell -ExecutionPolicy Bypass -File .\run.ps1 -Live`
+| Platform | Command |
+|----------|---------|
+| **macOS / Linux** | `./run --live` |
+| **Windows** | `powershell -ExecutionPolicy Bypass -File .\run.ps1 -Live` |
 
 Wait for **`M4L_RUN_OK`** and **`M4L_PIPELINE_READY`**.
 
@@ -86,7 +85,26 @@ Describe the plugin in plain language (controls, sound, workflow). Personal proj
 
 ---
 
-Then help them write a spec and run **`tooling/m4l_pipeline.py`** when they are ready.
+Then help them write a spec and run **`tooling/m4l_pipeline.py`** when they are ready:
+
+1. **Scaffold** (optional): `./venv/bin/python scripts/scaffold_plugin.py --name MyPlugin --type midi_effect`
+2. **Validate**: `./venv/bin/python scripts/validate_spec.py path/to/spec.json`
+3. **Build + load**: `export M4L_PROJECTS_PREFIX=workspace` then `./venv/bin/python tooling/m4l_pipeline.py all path/to/spec.json`
+
+Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
+
+---
+
+## Tools (quick reference)
+
+| Intent | Command |
+|--------|---------|
+| Validate spec | `./venv/bin/python scripts/validate_spec.py spec.json` |
+| Scaffold workspace | `./venv/bin/python scripts/scaffold_plugin.py --name X --type midi_effect` |
+| Export `.amxd` → spec | `./venv/bin/python scripts/export_spec_from_amxd.py device.amxd -o spec.json` |
+| Build + deploy + load | `./venv/bin/python tooling/m4l_pipeline.py all spec.json` |
+| Live verify (OSC + MCP) | `./venv/bin/python scripts/m4l_verify.py` |
+| Templates | [`tooling/templates/`](tooling/templates/) |
 
 ---
 
@@ -96,6 +114,8 @@ Then help them write a spec and run **`tooling/m4l_pipeline.py`** when they are 
 |------|------|
 | **`--no-live`** | Same as default step 2 |
 | **`--setup-only`** | Bootstrap + preflight only |
+| **`m4l_pipeline all --with-adv`** | Also build/deploy `.adv` preset |
+| **`m4l_pipeline all --skip-validate`** | Skip spec schema/UI validation |
 
 ## Do not
 
@@ -127,3 +147,4 @@ Then help them write a spec and run **`tooling/m4l_pipeline.py`** when they are 
 |--------|---------|
 | **`M4L_RUN_OK`** | Step 2 or 4 command finished successfully |
 | **`M4L_PIPELINE_READY`** | Step 4 complete — Live connected, tutorial loaded |
+| **`M4L_VERIFY_OK`** | `scripts/m4l_verify.py` completed (build/browser/load/OSC) |

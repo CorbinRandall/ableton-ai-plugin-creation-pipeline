@@ -69,8 +69,15 @@ def check_spec(spec: dict) -> tuple[list[str], list[str]]:
                     f"{name}: no textcolor — build_amxd applies light gray default; set explicitly to match your theme"
                 )
 
+    open_pres = spec.get("openinpresentation", 1)
     if pres_count == 0:
-        errors.append("no presentation UI boxes found (device face will be blank in Live)")
+        if open_pres != 0:
+            errors.append(
+                "no presentation UI boxes found (device face will be blank in Live; "
+                "set presentation:1 + presentation_rect on controls, or openinpresentation:0)"
+            )
+        else:
+            warnings.append("openinpresentation is 0 and no presentation boxes — Edit mode only")
 
     return errors, warnings
 

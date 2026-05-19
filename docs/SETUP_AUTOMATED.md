@@ -20,7 +20,7 @@ Caches land in **`.bootstrap_cache/`** inside the repo (gitignored unless you cu
 
 **AbletonMCP patch:** after extracting the remote script, **`install_remote_scripts.py`** adds TCP **`create_audio_track`** (stock ahujasid/ableton-mcp only had **`create_midi_track`**). The M4L pipeline needs this for **`device_type: "audio_effect"`** → new audio track. Already bootstrapped? Run `./venv/bin/python scripts/install_remote_scripts.py --patch-mcp-only` and restart Live.
 
-This repo installs the **AbletonMCP *remote script*** that opens **TCP 9877 inside Live**. The tutorial Python tools (`m4l_pipeline.py`, `m4l_verify.py`) connect to that socket directly. They do **not** require the separate **Cursor/Claude “MCP server”** package from the same GitHub project—only add that if you want IDE integration beyond this pipeline.
+This repo installs the **AbletonMCP *remote script*** that opens **TCP 9877 inside Live**. The tutorial Python tools (`m4l_pipeline.py`, `m4l_verify.py`) connect to that socket directly. They do **not** require optional **IDE MCP server** packages (Cursor `~/.cursor/mcp.json`, Claude Desktop MCP, etc.)—see **[`AGENTIC_IDES.md`](AGENTIC_IDES.md)**. Only add those if you want IDE features beyond this pipeline.
 
 ## Python 3.10+ (auto when missing)
 

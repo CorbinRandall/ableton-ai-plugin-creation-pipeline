@@ -7,7 +7,7 @@
 
 Use this repo from any terminal or **agent-style IDE**: after clone, say **“run”** (or execute **`./run`**) to install the stack; then describe a device, generate a spec, and iterate in **Live** without hand-dragging files from Finder/Explorer.
 
-**Human walkthrough (what to open when):** **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)** · Agents: **[`AGENTS.md`](AGENTS.md)**
+**Human walkthrough:** **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)** · **Any agentic IDE:** **[`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md)** · **macOS / Windows / Linux:** **[`docs/CROSS_PLATFORM.md`](docs/CROSS_PLATFORM.md)** · Agents: **[`AGENTS.md`](AGENTS.md)**
 
 ---
 
@@ -64,6 +64,13 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 | Doc | Purpose |
 |-----|---------|
 | [**`docs/GETTING_STARTED.md`**](docs/GETTING_STARTED.md) | **Start here (humans)** — phases 1–4, what to open when |
+| [**`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md) | Any agentic IDE — same workflow |
+| [**`docs/CROSS_PLATFORM.md`](docs/CROSS_PLATFORM.md) | macOS, Windows, Linux commands |
+| [**`docs/VERIFY_GUIDE.md`](docs/VERIFY_GUIDE.md) | Live verify + parameter sweep |
+| [**`docs/AUDIO_SMOKE_TEST.md`](docs/AUDIO_SMOKE_TEST.md) | Manual audio checklist |
+| [**`docs/AGENT_TOOLS.md`**](docs/AGENT_TOOLS.md) | Shell commands for agents (validate, scaffold, export, build) |
+| [**`docs/ROADMAP.md`**](docs/ROADMAP.md) | Phased improvements and feasibility |
+| [**`docs/MAX_TO_SPEC.md`**](docs/MAX_TO_SPEC.md) | Export `.amxd` → spec (Max-first workflow) |
 | [**`docs/RUN.md`**](docs/RUN.md) | **`./run`** flags and behavior |
 | [**`AGENTS.md`**](AGENTS.md) | What AI agents should do when the user says **run** |
 | [**`docs/AGENT_IDE_BEGINNER_GUIDE.md`**](docs/AGENT_IDE_BEGINNER_GUIDE.md) | Cursor / similar — links to getting started |
@@ -100,6 +107,8 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 | **`BOOTSTRAP_PYTHON`** | Interpreter for **`venv`** creation |
 | **`M4L_VENV`** | Alternate venv directory (default **`./venv`**) |
 | **`M4L_SKIP_TEMPLATE`** | **`1`** to skip default Live set template install |
+| **`M4L_SKIP_VALIDATE`** | **`1`** to skip spec validation before `build` / `all` |
+| **`M4L_BUILD_ADV`** | **`1`** to generate/deploy `.adv` with `all` (or use `--with-adv`) |
 
 ---
 

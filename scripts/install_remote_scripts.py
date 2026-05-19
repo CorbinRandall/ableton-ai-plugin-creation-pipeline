@@ -16,8 +16,8 @@ The installer patches AbletonMCP to add TCP ``create_audio_track`` (upstream onl
 That lets ``tooling/m4l_pipeline.py`` open Max Audio devices on a **new audio track**.
 
 Env:
-  BOOTSTRAP_ABLETON_OSC_ARCHIVE   Override archive URL (default: master ZIP)
-  BOOTSTRAP_ABLETON_MCP_ARCHIVE   Override archive URL (default: main ZIP)
+  BOOTSTRAP_ABLETON_OSC_ARCHIVE   Override archive URL (default: pinned commit ZIP)
+  BOOTSTRAP_ABLETON_MCP_ARCHIVE   Override archive URL (default: pinned commit ZIP)
 """
 from __future__ import annotations
 

@@ -70,15 +70,18 @@ Write-Host '==> Projects allowlist'
 Write-Host '==> Preflight'
 & $py (Join-Path $Root 'scripts\verify_setup.py') --preflight
 
+Write-Host '==> Tutorial spec validation'
+& $py (Join-Path $Root 'scripts\validate_spec.py') (Join-Path $Root 'projects\Pipeline_Example\pipeline_example_spec.json')
+
 if ($Live) {
   Write-Host '==> Waiting for AbletonMCP'
   & $py (Join-Path $Root 'scripts\verify_setup.py') --wait-mcp 120
 } elseif (-not $NoLive) {
   Write-Host ''
-  Write-Host '=== Next: Step 3 (IDE agent guides Ableton setup) ==='
+  Write-Host '=== Next: Step 3 (agent guides Ableton - any IDE) ==='
   Write-Host '  Agent walks you through AbletonOSC + AbletonMCP; say Continue when done.'
   Write-Host '  Step 4: agent runs run.ps1 -Live'
-  Write-Host '  See docs/GETTING_STARTED.md and AGENTS.md'
+  Write-Host '  See docs/GETTING_STARTED.md, docs/AGENTIC_IDES.md, AGENTS.md'
   Write-Host ''
 }
 
@@ -92,7 +95,7 @@ if ($NoLive -or -not $Live) {
   & $py (Join-Path $Root 'projects\Pipeline_Example\build_pipeline_example.py') --no-live
   Write-Host ''
   Write-Host 'M4L_RUN_OK (step 2 complete)'
-  Write-Host '  -> Step 3: Ask IDE agent for OSC/MCP steps; reply Continue when done.'
+  Write-Host '  -> Step 3: Ask your agent for OSC/MCP steps; reply Continue when done.'
   Write-Host '  -> Steps 4-5: agent runs -Live, then helps you design your .amxd.'
   exit 0
 }
@@ -108,4 +111,4 @@ Write-Host 'M4L_RUN_OK (step 4 complete)'
 Write-Host 'M4L_PIPELINE_READY'
 Write-Host ''
 Write-Host '  Pipeline connected to Ableton Live.'
-Write-Host '  Step 5: Tell your IDE agent what type of .amxd you want to create.'
+  Write-Host '  Step 5: Tell your agent what type of .amxd you want to create.'

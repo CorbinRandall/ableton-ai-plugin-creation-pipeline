@@ -104,16 +104,19 @@ echo "==> Projects allowlist (public repo safety)"
 echo "==> Preflight (donors, Remote Scripts, imports)"
 "$PY" "$ROOT/scripts/verify_setup.py" --preflight
 
+echo "==> Tutorial spec validation"
+"$PY" "$ROOT/scripts/validate_spec.py" "$ROOT/projects/Pipeline_Example/pipeline_example_spec.json"
+
 if [[ "$LIVE" -eq 1 ]]; then
   echo "==> Waiting for AbletonMCP (Live must be open; surfaces enabled)"
   "$PY" "$ROOT/scripts/verify_setup.py" --wait-mcp 120
 elif [[ "$NO_LIVE" -eq 0 ]]; then
   echo ""
-  echo "=== Next: Step 3 (your IDE agent guides Ableton setup) ==="
-  echo "  Agent should walk you through AbletonOSC + AbletonMCP, then wait for you to say:"
+  echo "=== Next: Step 3 (agent guides Ableton — any IDE) ==="
+  echo "  Your agent should walk you through AbletonOSC + AbletonMCP, then wait for:"
   echo "    \"Continue\" (or \"Ready\") when both are enabled and Live is open."
-  echo "  Then step 4: agent runs ./run --live"
-  echo "  See docs/GETTING_STARTED.md and AGENTS.md"
+  echo "  Step 4: agent runs ./run --live"
+  echo "  See docs/GETTING_STARTED.md, docs/AGENTIC_IDES.md, AGENTS.md"
   echo ""
 fi
 
@@ -127,7 +130,7 @@ if [[ "$NO_LIVE" -eq 1 || "$LIVE" -eq 0 ]]; then
   "$PY" "$ROOT/projects/Pipeline_Example/build_pipeline_example.py" --no-live
   echo ""
   echo "M4L_RUN_OK (step 2 complete)"
-  echo "  → Step 3: Ask your IDE agent for AbletonOSC + AbletonMCP steps; reply \"Continue\" when done."
+  echo "  → Step 3: Ask your agent (Cursor, Claude, Copilot, …) for OSC/MCP steps; reply \"Continue\" when done."
   echo "  → Step 4–5: Agent runs ./run --live, then helps you design your .amxd."
   exit 0
 fi
@@ -144,5 +147,5 @@ echo "M4L_PIPELINE_READY"
 echo ""
 echo "  Pipeline connected to Ableton Live."
 echo "  Tutorial device should be on a new track."
-echo "  Step 5: Tell your IDE agent what type of .amxd you want to create"
+  echo "  Step 5: Tell your agent what type of .amxd you want to create"
 echo "          (midi effect, audio effect, or instrument)."

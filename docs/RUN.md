@@ -53,7 +53,7 @@ Live cannot enable Control Surfaces from the CLI. After step 2, your **IDE agent
 
 Preflight should pass after bootstrap. Live/MCP steps are skipped or print guidance only.
 
-## For AI agents (Cursor, Claude, etc.)
+## For AI agents (any agentic IDE)
 
 When the user says **run** (first time after clone):
 
@@ -63,10 +63,11 @@ When the user says **run** (first time after clone):
 4. **Step 4:** On **continue** / **ready**: `./run --live` → **`M4L_PIPELINE_READY`**.
 5. **Step 5:** Confirm pipeline connected; ask what **midi_effect** / **audio_effect** / **instrument** they want.
 
-Agent contract: **[`AGENTS.md`](../AGENTS.md)**.
+Agent contract: **[`AGENTS.md`](../AGENTS.md)** · Per editor: **[`AGENTIC_IDES.md`](AGENTIC_IDES.md)**.
 
 ## After `M4L_PIPELINE_READY` (step 5)
 
+- Agent tools: **[`AGENT_TOOLS.md`](AGENT_TOOLS.md)** (validate, scaffold, export, build).
 - Personal plugins: **`projects/workspace/`** + **`M4L_PROJECTS_PREFIX=workspace`** — **[`PRIVATE_PLUGINS.md`](PRIVATE_PLUGINS.md)**.
-- Custom devices: **`tooling/m4l_pipeline.py`**, specs under **`projects/workspace/<YourPlugin>/`**.
+- Spec flags: **`--with-adv`**, **`--skip-validate`**; env **`M4L_BUILD_ADV`**, **`M4L_SKIP_VALIDATE`**.
 - UI / presentation: **[`M4L_FRONTEND_AND_BACKEND.md`](M4L_FRONTEND_AND_BACKEND.md)**.
