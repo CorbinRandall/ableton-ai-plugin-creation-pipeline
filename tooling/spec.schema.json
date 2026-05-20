@@ -48,6 +48,8 @@
           "properties": {
             "id": { "type": "string" },
             "maxclass": { "type": "string", "minLength": 1 },
+            "numinlets": { "type": "integer", "minimum": 0 },
+            "numoutlets": { "type": "integer", "minimum": 0 },
             "patching_rect": {
               "type": "array",
               "minItems": 4,
@@ -62,7 +64,46 @@
             },
             "presentation": { "type": "integer", "enum": [0, 1] },
             "parameter_enable": { "type": "integer", "enum": [0, 1] }
-          }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "maxclass": {
+                    "enum": [
+                      "live.dial",
+                      "live.slider",
+                      "live.numbox",
+                      "live.toggle",
+                      "live.menu",
+                      "live.tab"
+                    ]
+                  }
+                },
+                "required": ["maxclass"]
+              },
+              "then": {
+                "properties": {
+                  "parameter_enable": { "const": 1 },
+                  "saved_attribute_attributes": {
+                    "type": "object",
+                    "required": ["valueof"],
+                    "properties": {
+                      "valueof": {
+                        "type": "object",
+                        "required": [
+                          "parameter_longname",
+                          "parameter_shortname",
+                          "parameter_type"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "required": ["parameter_enable", "saved_attribute_attributes"]
+              }
+            }
+          ]
         }
       }
     },
@@ -79,12 +120,14 @@
             "source": {
               "type": "array",
               "minItems": 2,
-              "maxItems": 2
+              "maxItems": 2,
+              "prefixItems": [{ "type": "string" }, { "type": "integer", "minimum": 0 }]
             },
             "destination": {
               "type": "array",
               "minItems": 2,
-              "maxItems": 2
+              "maxItems": 2,
+              "prefixItems": [{ "type": "string" }, { "type": "integer", "minimum": 0 }]
             }
           }
         }

@@ -67,23 +67,33 @@ def validate_structure(spec: dict) -> tuple[list[str], list[str]]:
                 warnings.append(msg)
 
     box_ids: set[str] = set()
+    box_outlets: dict[str, int] = {}
+    box_inlets: dict[str, int] = {}
     for entry in spec.get("boxes") or []:
-        bid = (entry.get("box") or {}).get("id")
+        b = entry.get("box") or {}
+        bid = b.get("id")
         if bid:
             if bid in box_ids:
                 errors.append(f"duplicate box id: {bid}")
             box_ids.add(bid)
+            box_outlets[bid] = int(b.get("numoutlets", 0) or 0)
+            box_inlets[bid] = int(b.get("numinlets", 0) or 0)
 
     for i, entry in enumerate(spec.get("lines") or []):
         pl = entry.get("patchline") or {}
-        for role in ("source", "destination"):
+        for role, lookup in (("source", box_outlets), ("destination", box_inlets)):
             end = pl.get(role)
-            if not end or len(end) < 1:
-                errors.append(f"lines[{i}].patchline.{role}: missing")
+            if not end or len(end) < 2:
+                errors.append(f"lines[{i}].patchline.{role}: must be [id, index]")
                 continue
-            ref = end[0]
+            ref, idx = end[0], end[1]
             if ref not in box_ids:
-                warnings.append(f"lines[{i}].patchline.{role} references unknown id {ref!r}")
+                errors.append(f"lines[{i}].patchline.{role}: unknown id {ref!r}")
+            elif isinstance(idx, int) and ref in lookup and idx >= lookup[ref]:
+                errors.append(
+                    f"lines[{i}].patchline.{role}: outlet/inlet {idx} out of range "
+                    f"for {ref!r} (has {lookup[ref]})"
+                )
 
     return errors, warnings
 

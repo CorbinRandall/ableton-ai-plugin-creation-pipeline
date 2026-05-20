@@ -1,0 +1,228 @@
+{
+  "name": "NoiseGate",
+  "description": "Threshold + Attack + Release gate shell using live.gain~.",
+  "device_type": "audio_effect",
+  "devicewidth": 280.0,
+  "openinpresentation": 1,
+  "boxes": [
+    {
+      "box": {
+        "id": "obj-1",
+        "maxclass": "plugin~",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "outlettype": [
+          "signal"
+        ],
+        "patching_rect": [
+          30.0,
+          30.0,
+          80.0,
+          22.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-2",
+        "maxclass": "newobj",
+        "numinlets": 2,
+        "numoutlets": 1,
+        "outlettype": [
+          "signal"
+        ],
+        "text": "live.gain~",
+        "patching_rect": [
+          30.0,
+          60.0,
+          70.0,
+          22.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-3",
+        "maxclass": "plugout~",
+        "numinlets": 1,
+        "numoutlets": 0,
+        "patching_rect": [
+          30.0,
+          90.0,
+          80.0,
+          22.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-4",
+        "maxclass": "live.dial",
+        "numinlets": 1,
+        "numoutlets": 2,
+        "outlettype": [
+          "",
+          "float"
+        ],
+        "parameter_enable": 1,
+        "presentation": 1,
+        "presentation_rect": [
+          20.0,
+          40.0,
+          41.0,
+          48.0
+        ],
+        "textcolor": [
+          0.811764705882353,
+          0.811764705882353,
+          0.827450980392157,
+          1.0
+        ],
+        "showname": 1,
+        "shownumber": 1,
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Threshold",
+            "parameter_shortname": "Threshold",
+            "parameter_type": 0,
+            "parameter_mmin": -60.0,
+            "parameter_mmax": 0.0,
+            "parameter_initial_enable": 1,
+            "parameter_initial": [
+              -24.0
+            ],
+            "parameter_unitstyle": 4
+          }
+        },
+        "patching_rect": [
+          30.0,
+          120.0,
+          41.0,
+          48.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-5",
+        "maxclass": "live.dial",
+        "numinlets": 1,
+        "numoutlets": 2,
+        "outlettype": [
+          "",
+          "float"
+        ],
+        "parameter_enable": 1,
+        "presentation": 1,
+        "presentation_rect": [
+          77.0,
+          40.0,
+          41.0,
+          48.0
+        ],
+        "textcolor": [
+          0.811764705882353,
+          0.811764705882353,
+          0.827450980392157,
+          1.0
+        ],
+        "showname": 1,
+        "shownumber": 1,
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Attack",
+            "parameter_shortname": "Attack",
+            "parameter_type": 0,
+            "parameter_mmin": 0.0,
+            "parameter_mmax": 500.0,
+            "parameter_initial_enable": 1,
+            "parameter_initial": [
+              10.0
+            ],
+            "parameter_unitstyle": 3
+          }
+        },
+        "patching_rect": [
+          30.0,
+          176.0,
+          41.0,
+          48.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-6",
+        "maxclass": "live.dial",
+        "numinlets": 1,
+        "numoutlets": 2,
+        "outlettype": [
+          "",
+          "float"
+        ],
+        "parameter_enable": 1,
+        "presentation": 1,
+        "presentation_rect": [
+          134.0,
+          40.0,
+          41.0,
+          48.0
+        ],
+        "textcolor": [
+          0.811764705882353,
+          0.811764705882353,
+          0.827450980392157,
+          1.0
+        ],
+        "showname": 1,
+        "shownumber": 1,
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Release",
+            "parameter_shortname": "Release",
+            "parameter_type": 0,
+            "parameter_mmin": 0.0,
+            "parameter_mmax": 2000.0,
+            "parameter_initial_enable": 1,
+            "parameter_initial": [
+              100.0
+            ],
+            "parameter_unitstyle": 3
+          }
+        },
+        "patching_rect": [
+          30.0,
+          232.0,
+          41.0,
+          48.0
+        ]
+      }
+    }
+  ],
+  "lines": [
+    {
+      "patchline": {
+        "source": [
+          "obj-1",
+          0
+        ],
+        "destination": [
+          "obj-2",
+          0
+        ]
+      }
+    },
+    {
+      "patchline": {
+        "source": [
+          "obj-2",
+          0
+        ],
+        "destination": [
+          "obj-3",
+          0
+        ]
+      }
+    }
+  ]
+}

@@ -22,6 +22,7 @@ if str(_TOOLING) not in sys.path:
     sys.path.insert(0, str(_TOOLING))
 
 from spec_validate import validate_spec, validate_structure, validate_ui  # noqa: E402
+from cli_json import emit_json  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -30,6 +31,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--structure-only", action="store_true", help="JSON Schema + graph hints only")
     ap.add_argument("--ui-only", action="store_true", help="Presentation / textcolor checks only")
     ap.add_argument("--no-layout", action="store_true", help="Skip presentation overlap checks")
+    ap.add_argument("--json", action="store_true", help="Emit one JSON object on stdout (last line)")
     args = ap.parse_args(argv)
 
     if not args.spec.is_file():
@@ -59,7 +61,17 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: {e}", file=sys.stderr)
 
     if errors:
+        if args.json:
+            emit_json(
+                {"errors": errors, "warnings": warnings, "spec": str(args.spec)},
+                ok=False,
+            )
         return 1
+    if args.json:
+        emit_json(
+            {"errors": [], "warnings": warnings, "spec": str(args.spec), "marker": "SPEC_VALIDATE_OK"},
+            ok=True,
+        )
     print("SPEC_VALIDATE_OK", args.spec.name)
     return 0
 

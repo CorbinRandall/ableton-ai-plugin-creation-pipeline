@@ -103,3 +103,32 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 | GitHub Copilot | [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) |
 
 See [`examples/README.md`](../examples/README.md).
+
+## Pipeline MCP server (optional IDE MCP)
+
+**AbletonMCP** in Live (Control Surface, TCP 9877) is **not** this server.
+
+| Tool | Purpose |
+|------|---------|
+| `tooling/m4l_mcp_server.py` | stdio MCP — validate, build, deploy, load, recipes, diagnose |
+| `tooling/spec_builder.py` | Python DSL for specs |
+| `examples/recipes/` | Named device patterns |
+| `tooling/spec_to_svg.py` | Presentation preview without Live |
+
+Install: `pip install 'mcp>=1.2.0'` (in `requirements.txt`).
+
+Example config (use absolute paths):
+
+```json
+{
+  "mcpServers": {
+    "m4l-pipeline": {
+      "command": "/abs/path/to/repo/venv/bin/python",
+      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"]
+    }
+  }
+}
+```
+
+Full v2 plan: [`docs/AGENT_IMPLEMENTATION_PLAN.md`](AGENT_IMPLEMENTATION_PLAN.md).
+

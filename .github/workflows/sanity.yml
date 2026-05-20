@@ -23,6 +23,8 @@ jobs:
       - run: python scripts/check_projects_allowlist.py
       - run: python scripts/check_donor_consistency.py
       - run: python scripts/test_m4l_pipeline_deploy.py
+      - run: python scripts/test_schema_negatives.py
+      - run: python scripts/test_spec_builder.py
       - run: python scripts/validate_spec.py projects/Pipeline_Example/pipeline_example_spec.json
       - run: python scripts/validate_spec.py examples/simple_gain_audio_spec.json
       - run: python scripts/validate_spec.py examples/volume_knob_audio_spec.json
@@ -33,3 +35,10 @@ jobs:
       - run: python -c "import os; s=os.stat('/tmp/simple_gain_ci.amxd').st_size; assert 2000<s<200000, s"
       - run: python tooling/m4l_pipeline.py build examples/volume_knob_audio_spec.json /tmp/volume_knob_ci.amxd
       - run: python -c "import os; s=os.stat('/tmp/volume_knob_ci.amxd').st_size; assert 2000<s<200000, s"
+      - run: |
+          for d in examples/recipes/*/; do
+            python "$d/build.py"
+            python scripts/validate_spec.py "$d/spec.json"
+            python tooling/m4l_pipeline.py build "$d/spec.json" "/tmp/recipe_$(basename "$d").amxd"
+          done
+      - run: python tooling/spec_to_svg.py examples/simple_gain_audio_spec.json -o /tmp/sg.svg
