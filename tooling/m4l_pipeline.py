@@ -422,7 +422,10 @@ def build_amxd(
         require_valid_spec(spec)
     device_type = spec.get("device_type", "midi_effect")
     header_32, subheader_16, ref_root, trailing = _get_reference(device_type)
-    patch = deepcopy(ref_root.get("patcher", {}))
+    # Start from the donor's full patcher to carry over required fields like
+    # fileversion and classnamespace — without these Max rejects the file with
+    # "createdevice" error 6 ("device file broken").
+    patch = deepcopy(ref_root)
 
     # Override with spec content
     patch["appversion"] = _APPVERSION
