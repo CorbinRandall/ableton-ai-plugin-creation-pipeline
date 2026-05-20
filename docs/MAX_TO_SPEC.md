@@ -36,7 +36,10 @@ export M4L_PROJECTS_PREFIX=workspace
 ## Round-trip
 
 ```text
-Max Save .amxd  →  export_spec_from_amxd.py  →  edit spec  →  m4l_pipeline build/all  →  Live
+Max Save .amxd  →  export_spec_from_amxd.py  →  edit spec  →  m4l_pipeline verify/all  →  Live
 ```
+
+For **UI-only** tweaks (background color, title) on a Max-saved device, prefer **`m4l_pipeline.py patch`**
+instead of full rebuild — see [`TROUBLESHOOTING_M4L.md`](TROUBLESHOOTING_M4L.md).
 
 For readable `git diff` on `.amxd` in other projects, contributors may use **maxdevtools** `amxd_textconv.py` — that output is for humans, not this pipeline’s spec format.

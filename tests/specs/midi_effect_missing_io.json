@@ -1,0 +1,17 @@
+{
+  "name": "MissingIO",
+  "device_type": "midi_effect",
+  "description": "Fixture: midi_effect without midiin/midiout (should fail strict validation).",
+  "devicewidth": 180,
+  "boxes": [
+    {
+      "box": {
+        "id": "obj-1",
+        "maxclass": "comment",
+        "text": "no I/O",
+        "patching_rect": [10, 10, 80, 20]
+      }
+    }
+  ],
+  "lines": []
+}

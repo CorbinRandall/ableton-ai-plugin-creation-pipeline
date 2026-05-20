@@ -54,6 +54,20 @@ git config --global core.excludesfile ~/.gitignore_global
 
 Use your real folder slug locally; do not commit that file to the public repo.
 
+### Pre-commit hook (recommended)
+
+Block accidental `git add` of workspace plugin files:
+
+```bash
+./venv/bin/python scripts/install_workspace_pre_commit.py
+```
+
+This writes **`.git/hooks/pre-commit`** locally (never pushed). It runs **`scripts/check_workspace_not_staged.py`**.
+
+Copy **`docs/templates/PRIVATE_PLUGIN_CHECKLIST.md.example`** into your gitignored plugin folder as a private checklist.
+
+If a name already reached git history, see **[`docs/HISTORY_SCRUBBING.md`](HISTORY_SCRUBBING.md)**.
+
 ## What not to do
 
 | Do not | Why |
@@ -80,3 +94,5 @@ If you use an AI coding assistant in this repo, keep **private device names and 
 - `projects/workspace/` (gitignored), or
 - A **separate private repository**, or
 - Local rules under your user config — not in tracked files here.
+- **[`docs/TROUBLESHOOTING_M4L.md`](TROUBLESHOOTING_M4L.md)** — device-class deploy mistakes (`CreateDevice` error 6).
+- Describe pipeline fixes by **bug class** only in public commits/docs — not private plugin names.

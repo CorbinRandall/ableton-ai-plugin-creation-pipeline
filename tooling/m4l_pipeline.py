@@ -23,7 +23,9 @@ edition (**Suite**, or **Standard + M4L add-on**) to open these devices (see **`
 
 Usage:
     python3 m4l_pipeline.py build   spec.json [output.amxd] [--skip-validate]    # .amxd only — no Ableton
-    python3 m4l_pipeline.py deploy  path.amxd [device_type]
+    python3 m4l_pipeline.py deploy  path.amxd|.adv [device_type] [--category-root]
+    python3 m4l_pipeline.py patch     path.amxd [--bgcolor R,G,B,A] [--in-place] [--deploy device_type]
+    python3 m4l_pipeline.py verify    spec.json [--skip-validate]
     python3 m4l_pipeline.py load    track_index device_name [device_type]
     python3 m4l_pipeline.py info    track_index
     python3 m4l_pipeline.py session
@@ -87,7 +89,13 @@ def plugin_projects_base() -> Path:
     Use a single path segment (e.g. ``workspace``, ``local``). Slashes are stripped.
     """
 
-    extra = (os.environ.get("M4L_PROJECTS_PREFIX") or "").strip().strip("/\\")
+    extra_raw = (os.environ.get("M4L_PROJECTS_PREFIX") or "").strip()
+    extra = extra_raw.strip("/\\")
+    if extra_raw and not extra:
+        print(
+            "WARN: M4L_PROJECTS_PREFIX was set but stripped to empty — using default projects/",
+            file=sys.stderr,
+        )
     base = REPO_ROOT / "projects"
     return (base / extra) if extra else base
 
@@ -170,42 +178,165 @@ def reference_amxd_path(device_type: str = "midi_effect") -> Path:
 
 
 
-# User Library destinations by device type
-_USER_LIB = _ableton_home() / "User Library/Presets"
-_DEST_MAP = {
-    "midi_effect":  _USER_LIB / "MIDI Effects"  / "Max MIDI Effect",
-    "audio_effect": _USER_LIB / "Audio Effects"  / "Max Audio Effect",
-    "instrument":   _USER_LIB / "Instruments"    / "Max Instrument",
+# User Library destinations by device type (lazy — reads ABLETON_HOME per call).
+_DEVICE_TYPE_FOLDERS = {
+    "midi_effect": ("MIDI Effects", "Max MIDI Effect"),
+    "audio_effect": ("Audio Effects", "Max Audio Effect"),
+    "instrument": ("Instruments", "Max Instrument"),
 }
 
-# Browser paths for AbletonMCP load — user_library is immediately available
-# after deploy (max_for_live has delayed indexing).
-_BROWSER_MAP = {
-    "midi_effect":  "user_library/Presets/MIDI Effects/Max MIDI Effect",
-    "audio_effect": "user_library/Presets/Audio Effects/Max Audio Effect",
-    "instrument":   "user_library/Presets/Instruments/Max Instrument",
-}
+
+def _user_lib_presets() -> Path:
+    return _ableton_home() / "User Library/Presets"
+
+
+def _dest_dir(device_type: str) -> Path:
+    """User Library folder for one M4L device class (category root, not Imported/)."""
+    parts = _DEVICE_TYPE_FOLDERS.get(device_type)
+    if parts is None:
+        raise ValueError(f"Unknown device_type: {device_type!r}")
+    return _user_lib_presets() / parts[0] / parts[1]
+
+
+def _browser_root(device_type: str) -> str:
+    parts = _DEVICE_TYPE_FOLDERS.get(device_type)
+    if parts is None:
+        raise ValueError(f"Unknown device_type: {device_type!r}")
+    return f"user_library/Presets/{parts[0]}/{parts[1]}"
+
+
+class _LazyDestMap:
+    """Backward-compatible ``_DEST_MAP`` that resolves paths lazily."""
+
+    def get(self, key: str, default=None):
+        try:
+            return _dest_dir(key)
+        except ValueError:
+            return default
+
+    def __getitem__(self, key: str) -> Path:
+        return _dest_dir(key)
+
+    def __contains__(self, key: object) -> bool:
+        return key in _DEVICE_TYPE_FOLDERS
+
+    def keys(self):
+        return _DEVICE_TYPE_FOLDERS.keys()
+
+    def values(self):
+        return (_dest_dir(k) for k in _DEVICE_TYPE_FOLDERS)
+
+    def items(self):
+        return ((k, _dest_dir(k)) for k in _DEVICE_TYPE_FOLDERS)
+
+
+class _LazyBrowserMap:
+    def get(self, key: str, default=None):
+        try:
+            return _browser_root(key)
+        except ValueError:
+            return default
+
+    def __getitem__(self, key: str) -> str:
+        return _browser_root(key)
+
+
+_DEST_MAP = _LazyDestMap()
+_BROWSER_MAP = _LazyBrowserMap()
+
+# Sidecar filename: ``MyDevice.amxd`` → ``MyDevice.device_type`` (one-line text).
+_DEVICE_TYPE_SIDECAR_SUFFIX = ".device_type"
 
 # AbletonMCP socket
 _ABLETON_HOST = "127.0.0.1"
 _ABLETON_PORT = 9877
 
+_VALID_DEVICE_TYPES = frozenset(_DEVICE_TYPE_FOLDERS.keys())
+
+
+def sidecar_path_for_artifact(artifact_path: Path) -> Path:
+    """``foo.amxd`` → ``foo.device_type``."""
+    return artifact_path.with_name(artifact_path.stem + _DEVICE_TYPE_SIDECAR_SUFFIX)
+
+
+def write_device_type_sidecar(artifact_path: Path, device_type: str) -> Path:
+    if device_type not in _VALID_DEVICE_TYPES:
+        raise ValueError(f"Unknown device_type: {device_type!r}")
+    sidecar = sidecar_path_for_artifact(artifact_path)
+    sidecar.write_text(device_type + "\n", encoding="utf-8")
+    return sidecar
+
+
+def read_device_type_sidecar(artifact_path: Path) -> str | None:
+    sidecar = sidecar_path_for_artifact(artifact_path)
+    if not sidecar.is_file():
+        return None
+    text = sidecar.read_text(encoding="utf-8").strip()
+    return text or None
+
+
+def assert_device_type_sidecar(artifact_path: Path, expected: str) -> None:
+    """Raise ``ValueError`` when a sidecar exists and disagrees with ``expected``."""
+    found = read_device_type_sidecar(artifact_path)
+    if found is None:
+        return
+    if found != expected:
+        raise ValueError(
+            f"device_type sidecar mismatch for {artifact_path.name}: "
+            f"sidecar={found!r}, expected={expected!r}. "
+            "Deploy/load using the matching User Library category "
+            "(see docs/TROUBLESHOOTING_M4L.md)."
+        )
+
+
+def deploy_artifact_for_device_type(
+    artifact_path: Path,
+    device_type: str,
+    *,
+    imported: bool = True,
+) -> list[Path]:
+    """Copy one artifact into the User Library tree for a single ``device_type``.
+
+    Default destination is ``…/Imported/`` (MCP/browser load path). Never copies into
+    multiple device-class folders — that mismatch causes Max ``CreateDevice`` error 6.
+    """
+    artifact_path = Path(artifact_path)
+    if not artifact_path.is_file():
+        raise FileNotFoundError(artifact_path)
+    if device_type not in _VALID_DEVICE_TYPES:
+        raise ValueError(f"Unknown device_type: {device_type!r}")
+
+    assert_device_type_sidecar(artifact_path, device_type)
+
+    dest_root = _dest_dir(device_type)
+    destinations: list[Path] = []
+    if imported:
+        dest_dir = dest_root / "Imported"
+    else:
+        dest_dir = dest_root
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / artifact_path.name
+    shutil.copy2(artifact_path, dest)
+    print(f"Deployed → {dest}")
+    destinations.append(dest)
+
+    sidecar = sidecar_path_for_artifact(artifact_path)
+    if sidecar.is_file():
+        sidecar_dest = dest_dir / sidecar.name
+        shutil.copy2(sidecar, sidecar_dest)
+
+    return destinations
+
 
 # ── Binary format ────────────────────────────────────────────────────────────
 
-def _extract_amxd_parts(data: bytes) -> tuple[bytes, bytes, dict, bytes]:
-    """Parse an official .amxd file: 32-byte header + JSON starting at byte 32.
+def _amxd_json_starts_at_32(data: bytes) -> bool:
+    """True when JSON root begins at byte 32 (compact pipeline / blank templates)."""
+    return len(data) > 34 and data[32:34] == b'{"'
 
-    Official blank Max for Live templates store JSON directly at byte 32.
-    The JSON opens with '{"patcher" : \t{' so byte 48 is the inner patcher dict.
-    Returns (header_32, _ignored_16, patcher_dict, trailing_bytes).
-    Only header_32 and patcher_dict matter — the second element is a legacy
-    placeholder kept so existing call-sites don't need updating.
-    """
-    header = data[:32]
-    subheader = data[32:48]  # first 16 bytes of JSON — kept for signature compat
 
-    body = data[48:]
+def _decode_amxd_json_at(data: bytes, offset: int) -> tuple[dict, bytes]:
+    body = data[offset:]
     end = len(body)
     while end:
         try:
@@ -218,8 +349,28 @@ def _extract_amxd_parts(data: bytes) -> tuple[bytes, bytes, dict, bytes]:
     dec = json.JSONDecoder()
     obj, char_end = dec.raw_decode(s)
     json_byte_len = len(s[:char_end].encode("utf-8"))
-    trailing = data[48 + json_byte_len:]
-    return header, subheader, obj, trailing
+    trailing = data[offset + json_byte_len :]
+    return obj, trailing
+
+
+def _extract_amxd_parts(data: bytes) -> tuple[bytes, bytes, dict, bytes]:
+    """Parse an .amxd file and return the inner patcher dict.
+
+    Supports compact JSON-at-32 (pipeline builds, midi/audio donors) and legacy
+    subheader + JSON-at-48 (instrument donor, Max saves with dlst trailer).
+    Returns (header_32, subheader_16, patcher_dict, trailing_bytes).
+    """
+    header = data[:32]
+    subheader = data[32:48]
+
+    offset = 32 if _amxd_json_starts_at_32(data) else 48
+    obj, trailing = _decode_amxd_json_at(data, offset)
+
+    if "patcher" in obj and isinstance(obj.get("patcher"), dict):
+        patcher = obj["patcher"]
+    else:
+        patcher = obj
+    return header, subheader, patcher, trailing
 
 
 
@@ -269,7 +420,42 @@ def _get_reference(device_type: str = "midi_effect") -> tuple[bytes, bytes, dict
 # See docs/M4L_FRONTEND_AND_BACKEND.md.
 # }
 
-_APPVERSION = {"major": 8, "minor": 6, "revision": 4, "architecture": "x64", "modernui": 1}
+_APPVERSION_FALLBACK = {"major": 8, "minor": 6, "revision": 4, "architecture": "x64", "modernui": 1}
+
+
+def _resolve_appversion(donor_patcher: dict) -> dict:
+    """Choose Max ``appversion`` stamp for a built device.
+
+    Default: preserve donor. Override with ``M4L_APPVERSION=9.1.4`` or
+    ``M4L_APPVERSION_JSON_FILE=/path/to.json`` (full dict).
+    """
+    json_file = (os.environ.get("M4L_APPVERSION_JSON_FILE") or "").strip()
+    if json_file:
+        return json.loads(Path(json_file).read_text(encoding="utf-8"))
+
+    env_ver = (os.environ.get("M4L_APPVERSION") or "").strip()
+    if env_ver:
+        m = re.match(r"^(\d+)\.(\d+)\.(\d+)$", env_ver)
+        if not m:
+            raise ValueError(
+                f"M4L_APPVERSION must match MAJOR.MINOR.REVISION, got {env_ver!r}"
+            )
+        return {
+            "major": int(m.group(1)),
+            "minor": int(m.group(2)),
+            "revision": int(m.group(3)),
+            "architecture": "x64",
+            "modernui": 1,
+        }
+
+    donor_av = donor_patcher.get("appversion")
+    if isinstance(donor_av, dict) and donor_av.get("major") is not None:
+        return deepcopy(donor_av)
+    return deepcopy(_APPVERSION_FALLBACK)
+
+
+# Legacy name kept for tests/docs that reference the fallback stamp.
+_APPVERSION = _APPVERSION_FALLBACK
 
 # Max classes that are normally patch-only (not shown on the device face).
 # Light label/value text on dark M4L device backgrounds (~Live rack gray).
@@ -374,7 +560,7 @@ def build_amxd(
     patch = deepcopy(ref_root)
 
     # Override with spec content
-    patch["appversion"] = _APPVERSION
+    patch["appversion"] = _resolve_appversion(patch)
     boxes = _ensure_presentation_boxes(spec["boxes"])
     patch["boxes"] = _apply_live_ui_contrast(boxes)
     patch["lines"] = spec.get("lines", [])
@@ -429,6 +615,7 @@ def build_amxd(
         output = WORKSPACE / f"{name}.amxd"
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(amxd_bytes)
+    write_device_type_sidecar(output, device_type)
     print(f"Built {output} ({len(amxd_bytes)} bytes)")
     return output
 
@@ -504,7 +691,8 @@ def build_adv(spec: dict, amxd_deploy_path: Path, output: Path | None = None) ->
 				</MxDFloatParameter>"""
 
     # Relative path from User Library root
-    rel_path = str(amxd_deploy_path).replace(str(_USER_LIB.parent) + "/", "")
+    rel_path = str(amxd_deploy_path).replace(str(_user_lib_presets().parent) + os.sep, "")
+    rel_path = rel_path.replace(str(_user_lib_presets().parent) + "/", "")
     abs_path = str(amxd_deploy_path)
     file_size = amxd_deploy_path.stat().st_size if amxd_deploy_path.exists() else 0
 
@@ -604,28 +792,213 @@ def build_adv(spec: dict, amxd_deploy_path: Path, output: Path | None = None) ->
     return output
 
 
-def deploy_amxd(amxd_path: Path, device_type: str = "midi_effect") -> Path:
-    """Copy .amxd to the User Library so Ableton's browser sees it."""
-    dest_dir = _DEST_MAP.get(device_type)
-    if dest_dir is None:
-        raise ValueError(f"Unknown device_type: {device_type}")
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    dest = dest_dir / amxd_path.name
-    shutil.copy2(amxd_path, dest)
-    print(f"Deployed → {dest}")
-    return dest
+def deploy_amxd(
+    amxd_path: Path,
+    device_type: str = "midi_effect",
+    *,
+    imported: bool = True,
+) -> Path:
+    """Copy .amxd to the User Library (default: ``Imported/``)."""
+    dests = deploy_artifact_for_device_type(amxd_path, device_type, imported=imported)
+    return dests[0]
 
 
-def deploy_adv(adv_path: Path, device_type: str = "midi_effect") -> Path:
-    """Copy .adv to the User Library."""
-    dest_dir = _DEST_MAP.get(device_type)
-    if dest_dir is None:
-        raise ValueError(f"Unknown device_type: {device_type}")
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    dest = dest_dir / adv_path.name
-    shutil.copy2(adv_path, dest)
-    print(f"Deployed → {dest}")
-    return dest
+def deploy_adv(
+    adv_path: Path,
+    device_type: str = "midi_effect",
+    *,
+    imported: bool = True,
+) -> Path:
+    """Copy .adv to the User Library (default: ``Imported/``)."""
+    dests = deploy_artifact_for_device_type(adv_path, device_type, imported=imported)
+    return dests[0]
+
+
+def _patcher_dict_from_amxd_root(obj: dict) -> dict:
+    if "patcher" in obj and isinstance(obj["patcher"], dict):
+        return obj["patcher"]
+    return obj
+
+
+def _find_title_comment_box(patcher: dict) -> dict | None:
+    boxes = patcher.get("boxes") or []
+    candidates: list[dict] = []
+    for entry in boxes:
+        box = entry.get("box") or {}
+        if box.get("maxclass") != "comment":
+            continue
+        if box.get("presentation") != 1:
+            continue
+        candidates.append(box)
+    for box in candidates:
+        if box.get("fontface") == 1:
+            return box
+    return candidates[0] if candidates else None
+
+
+def _parse_rgba_csv(value: str) -> list[float]:
+    parts = [p.strip() for p in value.split(",")]
+    if len(parts) != 4:
+        raise ValueError(f"RGBA must have 4 comma-separated values, got {value!r}")
+    return [float(p) for p in parts]
+
+
+def _repack_amxd_patched(
+    data: bytes,
+    patcher: dict,
+    *,
+    device_name: str,
+    allow_dlst_rebuild: bool = False,
+) -> bytes:
+    header, subheader, _old_root, trailing = _extract_amxd_parts(data)
+    root = {"patcher": patcher}
+
+    if _amxd_json_starts_at_32(data):
+        return _pack_amxd(header, root, device_name=device_name)
+
+    json_bytes = json.dumps(root, ensure_ascii=False).encode("utf-8")
+    json_pad = (4 - len(json_bytes) % 4) % 4
+    json_padded = json_bytes + b"\x00" * json_pad
+
+    old_content_size = struct.unpack(">I", subheader[12:16])[0]
+    old_json_padded_len = old_content_size - 16
+
+    if len(json_padded) == old_json_padded_len:
+        new_content_size = 16 + len(json_padded)
+        new_section_size = new_content_size + len(trailing)
+        hdr = bytearray(header)
+        struct.pack_into("<I", hdr, 28, new_section_size)
+        sub = bytearray(subheader)
+        struct.pack_into(">I", sub, 12, new_content_size)
+        return bytes(hdr) + bytes(sub) + json_padded + trailing
+
+    if not allow_dlst_rebuild:
+        raise ValueError(
+            "Patch changed JSON byte length; embedded dlst cannot be preserved. "
+            "Pass allow_dlst_rebuild=True or use a smaller edit."
+        )
+    print(
+        "WARN: Rebuilding dlst — trailing embeds from Max save may be lost.",
+        file=sys.stderr,
+    )
+    return _pack_amxd(header, root, device_name=device_name)
+
+
+def _next_patch_output_path(src: Path) -> Path:
+    parent = src.parent
+    stem = src.stem
+    if stem.endswith(".amxd"):
+        stem = stem[:-5]
+    pat = re.compile(r"^(?P<base>.+)_patch(?P<n>\d+)$")
+    m = pat.match(stem)
+    base = m.group("base") if m else stem
+    n = int(m.group("n")) + 1 if m else 1
+    while (parent / f"{base}_patch{n}.amxd").exists():
+        n += 1
+    return parent / f"{base}_patch{n}.amxd"
+
+
+def patch_amxd_field(
+    amxd_path: Path,
+    *,
+    bgcolor: list[float] | None = None,
+    editing_bgcolor: list[float] | None = None,
+    title_text: str | None = None,
+    title_color: list[float] | None = None,
+    in_place: bool = False,
+    allow_dlst_rebuild: bool = False,
+    output: Path | None = None,
+) -> Path:
+    """Surgical UI edit on an existing ``.amxd`` without ``build_amxd`` mutators."""
+    amxd_path = Path(amxd_path)
+    if not amxd_path.is_file():
+        raise FileNotFoundError(amxd_path)
+
+    data = amxd_path.read_bytes()
+    _header, _sub, root_obj, _trail = _extract_amxd_parts(data)
+    patcher = deepcopy(_patcher_dict_from_amxd_root(root_obj))
+
+    if bgcolor is not None:
+        patcher["bgcolor"] = list(bgcolor)
+    if editing_bgcolor is not None:
+        patcher["editing_bgcolor"] = list(editing_bgcolor)
+    if title_text is not None or title_color is not None:
+        title_box = _find_title_comment_box(patcher)
+        if title_box is None:
+            raise ValueError("No presentation title comment box found to patch")
+        if title_text is not None:
+            title_box["text"] = title_text
+        if title_color is not None:
+            title_box["textcolor"] = list(title_color)
+
+    if not any(v is not None for v in (bgcolor, editing_bgcolor, title_text, title_color)):
+        raise ValueError("No patch fields specified")
+
+    device_name = amxd_path.stem
+    out_bytes = _repack_amxd_patched(
+        data,
+        patcher,
+        device_name=device_name,
+        allow_dlst_rebuild=allow_dlst_rebuild,
+    )
+
+    if in_place:
+        out_path = amxd_path
+    elif output is not None:
+        out_path = Path(output)
+    else:
+        out_path = _next_patch_output_path(amxd_path)
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_bytes(out_bytes)
+
+    sidecar_src = sidecar_path_for_artifact(amxd_path)
+    if sidecar_src.is_file():
+        shutil.copy2(sidecar_src, sidecar_path_for_artifact(out_path))
+    elif not in_place:
+        pass
+
+    print(f"Patched → {out_path} ({len(out_bytes)} bytes)")
+    return out_path
+
+
+def _lint_amxd_dlst(amxd_path: Path) -> list[str]:
+    """Lint dlst only for legacy subheader .amxd files (compact builds omit dlst)."""
+    data = amxd_path.read_bytes()
+    if _amxd_json_starts_at_32(data):
+        return []
+    if b"dlst" not in data:
+        return ["missing dlst section"]
+    return []
+
+
+def verify_spec_offline(spec: dict, *, skip_validate: bool = False) -> dict:
+    """Validate spec, build to a temp file, and lint sidecar + dlst (no Live)."""
+    from tempfile import TemporaryDirectory
+
+    if not skip_validate:
+        from spec_validate import require_valid_spec
+
+        require_valid_spec(spec)
+
+    device_type = spec.get("device_type", "midi_effect")
+    with TemporaryDirectory(prefix="m4l_verify_") as tmp:
+        out = Path(tmp) / amxd_filename_for_spec(spec.get("name", "Untitled"))
+        build_amxd(spec, out, skip_validate=True)
+        sidecar = read_device_type_sidecar(out)
+        if sidecar != device_type:
+            raise ValueError(
+                f"sidecar device_type {sidecar!r} != spec {device_type!r}"
+            )
+        dlst_errors = _lint_amxd_dlst(out)
+        if dlst_errors:
+            raise ValueError("; ".join(dlst_errors))
+        return {
+            "status": "ok",
+            "amxd_bytes": out.stat().st_size,
+            "device_type": device_type,
+            "sidecar": sidecar,
+        }
 
 
 # ── AbletonMCP socket helpers ────────────────────────────────────────────────
@@ -875,11 +1248,17 @@ def _create_new_track_for_device_type(device_type: str) -> tuple[int, str]:
     return _create_midi_track_index(), "midi"
 
 
-def load_device(track_index: int, device_name: str,
-                device_type: str = "midi_effect") -> dict:
+def load_device(
+    track_index: int,
+    device_name: str,
+    device_type: str = "midi_effect",
+) -> dict:
     """Load a device from User Library → Imported/ onto a track (stem matches ``device_name``)."""
-    browser_root = _BROWSER_MAP.get(device_type, _BROWSER_MAP["midi_effect"])
+    browser_root = _browser_root(device_type)
     path = f"{browser_root}/Imported/{device_name}"
+    imported_amxd = _dest_dir(device_type) / "Imported" / f"{device_name}.amxd"
+    if imported_amxd.is_file():
+        assert_device_type_sidecar(imported_amxd, device_type)
     result = load_browser_item_by_browser_path(track_index, path)
     print(f"Load result: {json.dumps(result, indent=2)}")
     return result
@@ -901,9 +1280,13 @@ def _wait_load_browser_imported(
     """
     import time
 
-    browser_root = _BROWSER_MAP.get(device_type, _BROWSER_MAP["midi_effect"])
+    browser_root = _browser_root(device_type)
     parent_path = f"{browser_root}/Imported"
     load_path = f"{parent_path}/{stem}"
+
+    imported_amxd = _dest_dir(device_type) / "Imported" / f"{stem}.amxd"
+    if imported_amxd.is_file():
+        assert_device_type_sidecar(imported_amxd, device_type)
 
     last: dict = {"status": "error", "message": "no load attempts"}
     for attempt in range(max_retries):
@@ -1038,29 +1421,36 @@ def build_deploy_load(
     amxd_file = amxd_filename_for_spec(name)
     built = vdir / amxd_file
     build_amxd(spec, built, skip_validate=skip_validate)
+
+    donor_av = "unknown"
+    try:
+        _h, _s, donor_patch, _t = _get_reference(device_type)
+        donor_av = str(_resolve_appversion(donor_patch).get("major", "?"))
+    except Exception:
+        pass
+    from datetime import datetime, timezone
+
+    version_lines = [
+        ver,
+        f"donor_appversion_major: {donor_av}",
+        f"built_at: {datetime.now(timezone.utc).isoformat()}",
+    ]
     (vdir / "spec.json").write_text(
         json.dumps(spec, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    (vdir / "VERSION.txt").write_text(ver + "\n", encoding="utf-8")
+    (vdir / "VERSION.txt").write_text("\n".join(version_lines) + "\n", encoding="utf-8")
     print(f"Versioned build → {built} ({ver})")
 
-    dest_dir = _DEST_MAP.get(device_type)
-    imported_dir = dest_dir / "Imported"
-    imported_dir.mkdir(parents=True, exist_ok=True)
-    amxd_deploy = imported_dir / built.name
-    shutil.copy2(built, amxd_deploy)
-    print(f"Deployed .amxd → {amxd_deploy}")
+    deployed = deploy_artifact_for_device_type(built, device_type, imported=True)
+    amxd_deploy = deployed[0]
 
     build_adv_flag = with_adv or os.environ.get("M4L_BUILD_ADV") == "1"
     if build_adv_flag:
         adv_built = vdir / f"{name}.adv"
         build_adv(spec, amxd_deploy, adv_built)
-        adv_deploy = deploy_adv(adv_built, device_type)
-        print(f"Deployed .adv → {adv_deploy}")
-        adv_imported = imported_dir / adv_built.name
-        shutil.copy2(adv_built, adv_imported)
-        print(f"Deployed .adv → {adv_imported}")
+        write_device_type_sidecar(adv_built, device_type)
+        deploy_artifact_for_device_type(adv_built, device_type, imported=True)
 
     result: dict = {
         "version": ver,
@@ -1134,9 +1524,84 @@ def _cli():
         )
 
     elif cmd == "deploy":
-        amxd = Path(sys.argv[2])
-        device_type = sys.argv[3] if len(sys.argv) > 3 else "midi_effect"
-        deploy_amxd(amxd, device_type)
+        argv_tail = sys.argv[2:]
+        imported = "--category-root" not in argv_tail
+        filtered = [a for a in argv_tail if a != "--category-root"]
+        if not filtered:
+            print(
+                "usage: m4l_pipeline.py deploy <path.amxd|.adv> [device_type] [--category-root]",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        artifact = Path(filtered[0])
+        device_type = filtered[1] if len(filtered) > 1 else "midi_effect"
+        deploy_artifact_for_device_type(artifact, device_type, imported=imported)
+
+    elif cmd == "patch":
+        argv_tail = sys.argv[2:]
+        if not argv_tail:
+            print(
+                "usage: m4l_pipeline.py patch <file.amxd> [--bgcolor R,G,B,A] "
+                "[--editing-bgcolor R,G,B,A] [--title-text TEXT] [--title-color R,G,B,A] "
+                "[--in-place] [--allow-dlst-rebuild] [--deploy device_type]",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        amxd = Path(argv_tail[0])
+        bgcolor = editing_bgcolor = title_text = title_color = None
+        in_place = False
+        allow_dlst_rebuild = False
+        deploy_type: str | None = None
+        i = 1
+        while i < len(argv_tail):
+            a = argv_tail[i]
+            if a == "--bgcolor" and i + 1 < len(argv_tail):
+                bgcolor = _parse_rgba_csv(argv_tail[i + 1])
+                i += 2
+            elif a == "--editing-bgcolor" and i + 1 < len(argv_tail):
+                editing_bgcolor = _parse_rgba_csv(argv_tail[i + 1])
+                i += 2
+            elif a == "--title-text" and i + 1 < len(argv_tail):
+                title_text = argv_tail[i + 1]
+                i += 2
+            elif a == "--title-color" and i + 1 < len(argv_tail):
+                title_color = _parse_rgba_csv(argv_tail[i + 1])
+                i += 2
+            elif a == "--in-place":
+                in_place = True
+                i += 1
+            elif a == "--allow-dlst-rebuild":
+                allow_dlst_rebuild = True
+                i += 1
+            elif a == "--deploy" and i + 1 < len(argv_tail):
+                deploy_type = argv_tail[i + 1]
+                i += 2
+            else:
+                print(f"Unknown patch argument: {a}", file=sys.stderr)
+                sys.exit(1)
+        out = patch_amxd_field(
+            amxd,
+            bgcolor=bgcolor,
+            editing_bgcolor=editing_bgcolor,
+            title_text=title_text,
+            title_color=title_color,
+            in_place=in_place,
+            allow_dlst_rebuild=allow_dlst_rebuild,
+        )
+        if deploy_type:
+            deploy_artifact_for_device_type(out, deploy_type, imported=True)
+
+    elif cmd == "verify":
+        argv_tail = sys.argv[2:]
+        skip_validate = "--skip-validate" in argv_tail
+        filtered = [a for a in argv_tail if a != "--skip-validate"]
+        if not filtered:
+            print("usage: m4l_pipeline.py verify <spec.json> [--skip-validate]", file=sys.stderr)
+            sys.exit(1)
+        spec = json.loads(Path(filtered[0]).read_text(encoding="utf-8"))
+        result = verify_spec_offline(spec, skip_validate=skip_validate)
+        print(json.dumps(result, indent=2))
+        print("M4L_VERIFY_OFFLINE_OK")
 
     elif cmd == "load":
         track = int(sys.argv[2])

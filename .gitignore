@@ -31,3 +31,12 @@ projects/Pipeline_Example/Pipeline_Example */
 # Keys / OS cruft
 *.pem
 Thumbs.db
+
+# IDE / agent caches (local transcripts — never commit)
+.cursor/agent-transcripts/
+.cursor/conversations/
+.claude/worktrees/
+.codeium/
+.cline/
+.aider*
+.aider/

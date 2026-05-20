@@ -34,6 +34,9 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 | Scaffold workspace plugin | `scripts/scaffold_plugin.py --name MyPlugin --type midi_effect` |
 | Export `.amxd` → spec | `scripts/export_spec_from_amxd.py device.amxd -o spec.json` |
 | Build `.amxd` only | `tooling/m4l_pipeline.py build spec.json` |
+| Offline verify (validate + build + sidecar) | `tooling/m4l_pipeline.py verify spec.json` |
+| Patch UI on existing `.amxd` (Max-first) | `tooling/m4l_pipeline.py patch device.amxd --bgcolor 0,0,0,1 [--deploy midi_effect]` |
+| Deploy artifact to Imported/ | `tooling/m4l_pipeline.py deploy device.amxd [device_type]` |
 | Build + deploy + load | `tooling/m4l_pipeline.py all spec.json` |
 | Same, no Live | `… all spec.json --no-live` |
 | Include `.adv` | `… all spec.json --with-adv` or `M4L_BUILD_ADV=1` |
@@ -42,6 +45,11 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 | Confirm MCP can create **audio** tracks (after Live restart post-install) | `scripts/verify_setup.py --wait-mcp 120 --assert-create-audio-track` |
 | Preflight | `scripts/verify_setup.py --preflight` |
 | Live verify | `scripts/m4l_verify.py` (see [`VERIFY_GUIDE.md`](VERIFY_GUIDE.md)) |
+| Donor appversion consistency | `scripts/check_donor_consistency.py` |
+| Deploy / patch unit tests (offline) | `scripts/test_m4l_pipeline_deploy.py` |
+| Block staging workspace content | `scripts/check_workspace_not_staged.py` |
+| Install workspace pre-commit hook | `scripts/install_workspace_pre_commit.py` |
+| Troubleshooting CreateDevice errors | [`TROUBLESHOOTING_M4L.md`](TROUBLESHOOTING_M4L.md) |
 | Parameter sweep | `scripts/m4l_parameter_sweep.py --track N --device D` |
 | Audio checklist (manual) | [`AUDIO_SMOKE_TEST.md`](AUDIO_SMOKE_TEST.md) |
 
@@ -64,6 +72,7 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 | `SCAFFOLD_OK` | Workspace project created |
 | `EXPORT_SPEC_OK` | Export from `.amxd` done |
 | `M4L_VERIFY_OK` | Live verify passed |
+| `M4L_VERIFY_OFFLINE_OK` | `m4l_pipeline.py verify` passed (no Live) |
 | `M4L_AUDIO_MCP_OK` | `verify_setup.py --assert-create-audio-track` succeeded |
 | `M4L_PARAM_SWEEP_OK` | Parameter OSC read/write OK |
 
@@ -75,6 +84,8 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 | `M4L_SKIP_LIVE=1` | Skip MCP load in `all` |
 | `M4L_SKIP_VALIDATE=1` | Skip spec validation before build |
 | `M4L_BUILD_ADV=1` | Generate/deploy `.adv` with `all` |
+| `M4L_APPVERSION=9.1.4` | Override Max appversion stamp on build (default: preserve donor) |
+| `M4L_APPVERSION_JSON_FILE=/path` | Full appversion dict override (rare) |
 | `M4L_ALLOW_AUDIO_ON_MIDI=1` | Debug only: load `audio_effect` on MIDI if MCP lacks `create_audio_track` (usually breaks in Live) |
 | `ABLETON_HOME` | Override Ableton user folder |
 

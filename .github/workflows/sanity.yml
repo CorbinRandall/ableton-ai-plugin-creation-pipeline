@@ -21,9 +21,15 @@ jobs:
       - run: python scripts/test_verification_helpers.py
       - run: python -m compileall -q scripts tooling projects
       - run: python scripts/check_projects_allowlist.py
+      - run: python scripts/check_donor_consistency.py
+      - run: python scripts/test_m4l_pipeline_deploy.py
       - run: python scripts/validate_spec.py projects/Pipeline_Example/pipeline_example_spec.json
       - run: python scripts/validate_spec.py examples/simple_gain_audio_spec.json
       - run: python scripts/validate_spec.py examples/volume_knob_audio_spec.json
+      - run: python tooling/m4l_pipeline.py verify projects/Pipeline_Example/pipeline_example_spec.json
       - run: python tooling/m4l_pipeline.py build projects/Pipeline_Example/pipeline_example_spec.json /tmp/pipeline_example_ci.amxd
+      - run: python -c "import os; s=os.stat('/tmp/pipeline_example_ci.amxd').st_size; assert 2000<s<200000, s"
       - run: python tooling/m4l_pipeline.py build examples/simple_gain_audio_spec.json /tmp/simple_gain_ci.amxd
+      - run: python -c "import os; s=os.stat('/tmp/simple_gain_ci.amxd').st_size; assert 2000<s<200000, s"
       - run: python tooling/m4l_pipeline.py build examples/volume_knob_audio_spec.json /tmp/volume_knob_ci.amxd
+      - run: python -c "import os; s=os.stat('/tmp/volume_knob_ci.amxd').st_size; assert 2000<s<200000, s"

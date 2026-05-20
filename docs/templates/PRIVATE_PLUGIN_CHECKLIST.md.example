@@ -1,0 +1,28 @@
+# Private plugin checklist (copy locally — do not commit with real names)
+
+Copy to `projects/workspace/<YourPlugin>/CHECKLIST.md` inside the gitignored workspace tree.
+
+## Deploy
+
+- [ ] `device_type` in spec matches how you load in Live (`midi_effect` / `audio_effect` / `instrument`)
+- [ ] Deploy uses **`deploy_artifact_for_device_type`** or **`m4l_pipeline.py all`** — **one** User Library category only
+- [ ] Remove stray copies under **wrong** Max MIDI / Max Audio / Instrument folders
+- [ ] Load from **`…/Imported/`** under the matching category
+
+## UI-only tweaks (Max-first)
+
+- [ ] Edit in Max **or** use **`m4l_pipeline.py patch`** on a Max-saved `.amxd`
+- [ ] Do **not** rerun full Python graph rebuild for background/title-only changes
+- [ ] **`--deploy <device_type>`** after patch when testing in Live
+
+## Version archives
+
+- [ ] Keep local `versions/` or `{Name} X.Y/` folders under `projects/workspace/`
+- [ ] Never `git add` workspace contents except your private notes inside the gitignored tree
+
+## Agent / IDE
+
+- [ ] Optional: `.cursor/rules/private-plugin.mdc` in this folder (local only)
+- [ ] User-level Cursor rule: never put workspace plugin names in **public** commit messages, PR titles, or branch names
+
+See [`docs/PRIVATE_PLUGINS.md`](../../docs/PRIVATE_PLUGINS.md) and [`docs/TROUBLESHOOTING_M4L.md`](../../docs/TROUBLESHOOTING_M4L.md).
