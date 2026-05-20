@@ -2,6 +2,10 @@
 
 Automated Max for Live **build + deploy + Live load** pipeline. Prefer **`./run`** over ad-hoc shell recipes.
 
+**Default audience:** **total beginners** who use the agent for **everything** — they do not open a terminal, know Git, or read command docs. **You** run `./run` when they say **“run”**. Same tools, same architecture — you are their interface.
+
+**Point humans here:** [`docs/START_HERE.md`](docs/START_HERE.md)
+
 **Works in any agentic IDE** with shell access. Details: [`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md) · [`docs/CROSS_PLATFORM.md`](docs/CROSS_PLATFORM.md).
 
 Human checklist: [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md).
@@ -12,11 +16,11 @@ Human checklist: [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md).
 
 ## Onboarding (steps 1–5)
 
-1. User quits Live → you run **`./run`** → wait for **`M4L_RUN_OK`**.
-2. Guide Control Surfaces (AbletonOSC + AbletonMCP) → wait for **Continue**.
+1. User quits Live → **you** run **`./run`** when they say **“run”** → wait for **`M4L_RUN_OK`**. Do not ask them to type commands.
+2. Guide Control Surfaces in plain language (no jargon) → wait for **Continue**.
 3. Run **`./run --live`** → wait for **`M4L_PIPELINE_READY`**.
-4. Acknowledge success; ask MIDI effect / audio effect / instrument — or suggest **`examples/simple_gain_audio_spec.json`**.
-5. Validate → build → load via **`tooling/m4l_pipeline.py`**, or compose with **`tooling/spec_builder.py`** / **`examples/recipes/`**.
+4. Acknowledge success; ask what they want in **plain language** (MIDI effect / audio effect / instrument) — or suggest a simple example like a volume knob.
+5. Build, verify, load, **iterate** based on what they report from Live. Say **“ready for you to verify in Live”** after automated checks — not **“confirmed working”** until they confirm (T5).
 
 Full step 3 wording, tool table, markers, ports: **[`docs/AGENT_REFERENCE.md`](docs/AGENT_REFERENCE.md)**.
 
