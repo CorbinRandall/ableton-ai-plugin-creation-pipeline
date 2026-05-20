@@ -1,0 +1,338 @@
+{
+  "name": "SimpleLFO",
+  "description": "cycle~ LFO tremolo — Rate and Depth scale *~ on audio path.",
+  "device_type": "audio_effect",
+  "devicewidth": 220.0,
+  "openinpresentation": 1,
+  "boxes": [
+    {
+      "box": {
+        "id": "obj-1",
+        "maxclass": "plugin~",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "outlettype": [
+          "signal"
+        ],
+        "patching_rect": [
+          30.0,
+          30.0,
+          80.0,
+          22.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-2",
+        "maxclass": "*~",
+        "numinlets": 2,
+        "numoutlets": 1,
+        "outlettype": [
+          "signal"
+        ],
+        "patching_rect": [
+          30.0,
+          60.0,
+          37.0,
+          22.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-3",
+        "maxclass": "newobj",
+        "numinlets": 2,
+        "numoutlets": 1,
+        "outlettype": [
+          "signal"
+        ],
+        "text": "cycle~ 1",
+        "patching_rect": [
+          30.0,
+          90.0,
+          56.0,
+          22.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-4",
+        "maxclass": "*~",
+        "numinlets": 2,
+        "numoutlets": 1,
+        "outlettype": [
+          "signal"
+        ],
+        "patching_rect": [
+          30.0,
+          120.0,
+          37.0,
+          22.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-5",
+        "maxclass": "sig~",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "outlettype": [
+          "signal"
+        ],
+        "patching_rect": [
+          30.0,
+          150.0,
+          37.0,
+          22.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-6",
+        "maxclass": "sig~",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "outlettype": [
+          "signal"
+        ],
+        "patching_rect": [
+          30.0,
+          180.0,
+          37.0,
+          22.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-7",
+        "maxclass": "plugout~",
+        "numinlets": 1,
+        "numoutlets": 0,
+        "patching_rect": [
+          30.0,
+          210.0,
+          80.0,
+          22.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-8",
+        "maxclass": "live.dial",
+        "numinlets": 1,
+        "numoutlets": 2,
+        "outlettype": [
+          "",
+          "float"
+        ],
+        "parameter_enable": 1,
+        "presentation": 1,
+        "presentation_rect": [
+          20.0,
+          40.0,
+          41.0,
+          48.0
+        ],
+        "textcolor": [
+          0.811764705882353,
+          0.811764705882353,
+          0.827450980392157,
+          1.0
+        ],
+        "showname": 1,
+        "shownumber": 1,
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Rate",
+            "parameter_shortname": "Rate",
+            "parameter_type": 0,
+            "parameter_mmin": 0.1,
+            "parameter_mmax": 20.0,
+            "parameter_initial_enable": 1,
+            "parameter_initial": [
+              2.0
+            ],
+            "parameter_unitstyle": 0
+          }
+        },
+        "patching_rect": [
+          30.0,
+          240.0,
+          41.0,
+          48.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-9",
+        "maxclass": "live.dial",
+        "numinlets": 1,
+        "numoutlets": 2,
+        "outlettype": [
+          "",
+          "float"
+        ],
+        "parameter_enable": 1,
+        "presentation": 1,
+        "presentation_rect": [
+          77.0,
+          40.0,
+          41.0,
+          48.0
+        ],
+        "textcolor": [
+          0.811764705882353,
+          0.811764705882353,
+          0.827450980392157,
+          1.0
+        ],
+        "showname": 1,
+        "shownumber": 1,
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Depth",
+            "parameter_shortname": "Depth",
+            "parameter_type": 0,
+            "parameter_mmin": 0.0,
+            "parameter_mmax": 100.0,
+            "parameter_initial_enable": 1,
+            "parameter_initial": [
+              50.0
+            ],
+            "parameter_unitstyle": 1
+          }
+        },
+        "patching_rect": [
+          30.0,
+          296.0,
+          41.0,
+          48.0
+        ]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-10",
+        "maxclass": "newobj",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "outlettype": [
+          "float"
+        ],
+        "text": "* 0.01",
+        "patching_rect": [
+          30.0,
+          352.0,
+          42.0,
+          22.0
+        ]
+      }
+    }
+  ],
+  "lines": [
+    {
+      "patchline": {
+        "source": [
+          "obj-1",
+          0
+        ],
+        "destination": [
+          "obj-2",
+          0
+        ]
+      }
+    },
+    {
+      "patchline": {
+        "source": [
+          "obj-6",
+          0
+        ],
+        "destination": [
+          "obj-2",
+          1
+        ]
+      }
+    },
+    {
+      "patchline": {
+        "source": [
+          "obj-2",
+          0
+        ],
+        "destination": [
+          "obj-7",
+          0
+        ]
+      }
+    },
+    {
+      "patchline": {
+        "source": [
+          "obj-3",
+          0
+        ],
+        "destination": [
+          "obj-4",
+          0
+        ]
+      }
+    },
+    {
+      "patchline": {
+        "source": [
+          "obj-5",
+          0
+        ],
+        "destination": [
+          "obj-4",
+          1
+        ]
+      }
+    },
+    {
+      "patchline": {
+        "source": [
+          "obj-4",
+          0
+        ],
+        "destination": [
+          "obj-6",
+          0
+        ]
+      }
+    },
+    {
+      "patchline": {
+        "source": [
+          "obj-9",
+          1
+        ],
+        "destination": [
+          "obj-10",
+          0
+        ]
+      }
+    },
+    {
+      "patchline": {
+        "source": [
+          "obj-10",
+          0
+        ],
+        "destination": [
+          "obj-5",
+          0
+        ]
+      }
+    }
+  ]
+}

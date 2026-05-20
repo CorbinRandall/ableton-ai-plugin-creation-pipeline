@@ -1,0 +1,37 @@
+{
+  "name": "BadAudioIO",
+  "device_type": "audio_effect",
+  "devicewidth": 200,
+  "openinpresentation": 1,
+  "boxes": [
+    {
+      "box": {
+        "id": "obj-in",
+        "maxclass": "plugin~",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "patching_rect": [30, 40, 80, 22]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-dial",
+        "maxclass": "live.dial",
+        "numinlets": 1,
+        "numoutlets": 2,
+        "parameter_enable": 1,
+        "presentation": 1,
+        "presentation_rect": [24, 36, 41, 48],
+        "saved_attribute_attributes": {
+          "valueof": {
+            "parameter_longname": "Gain",
+            "parameter_shortname": "Gain",
+            "parameter_type": 0
+          }
+        },
+        "patching_rect": [130, 36, 41, 48]
+      }
+    }
+  ],
+  "lines": []
+}

@@ -1,0 +1,34 @@
+{
+  "name": "BadPatchline",
+  "device_type": "audio_effect",
+  "devicewidth": 200,
+  "openinpresentation": 1,
+  "boxes": [
+    {
+      "box": {
+        "id": "obj-in",
+        "maxclass": "plugin~",
+        "numinlets": 1,
+        "numoutlets": 1,
+        "patching_rect": [30, 40, 80, 22]
+      }
+    },
+    {
+      "box": {
+        "id": "obj-out",
+        "maxclass": "plugout~",
+        "numinlets": 1,
+        "numoutlets": 0,
+        "patching_rect": [30, 120, 80, 22]
+      }
+    }
+  ],
+  "lines": [
+    {
+      "patchline": {
+        "source": ["obj-doesntexist", 0],
+        "destination": ["obj-out", 0]
+      }
+    }
+  ]
+}
