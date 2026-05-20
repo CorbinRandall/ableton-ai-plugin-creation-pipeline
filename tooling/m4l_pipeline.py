@@ -194,12 +194,16 @@ _ABLETON_PORT = 9877
 # ── Binary format ────────────────────────────────────────────────────────────
 
 def _extract_amxd_parts(data: bytes) -> tuple[bytes, bytes, dict, bytes]:
-    """Split .amxd into (header_32, subheader_16, json_dict, trailing_bytes).
+    """Parse an official .amxd file: 32-byte header + JSON starting at byte 32.
 
-    The trailing bytes may contain SVGs, images, or other embedded resources.
+    Official blank Max for Live templates store JSON directly at byte 32.
+    The JSON opens with '{"patcher" : \t{' so byte 48 is the inner patcher dict.
+    Returns (header_32, _ignored_16, patcher_dict, trailing_bytes).
+    Only header_32 and patcher_dict matter — the second element is a legacy
+    placeholder kept so existing call-sites don't need updating.
     """
     header = data[:32]
-    subheader = data[32:48]
+    subheader = data[32:48]  # first 16 bytes of JSON — kept for signature compat
 
     body = data[48:]
     end = len(body)
@@ -218,78 +222,20 @@ def _extract_amxd_parts(data: bytes) -> tuple[bytes, bytes, dict, bytes]:
     return header, subheader, obj, trailing
 
 
-def _build_dlst(device_filename: str, json_padded_size: int) -> bytes:
-    """Build a dlst (dependency list) with one JSON entry.
 
-    The dlst tells Live where the JSON section is and its size.
-    Without a valid dlst, Live can't register device parameters.
+def _pack_amxd(header_32: bytes, root: dict, device_name: str = "Untitled") -> bytes:
+    """Assemble .amxd bytes: 32-byte header + JSON content.
 
-    All multi-byte integers are big-endian. Each field is:
-        tag(4 bytes) + size(4 bytes, includes tag+size) + data(size-8 bytes)
-    """
-    def _tag(name: str, data: bytes) -> bytes:
-        total = 8 + len(data)
-        return name.encode("ascii") + struct.pack(">I", total) + data
-
-    def _tag_u32(name: str, val: int) -> bytes:
-        return _tag(name, struct.pack(">I", val))
-
-    def _tag_str(name: str, s: str) -> bytes:
-        raw = s.encode("ascii") + b"\x00"
-        # Pad to 4-byte alignment
-        pad = (4 - len(raw) % 4) % 4
-        return _tag(name, raw + b"\x00" * pad)
-
-    # Build the dire entry for JSON
-    dire_body = (
-        _tag_str("type", "JSON")
-        + _tag_str("fnam", device_filename)
-        + _tag_u32("sz32", json_padded_size)
-        + _tag_u32("of32", 16)  # offset from byte 32 (mx@c subheader)
-        + _tag_u32("vers", 0)
-        + _tag_u32("flag", 0x11)  # 0x11 = standard JSON resource flag
-        + _tag_u32("mdat", 0)
-    )
-    dire = b"dire" + struct.pack(">I", 8 + len(dire_body)) + dire_body
-
-    # Wrap in dlst
-    dlst = b"dlst" + struct.pack(">I", 8 + len(dire)) + dire
-    return dlst
-
-
-def _pack_amxd(header_32: bytes, subheader_16: bytes, root: dict,
-               device_name: str = "Untitled") -> bytes:
-    """Reassemble .amxd bytes: header + subheader + padded JSON + dlst.
-
-    The dlst (dependency list) records the JSON section's byte offset and size.
-    Live uses this to locate and parse device parameters.
+    Matches the official blank Max for Live template format: JSON starts
+    directly at byte 32, no binary subheader, no dlst trailer.
+    section_size at header[28:32] (LE) = len(JSON bytes).
     """
     json_bytes = json.dumps(root, ensure_ascii=False).encode("utf-8")
 
-    # Pad JSON to 4-byte boundary (required by format)
-    json_pad = (4 - len(json_bytes) % 4) % 4
-    json_padded = json_bytes + b"\x00" * json_pad
-    json_padded_size = len(json_padded)
-
-    # Build dependency list
-    device_filename = f"{device_name}.amxd"
-    dlst = _build_dlst(device_filename, json_padded_size)
-
-    # Content size = subheader(16) + json_padded (everything before dlst)
-    # This goes in the subheader at offset 12 (big-endian).
-    # Live uses it to locate the dlst boundary.
-    content_size = 16 + json_padded_size
-
-    # Section size = content_size + dlst (everything after the 32-byte header)
-    section_size = content_size + len(dlst)
-
     hdr = bytearray(header_32)
-    struct.pack_into("<I", hdr, 28, section_size)
+    struct.pack_into("<I", hdr, 28, len(json_bytes))
 
-    sub = bytearray(subheader_16)
-    struct.pack_into(">I", sub, 12, content_size)
-
-    return bytes(hdr) + bytes(sub) + json_padded + dlst
+    return bytes(hdr) + json_bytes
 
 
 def _get_reference(device_type: str = "midi_effect") -> tuple[bytes, bytes, dict, bytes]:
@@ -421,7 +367,7 @@ def build_amxd(
 
         require_valid_spec(spec)
     device_type = spec.get("device_type", "midi_effect")
-    header_32, subheader_16, ref_root, trailing = _get_reference(device_type)
+    header_32, _subheader, ref_root, _trailing = _get_reference(device_type)
     # Start from the donor's full patcher to carry over required fields like
     # fileversion and classnamespace — without these Max rejects the file with
     # "createdevice" error 6 ("device file broken").
@@ -447,6 +393,9 @@ def build_amxd(
 
     # Explicitly replace project and styles so no reference-device identity leaks
     # into the built .amxd (prevents hot swap navigating to the reference file).
+    # amxdtype encodes the M4L device type in the binary header — must match the
+    # donor (audio=0x61616161, midi=0x6D6D6D6D, instrument=0x69696969).
+    donor_amxdtype = ref_root.get("project", {}).get("amxdtype", 1835887981)
     patch["project"] = {
         "version": 1,
         "creationdate": 3590052786,
@@ -460,7 +409,7 @@ def build_amxd(
         "layout": {},
         "searchpath": {},
         "detailsvisible": 0,
-        "amxdtype": 1835887981,
+        "amxdtype": donor_amxdtype,
         "readonly": 0,
         "devpathtype": 0,
         "devpath": ".",
@@ -475,7 +424,7 @@ def build_amxd(
     # does not leak from the header donor. Basic live.* UI does not need them;
     # rack controls require presentation flags on boxes (see M4L_FRONTEND_AND_BACKEND.md).
     name = spec.get("name", "Untitled")
-    amxd_bytes = _pack_amxd(header_32, subheader_16, root, device_name=name)
+    amxd_bytes = _pack_amxd(header_32, root, device_name=name)
     if output is None:
         output = WORKSPACE / f"{name}.amxd"
     output.parent.mkdir(parents=True, exist_ok=True)
