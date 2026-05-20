@@ -178,6 +178,7 @@ Suggested additions to **`ableton-plugin-pipeline`**:
 
 ## See also
 
+- [`docs/VERIFICATION_TIERS.md`](VERIFICATION_TIERS.md) — **T4** optional Max-side UDP ping template: [`tooling/templates/midi_effect_selftest_ping.json`](../tooling/templates/midi_effect_selftest_ping.json)
 - [`projects/Pipeline_Example/`](../projects/Pipeline_Example/) — tutorial spec (should include presentation fields after update)
 - [`VERIFY_GUIDE.md`](VERIFY_GUIDE.md) — MCP + OSC verification (backend)
 - [Ableton: Max for Live device presentation](https://help.ableton.com/hc/en-us/articles/209072909-Max-for-Live-device-presentation) — official UI mode overview

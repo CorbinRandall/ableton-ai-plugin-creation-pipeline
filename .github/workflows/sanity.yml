@@ -1,3 +1,6 @@
+# Sanity CI: T0 (validate spec, compile, offline build) + repo-only preflight (imports + donors).
+# Does NOT run Ableton Live — not MCP_LOAD_OK / OSC / rack health (see docs/VERIFICATION_TIERS.md).
+
 name: sanity
 
 on:
@@ -14,9 +17,13 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
+      - run: python scripts/verify_setup.py --preflight --repo-only
+      - run: python scripts/test_verification_helpers.py
       - run: python -m compileall -q scripts tooling projects
       - run: python scripts/check_projects_allowlist.py
       - run: python scripts/validate_spec.py projects/Pipeline_Example/pipeline_example_spec.json
       - run: python scripts/validate_spec.py examples/simple_gain_audio_spec.json
+      - run: python scripts/validate_spec.py examples/volume_knob_audio_spec.json
       - run: python tooling/m4l_pipeline.py build projects/Pipeline_Example/pipeline_example_spec.json /tmp/pipeline_example_ci.amxd
       - run: python tooling/m4l_pipeline.py build examples/simple_gain_audio_spec.json /tmp/simple_gain_ci.amxd
+      - run: python tooling/m4l_pipeline.py build examples/volume_knob_audio_spec.json /tmp/volume_knob_ci.amxd

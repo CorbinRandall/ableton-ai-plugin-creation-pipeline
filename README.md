@@ -3,6 +3,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Sanity CI](https://github.com/CorbinRandall/ableton-ai-plugin-creation-pipeline/actions/workflows/sanity.yml/badge.svg)](https://github.com/CorbinRandall/ableton-ai-plugin-creation-pipeline/actions/workflows/sanity.yml)
 
+The **`sanity`** workflow exercises roughly [**T0**](./docs/VERIFICATION_TIERS.md) (validate spec + compile Python + offline **`m4l_pipeline.py build`**). It does **not** run Ableton Live and **cannot** prove that a device loads cleanly or sounds correct — use **`scripts/m4l_verify.py`** on your Mac or Windows machine when Live + MCP + OSC are enabled ([**T2**](./docs/VERIFICATION_TIERS.md) onward).
+
 Use this repo with an **agent-style IDE** (Cursor, Claude Code, Antigravity, Copilot in agent mode, etc.) to **describe Max for Live devices in plain language** and turn them into **`.amxd`** files: validated JSON specs → build → deploy to your **Ableton User Library** → load on a **new track** via **[AbletonMCP](https://github.com/ahujasid/ableton-mcp)** (optional **[AbletonOSC](https://github.com/ideoforms/AbletonOSC)** for checks and automation).
 
 ---
@@ -23,9 +25,18 @@ Steps **2–4** match **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)** a
 
 ## First device to build (recommended smoke test)
 
-This path is **validated in CI**: schema/UI/layout checks plus **`m4l_pipeline.py build`**.
+This path is covered by **`sanity` CI**: schema/UI/layout checks plus **`m4l_pipeline.py build`** — **not** a Live rack proof (see **[docs/VERIFICATION_TIERS.md](docs/VERIFICATION_TIERS.md)**).
 
-**SimpleGain** — one **Gain** knob on an **audio effect** using the same **dry audio path** as our CI template (`plugin~` → `plugout~`). The knob is real in Live (automation/MIDI map); wire it to `*~` / `line~` in Max when you want audible level control—see **`tooling/templates/audio_effect_stub.json`**.
+**VolumeKnob** — same **`audio_effect`** category with an **audible** path: **`plugin~` → `*~` → `plugout~`**, **`Volume`** dial **0–100** scaled by **`* 0.01` → `sig~`** into the multiplier. Build/deploy (recommended: gitignored sandbox):
+
+```bash
+./venv/bin/python scripts/validate_spec.py examples/volume_knob_audio_spec.json
+M4L_PROJECTS_PREFIX=workspace ./venv/bin/python tooling/m4l_pipeline.py all examples/volume_knob_audio_spec.json --with-adv
+```
+
+Then **`scripts/m4l_verify.py --spec examples/volume_knob_audio_spec.json --skip-build --expect-params Volume`** after Live sees a patched MCP (**full quit + reopen** if you just ran **`install_remote_scripts.py`**).
+
+**SimpleGain** — one **Gain** knob on an **audio effect** using the same **dry audio path** as our CI template (`plugin~` → `plugout~`). The knob is real in Live (automation/MIDI map); wire it to `*~` / `line~` in Max when you want audible level control—see **`tooling/templates/audio_effect_stub.json`** or copy **`examples/volume_knob_audio_spec.json`**.
 
 From the **repo root** (after **`./run`** created **`venv/`**):
 
@@ -84,8 +95,11 @@ Step-by-step (permissions, coding-only Mac, agent prompts): **[`docs/GETTING_STA
 
 | Step | Command |
 |------|---------|
-| Preflight only | `./venv/bin/python scripts/verify_setup.py --preflight` |
-| Live health | `./venv/bin/python scripts/verify_setup.py --wait-mcp 120` |
+| Preflight (repo + donors only, CI-friendly) | `./venv/bin/python scripts/verify_setup.py --preflight --repo-only` |
+| Preflight (full, needs Ableton User Library paths) | `./venv/bin/python scripts/verify_setup.py --preflight` |
+| Live MCP socket wait | `./venv/bin/python scripts/verify_setup.py --wait-mcp 120` |
+| Full verify (Live + MCP + OSC) | `./venv/bin/python scripts/m4l_verify.py` — **[docs/VERIFY_GUIDE.md](docs/VERIFY_GUIDE.md)** |
+| Verify unit tests (no Live) | `./venv/bin/python scripts/test_verification_helpers.py` |
 | Tutorial + load | `./venv/bin/python projects/Pipeline_Example/build_pipeline_example.py` |
 
 Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projects/workspace/…`** with **`M4L_PROJECTS_PREFIX=workspace`**). **`m4l_pipeline.py all`** / **`build_deploy_load`** **deploy** to User Library **Imported/** and by default **insert the device on a new Live track** via AbletonMCP (**`all --no-live`** or **`M4L_SKIP_LIVE=1`** skips Live). **`build`** only writes **`.amxd`**. Track type (**MIDI** vs **audio**) follows **`device_type`**. See **`projects/workspace/README.md`**.
@@ -100,6 +114,7 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 | [**`docs/AGENTIC_IDES.md`**](docs/AGENTIC_IDES.md) | Any agentic IDE — same workflow |
 | [**`docs/CROSS_PLATFORM.md`**](docs/CROSS_PLATFORM.md) | macOS, Windows, Linux commands |
 | [**`docs/VERIFY_GUIDE.md`**](docs/VERIFY_GUIDE.md) | Live verify + parameter sweep |
+| [**`docs/VERIFICATION_TIERS.md`**](docs/VERIFICATION_TIERS.md) | **T0–T5** — what automation vs humans actually prove |
 | [**`docs/AUDIO_SMOKE_TEST.md`**](docs/AUDIO_SMOKE_TEST.md) | Manual audio checklist |
 | [**`docs/AGENT_TOOLS.md`**](docs/AGENT_TOOLS.md) | Shell commands for agents (validate, scaffold, export, build) |
 | [**`docs/ROADMAP.md`**](docs/ROADMAP.md) | Phased improvements and feasibility |
@@ -122,7 +137,8 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 | **`run`** / **`run.ps1`** | **Start here** — bootstrap + env + preflight + optional Live tutorial |
 | **`bootstrap.sh`** / **`bootstrap.ps1`** | Lower-level install (called by **`./run`**) |
 | **`requirements.txt`** | **`python-osc`** |
-| **`examples/simple_gain_audio_spec.json`** | **First-build smoke test** — validated gain utility spec |
+| **`examples/simple_gain_audio_spec.json`** | **First-build smoke test** — dry **`plugin~` → `plugout~`** + Gain dial |
+| **`examples/volume_knob_audio_spec.json`** | **Audible volume** — **`Volume`** dial scales audio via **`*~`** / **`sig~`** |
 | **`scripts/install_remote_scripts.py`** | Download/install Remote Scripts (patches MCP for **`create_audio_track`**) |
 | **`scripts/verify_setup.py`** | MCP + OSC health (**`--preflight`** = filesystem only) |
 | **`tooling/m4l_pipeline.py`** | Spec → **`.amxd`**, deploy, Ableton load |

@@ -106,6 +106,7 @@ Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 | Export `.amxd` → spec | `./venv/bin/python scripts/export_spec_from_amxd.py device.amxd -o spec.json` |
 | Build + deploy + load | `./venv/bin/python tooling/m4l_pipeline.py all spec.json` |
 | Live verify (OSC + MCP) | `./venv/bin/python scripts/m4l_verify.py` |
+| Verify helpers unit tests (no Live) | `./venv/bin/python scripts/test_verification_helpers.py` |
 | Templates | [`tooling/templates/`](tooling/templates/) |
 
 ---
@@ -150,4 +151,7 @@ Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 |--------|---------|
 | **`M4L_RUN_OK`** | Step 2 or 4 command finished successfully |
 | **`M4L_PIPELINE_READY`** | Step 4 complete — Live connected, tutorial loaded |
-| **`M4L_VERIFY_OK`** | `scripts/m4l_verify.py` completed (build/browser/load/OSC) |
+| **`M4L_VERIFY_OK`** | `scripts/m4l_verify.py` completed (build/browser/load/**T2 alignment**/OSC **T3**) |
+| **`DEVICE_SELFTEST_OK`** | Optional **T4** UDP self-test passed (`--require-selftest-udp-port`) |
+
+Tier meanings and honest wording: **`docs/VERIFICATION_TIERS.md`**.
