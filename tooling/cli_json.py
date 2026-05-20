@@ -1,4 +1,8 @@
-"""Shared --json stdout helper for CLI scripts."""
+"""Shared --json stdout helper for CLI scripts.
+
+When --json is set, scripts should emit exactly one JSON object on stdout
+(no trailing marker line). Human markers and logs go to stderr or are omitted.
+"""
 
 from __future__ import annotations
 

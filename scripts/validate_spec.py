@@ -31,7 +31,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--structure-only", action="store_true", help="JSON Schema + graph hints only")
     ap.add_argument("--ui-only", action="store_true", help="Presentation / textcolor checks only")
     ap.add_argument("--no-layout", action="store_true", help="Skip presentation overlap checks")
-    ap.add_argument("--json", action="store_true", help="Emit one JSON object on stdout (last line)")
+    ap.add_argument("--json", action="store_true", help="Stdout is one JSON object only (no marker line)")
     args = ap.parse_args(argv)
 
     if not args.spec.is_file():
@@ -56,22 +56,34 @@ def main(argv: list[str] | None = None) -> int:
         errors, warnings = validate_spec(spec, include_layout=not args.no_layout)
 
     for w in warnings:
-        print(f"WARN: {w}")
+        stream = sys.stderr if args.json else sys.stdout
+        print(f"WARN: {w}", file=stream)
     for e in errors:
         print(f"ERROR: {e}", file=sys.stderr)
 
     if errors:
         if args.json:
             emit_json(
-                {"errors": errors, "warnings": warnings, "spec": str(args.spec)},
+                {
+                    "errors": errors,
+                    "warnings": warnings,
+                    "spec": str(args.spec),
+                    "marker": "SPEC_VALIDATE_FAIL",
+                },
                 ok=False,
             )
         return 1
     if args.json:
         emit_json(
-            {"errors": [], "warnings": warnings, "spec": str(args.spec), "marker": "SPEC_VALIDATE_OK"},
+            {
+                "errors": [],
+                "warnings": warnings,
+                "spec": str(args.spec),
+                "marker": "SPEC_VALIDATE_OK",
+            },
             ok=True,
         )
+        return 0
     print("SPEC_VALIDATE_OK", args.spec.name)
     return 0
 
