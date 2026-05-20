@@ -15,6 +15,9 @@ configure_ableton.py for Options.txt hooks only).
 The installer patches AbletonMCP to add TCP ``create_audio_track`` (upstream only had MIDI).
 That lets ``tooling/m4l_pipeline.py`` open Max Audio devices on a **new audio track**.
 
+It also optionally patches **`get_device_health`** (LOM snapshot for diagnostics — see
+``docs/MCP_DEVICE_HEALTH_SPIKE.md``).
+
 Env:
   BOOTSTRAP_ABLETON_OSC_ARCHIVE   Override archive URL (default: pinned commit ZIP)
   BOOTSTRAP_ABLETON_MCP_ARCHIVE   Override archive URL (default: pinned commit ZIP)
@@ -204,6 +207,95 @@ def patch_abletonmcp_user_library_uri_lookup(abletonmcp_dir: Path) -> bool:
     return True
 
 
+_GET_DEVICE_HEALTH_METHOD = '''    def _get_device_health(self, track_index, device_index):
+        """Ableton-plugin-pipeline spike: LOM snapshot (not Max DSP/UI health)."""
+        try:
+            if track_index < 0 or track_index >= len(self._song.tracks):
+                raise IndexError("Track index out of range")
+            track = self._song.tracks[track_index]
+            if device_index < 0 or device_index >= len(track.devices):
+                raise IndexError("Device index out of range")
+            device = track.devices[device_index]
+            info = {
+                "track_index": track_index,
+                "device_index": device_index,
+                "name": device.name,
+                "class_name": device.class_name,
+                "type": self._get_device_type(device),
+                "parameter_count": len(device.parameters),
+            }
+            if hasattr(device, "class_display_name"):
+                try:
+                    info["class_display_name"] = device.class_display_name
+                except Exception:
+                    info["class_display_name"] = None
+            for attr in ("can_have_chains", "can_have_drum_pads", "is_active"):
+                if hasattr(device, attr):
+                    try:
+                        info[attr] = getattr(device, attr)
+                    except Exception:
+                        info[attr] = None
+            return info
+        except Exception as e:
+            self.log_message("Error getting device health: " + str(e))
+            raise
+
+'''
+
+
+def patch_abletonmcp_get_device_health(abletonmcp_dir: Path) -> bool:
+    """Add ``get_device_health`` TCP command + ``_get_device_health`` handler (idempotent)."""
+    init_py = abletonmcp_dir / "__init__.py"
+    if not init_py.is_file():
+        return False
+    text = init_py.read_text(encoding="utf-8")
+    changed = False
+
+    route_needle = (
+        '            elif command_type == "get_track_info":\n'
+        '                track_index = params.get("track_index", 0)\n'
+        '                response["result"] = self._get_track_info(track_index)\n'
+    )
+    route_insert = route_needle + (
+        '            elif command_type == "get_device_health":\n'
+        '                track_index = params.get("track_index", 0)\n'
+        '                device_index = params.get("device_index", 0)\n'
+        '                response["result"] = self._get_device_health(track_index, device_index)\n'
+    )
+    if 'elif command_type == "get_device_health":' not in text:
+        if route_needle not in text:
+            raise RuntimeError(
+                "AbletonMCP __init__.py: get_track_info branch not found — upstream layout changed."
+            )
+        text = text.replace(route_needle, route_insert, 1)
+        changed = True
+
+    if "def _get_device_health(self, track_index, device_index):" not in text:
+        prefix = (
+            '            self.log_message("Error getting track info: " + str(e))\n'
+            '            raise\n'
+            '    \n'
+        )
+        for suffix in (
+            '    def _create_audio_track(self, index):',
+            '    def _create_midi_track(self, index):',
+        ):
+            anchor = prefix + suffix
+            if anchor in text:
+                text = text.replace(anchor, prefix + _GET_DEVICE_HEALTH_METHOD + suffix, 1)
+                changed = True
+                break
+        else:
+            raise RuntimeError(
+                "AbletonMCP __init__.py: could not insert _get_device_health "
+                "(expected _create_audio_track or _create_midi_track after _get_track_info)."
+            )
+
+    if changed:
+        init_py.write_text(text, encoding="utf-8")
+    return changed
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--cache-dir", type=Path, default=abc.repo_root() / ".bootstrap_cache")
@@ -237,6 +329,7 @@ def main() -> int:
         try:
             audio = patch_abletonmcp_create_audio_track(mcp)
             user_lib = patch_abletonmcp_user_library_uri_lookup(mcp)
+            health = patch_abletonmcp_get_device_health(mcp)
         except RuntimeError as exc:
             print(f"ERROR: {exc}", file=sys.stderr)
             return 1
@@ -244,7 +337,9 @@ def main() -> int:
             print("Patched AbletonMCP: added create_audio_track.")
         if user_lib:
             print("Patched AbletonMCP: user_library URI lookup for Imported/*.amxd.")
-        if not audio and not user_lib:
+        if health:
+            print("Patched AbletonMCP: added get_device_health (docs/MCP_DEVICE_HEALTH_SPIKE.md).")
+        if not audio and not user_lib and not health:
             print("AbletonMCP patches already applied (no file changes).")
         print("Quit Live completely and reopen so the remote script reloads.")
         return 0
@@ -287,6 +382,11 @@ def main() -> int:
                     "AbletonMCP: applied user_library URI patch "
                     "(needed to load User Library → Imported/*.amxd)."
                 )
+            if patch_abletonmcp_get_device_health(p):
+                print(
+                    "AbletonMCP: applied get_device_health patch "
+                    "(optional LOM snapshot — see docs/MCP_DEVICE_HEALTH_SPIKE.md)."
+                )
         except RuntimeError as exc:
             print(f"WARN: AbletonMCP patch skipped: {exc}")
 
@@ -295,6 +395,11 @@ def main() -> int:
         '\n Control Surface → pick "AbletonOSC" (and optionally "AbletonMCP"; input/output = blank).'
     )
     print("Remote script ports: MCP TCP 9877; OSC UDP 11000→11001 (see docs/SETUP_AUTOMATED.md).")
+    print(
+        "\nIf AbletonMCP was patched (create_audio_track): Live MUST restart before loading "
+        "**audio_effect** specs — otherwise MCP still runs the old script and Max Audio Effects "
+        "fail when inserted from this pipeline."
+    )
     return 0
 
 

@@ -83,6 +83,8 @@ Ableton is linked (OSC + MCP), and the tutorial Max for Live device is on a trac
 
 Describe the plugin in plain language (controls, sound, workflow). Personal projects go in **`projects/workspace/`** — see **[`docs/PRIVATE_PLUGINS.md`](docs/PRIVATE_PLUGINS.md)**.
 
+**Smoke-test suggestion:** point them at the tracked example **`examples/simple_gain_audio_spec.json`** first (*“build and load SimpleGain from `examples/simple_gain_audio_spec.json` with `--with-adv`”*) — it is CI-validated (gain knob on an audio effect).
+
 ---
 
 Then help them write a spec and run **`tooling/m4l_pipeline.py`** when they are ready:
@@ -104,6 +106,7 @@ Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 | Export `.amxd` → spec | `./venv/bin/python scripts/export_spec_from_amxd.py device.amxd -o spec.json` |
 | Build + deploy + load | `./venv/bin/python tooling/m4l_pipeline.py all spec.json` |
 | Live verify (OSC + MCP) | `./venv/bin/python scripts/m4l_verify.py` |
+| Verify helpers unit tests (no Live) | `./venv/bin/python scripts/test_verification_helpers.py` |
 | Templates | [`tooling/templates/`](tooling/templates/) |
 
 ---
@@ -123,7 +126,8 @@ Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 - Run **`--live`** before step 3 is confirmed (unless they clearly already finished Control Surfaces).  
 - Skip step 3 instructions after step 2 — always guide them and wait for **continue**.  
 - Commit under **`projects/`** except public tutorial sources.  
-- Put **private plugin names** in tracked files — use **`projects/workspace/`**.
+- Put **private plugin names** in tracked files — use **`projects/workspace/`**.  
+- Tell the user an **`audio_effect`** is “loaded and working” in Live **without** either (a) **`scripts/m4l_verify.py`** / pipeline **`all`** succeeding **after** AbletonMCP exposes **`create_audio_track`**, or (b) the user confirming in Live. Agents **cannot see the Ableton UI** — after **`install_remote_scripts`**, remind them to **quit Live fully** before **`create_audio_track`** works.
 
 ## Key paths
 
@@ -147,4 +151,7 @@ Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 |--------|---------|
 | **`M4L_RUN_OK`** | Step 2 or 4 command finished successfully |
 | **`M4L_PIPELINE_READY`** | Step 4 complete — Live connected, tutorial loaded |
-| **`M4L_VERIFY_OK`** | `scripts/m4l_verify.py` completed (build/browser/load/OSC) |
+| **`M4L_VERIFY_OK`** | `scripts/m4l_verify.py` completed (build/browser/load/**T2 alignment**/OSC **T3**) |
+| **`DEVICE_SELFTEST_OK`** | Optional **T4** UDP self-test passed (`--require-selftest-udp-port`) |
+
+Tier meanings and honest wording: **`docs/VERIFICATION_TIERS.md`**.

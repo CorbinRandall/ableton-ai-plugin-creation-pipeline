@@ -1,33 +1,72 @@
 # Ableton + Max for Live — AI-friendly pipeline
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Sanity CI](https://github.com/CorbinRandall/ableton-plugin-pipeline/actions/workflows/sanity.yml/badge.svg)](https://github.com/CorbinRandall/ableton-plugin-pipeline/actions/workflows/sanity.yml)
+[![Sanity CI](https://github.com/CorbinRandall/ableton-ai-plugin-creation-pipeline/actions/workflows/sanity.yml/badge.svg)](https://github.com/CorbinRandall/ableton-ai-plugin-creation-pipeline/actions/workflows/sanity.yml)
 
-The purpose of this tool is so that you can create Max For Live pluins with AI. 
-To do so, it sets up an agentic IDE (Cursor, Claude, Antigravity, etc.) so it's connected to Ableton and Max For Live. 
-Once the pipeline is set up, you can tell it to create plugins through natural language ie. "Create a gain volume plugin knob"
+The **`sanity`** workflow exercises roughly [**T0**](./docs/VERIFICATION_TIERS.md) (validate spec + compile Python + offline **`m4l_pipeline.py build`**). It does **not** run Ableton Live and **cannot** prove that a device loads cleanly or sounds correct — use **`scripts/m4l_verify.py`** on your Mac or Windows machine when Live + MCP + OSC are enabled ([**T2**](./docs/VERIFICATION_TIERS.md) onward).
 
-Complete in 5 min steps-
-| Step | Ableton | What you do |
-|------|---------|-------------|
-| **1** | **Closed** | **Quit Live** completely |
-| **2** | **Closed** | Clone this Repo → open in Agentic IDE (Cursor, Claude, Antigravity, etc.) → say **“run”** |
-| **3** | Open | **Agent** guides **AbletonOSC** + **AbletonMCP** steps (you add these two as Controllers in Ableton (like a midi controller) → after you're finished you say **“continue”** |
-| **4** | **Open** | Agent runs **`./run --live`** — tutorial on a new track |
-| **5** | **Open** | **Pipeline Complete** — tell the agent what **`.amxd`** you want ie. "Create a gain volume plugin knob" |
+Use this repo with an **agent-style IDE** (Cursor, Claude Code, Antigravity, Copilot in agent mode, etc.) to **describe Max for Live devices in plain language** and turn them into **`.amxd`** files: validated JSON specs → build → deploy to your **Ableton User Library** → load on a **new track** via **[AbletonMCP](https://github.com/ahujasid/ableton-mcp)** (optional **[AbletonOSC](https://github.com/ideoforms/AbletonOSC)** for checks and automation).
 
-**Clone → `./run` → build `.amxd` devices from JSON specs → deploy to your Ableton User Library → load on a new track via [AbletonMCP](https://github.com/ahujasid/ableton-mcp)** (optional **[AbletonOSC](https://github.com/ideoforms/AbletonOSC)** checks).
+---
 
-Use this repo from any terminal or **agent-style IDE**: after clone, say **“run”** (or execute **`./run`**) to install the stack; then describe a device, generate a spec, and iterate in **Live** without hand-dragging files from Finder/Explorer.
+## Five-minute setup
 
-**Human walkthrough:** **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)** · **Any agentic IDE:** **[`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md)** · **macOS / Windows / Linux:** **[`docs/CROSS_PLATFORM.md`](docs/CROSS_PLATFORM.md)** · Agents: **[`AGENTS.md`](AGENTS.md)**
+| Step | Ableton Live | What you do |
+|------|----------------|-------------|
+| **1** | **Quit** | Close Live completely. |
+| **2** | **Closed** | Clone this repo → open the folder in your IDE → tell the agent **`run`** (or run **`./run`** yourself). |
+| **3** | **Open** | Follow the agent’s steps to enable **AbletonOSC** and **AbletonMCP** under **Preferences → Link, Tempo & MIDI → Control Surface** (two rows, like picking MIDI controllers). When both are on, tell the agent **`continue`**. |
+| **4** | **Open** | Agent runs **`./run --live`** — bootstrap finishes and the **tutorial** device loads on a **new track**. |
+| **5** | **Open** | **Pipeline ready** — describe what you want next, e.g. *“Build the simple gain audio effect from `examples/simple_gain_audio_spec.json` and load it.”* |
+
+Steps **2–4** match **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)** and **[`AGENTS.md`](AGENTS.md)** in more detail.
+
+---
+
+## First device to build (recommended smoke test)
+
+This path is covered by **`sanity` CI**: schema/UI/layout checks plus **`m4l_pipeline.py build`** — **not** a Live rack proof (see **[docs/VERIFICATION_TIERS.md](docs/VERIFICATION_TIERS.md)**).
+
+**VolumeKnob** — same **`audio_effect`** category with an **audible** path: **`plugin~` → `*~` → `plugout~`**, **`Volume`** dial **0–100** scaled by **`* 0.01` → `sig~`** into the multiplier. Build/deploy (recommended: gitignored sandbox):
+
+```bash
+./venv/bin/python scripts/validate_spec.py examples/volume_knob_audio_spec.json
+M4L_PROJECTS_PREFIX=workspace ./venv/bin/python tooling/m4l_pipeline.py all examples/volume_knob_audio_spec.json --with-adv
+```
+
+Then **`scripts/m4l_verify.py --spec examples/volume_knob_audio_spec.json --skip-build --expect-params Volume`** after Live sees a patched MCP (**full quit + reopen** if you just ran **`install_remote_scripts.py`**).
+
+**SimpleGain** — one **Gain** knob on an **audio effect** using the same **dry audio path** as our CI template (`plugin~` → `plugout~`). The knob is real in Live (automation/MIDI map); wire it to `*~` / `line~` in Max when you want audible level control—see **`tooling/templates/audio_effect_stub.json`** or copy **`examples/volume_knob_audio_spec.json`**.
+
+From the **repo root** (after **`./run`** created **`venv/`**):
+
+```bash
+./venv/bin/python scripts/validate_spec.py examples/simple_gain_audio_spec.json
+./venv/bin/python tooling/m4l_pipeline.py all examples/simple_gain_audio_spec.json --with-adv
+```
+
+Use **`all --no-live`** if Live is closed (artifacts + deploy only). Personal forks of this idea belong under **`projects/workspace/`** — see **[`docs/PRIVATE_PLUGINS.md`](docs/PRIVATE_PLUGINS.md)**.
+
+**If SimpleGain (or any `audio_effect`) shows a generic Max error in Live:** you were probably missing **`create_audio_track`** in the **running** AbletonMCP (script updates require a **full Live restart**). The pipeline no longer loads audio effects onto MIDI tracks as a fallback. Fix: **`install_remote_scripts.py` → quit Live completely → reopen**, then verify:
+
+```bash
+./venv/bin/python scripts/verify_setup.py --wait-mcp 120 --assert-create-audio-track
+```
+
+Then **`m4l_pipeline.py all examples/simple_gain_audio_spec.json --with-adv`** again. See **`docs/LIVE_API_PATTERNS.md`**.
+
+Natural-language prompts work once the agent knows the workflow: *validate → `m4l_pipeline.py all …`* for **`examples/simple_gain_audio_spec.json`** (or a copy you edit). See **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
+
+---
+
+**Human walkthrough:** **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)** · **Any agentic IDE:** **[`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md)** · **macOS / Windows / Linux:** **[`docs/CROSS_PLATFORM.md`](docs/CROSS_PLATFORM.md)** · **Agents:** **[`AGENTS.md`](AGENTS.md)**
 
 ---
 
 ## Requirements
 
 | Requirement | Notes |
-|-------------|--------|
+|-------------|-------|
 | **Ableton Live** | **Suite**, or **Standard + [Max for Live add-on](https://help.ableton.com/hc/en-us/articles/206407124-Buying-Max-for-Live)** — not Lite/Intro ([Ableton Help](https://help.ableton.com/hc/en-us/articles/360000036850-Max-for-Live-bundled-in-Live)). |
 | **Python** | **3.10+** — ensured by **`bootstrap.sh`** / **`bootstrap.ps1`** when possible. |
 | **Header donor `.amxd`** | Pipeline packs JSON into an existing device wrapper ([**`docs/REFERENCE_HEADER_AND_IMPORT.md`**](docs/REFERENCE_HEADER_AND_IMPORT.md)). Generic starters are included in **`tooling/donors/`**. |
@@ -38,12 +77,10 @@ Use this repo from any terminal or **agent-style IDE**: after clone, say **“ru
 
 **`venv/` is not in git** — each clone runs **`./run`** to create it locally.
 
-
-
 ```bash
 # Step 1: quit Ableton first
-git clone https://github.com/CorbinRandall/ableton-plugin-pipeline.git
-cd ableton-plugin-pipeline
+git clone https://github.com/CorbinRandall/ableton-ai-plugin-creation-pipeline.git
+cd ableton-ai-plugin-creation-pipeline
 chmod +x run bootstrap.sh    # macOS / Linux
 ./run                        # step 2 — Live closed
 # step 3: agent guides OSC/MCP → you say "continue"
@@ -58,8 +95,11 @@ Step-by-step (permissions, coding-only Mac, agent prompts): **[`docs/GETTING_STA
 
 | Step | Command |
 |------|---------|
-| Preflight only | `./venv/bin/python scripts/verify_setup.py --preflight` |
-| Live health | `./venv/bin/python scripts/verify_setup.py --wait-mcp 120` |
+| Preflight (repo + donors only, CI-friendly) | `./venv/bin/python scripts/verify_setup.py --preflight --repo-only` |
+| Preflight (full, needs Ableton User Library paths) | `./venv/bin/python scripts/verify_setup.py --preflight` |
+| Live MCP socket wait | `./venv/bin/python scripts/verify_setup.py --wait-mcp 120` |
+| Full verify (Live + MCP + OSC) | `./venv/bin/python scripts/m4l_verify.py` — **[docs/VERIFY_GUIDE.md](docs/VERIFY_GUIDE.md)** |
+| Verify unit tests (no Live) | `./venv/bin/python scripts/test_verification_helpers.py` |
 | Tutorial + load | `./venv/bin/python projects/Pipeline_Example/build_pipeline_example.py` |
 
 Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projects/workspace/…`** with **`M4L_PROJECTS_PREFIX=workspace`**). **`m4l_pipeline.py all`** / **`build_deploy_load`** **deploy** to User Library **Imported/** and by default **insert the device on a new Live track** via AbletonMCP (**`all --no-live`** or **`M4L_SKIP_LIVE=1`** skips Live). **`build`** only writes **`.amxd`**. Track type (**MIDI** vs **audio**) follows **`device_type`**. See **`projects/workspace/README.md`**.
@@ -71,10 +111,11 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 | Doc | Purpose |
 |-----|---------|
 | [**`docs/GETTING_STARTED.md`**](docs/GETTING_STARTED.md) | **Start here (humans)** — phases 1–4, what to open when |
-| [**`docs/AGENTIC_IDES.md`](docs/AGENTIC_IDES.md) | Any agentic IDE — same workflow |
-| [**`docs/CROSS_PLATFORM.md`](docs/CROSS_PLATFORM.md) | macOS, Windows, Linux commands |
-| [**`docs/VERIFY_GUIDE.md`](docs/VERIFY_GUIDE.md) | Live verify + parameter sweep |
-| [**`docs/AUDIO_SMOKE_TEST.md`](docs/AUDIO_SMOKE_TEST.md) | Manual audio checklist |
+| [**`docs/AGENTIC_IDES.md`**](docs/AGENTIC_IDES.md) | Any agentic IDE — same workflow |
+| [**`docs/CROSS_PLATFORM.md`**](docs/CROSS_PLATFORM.md) | macOS, Windows, Linux commands |
+| [**`docs/VERIFY_GUIDE.md`**](docs/VERIFY_GUIDE.md) | Live verify + parameter sweep |
+| [**`docs/VERIFICATION_TIERS.md`**](docs/VERIFICATION_TIERS.md) | **T0–T5** — what automation vs humans actually prove |
+| [**`docs/AUDIO_SMOKE_TEST.md`**](docs/AUDIO_SMOKE_TEST.md) | Manual audio checklist |
 | [**`docs/AGENT_TOOLS.md`**](docs/AGENT_TOOLS.md) | Shell commands for agents (validate, scaffold, export, build) |
 | [**`docs/ROADMAP.md`**](docs/ROADMAP.md) | Phased improvements and feasibility |
 | [**`docs/MAX_TO_SPEC.md`**](docs/MAX_TO_SPEC.md) | Export `.amxd` → spec (Max-first workflow) |
@@ -96,6 +137,8 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 | **`run`** / **`run.ps1`** | **Start here** — bootstrap + env + preflight + optional Live tutorial |
 | **`bootstrap.sh`** / **`bootstrap.ps1`** | Lower-level install (called by **`./run`**) |
 | **`requirements.txt`** | **`python-osc`** |
+| **`examples/simple_gain_audio_spec.json`** | **First-build smoke test** — dry **`plugin~` → `plugout~`** + Gain dial |
+| **`examples/volume_knob_audio_spec.json`** | **Audible volume** — **`Volume`** dial scales audio via **`*~`** / **`sig~`** |
 | **`scripts/install_remote_scripts.py`** | Download/install Remote Scripts (patches MCP for **`create_audio_track`**) |
 | **`scripts/verify_setup.py`** | MCP + OSC health (**`--preflight`** = filesystem only) |
 | **`tooling/m4l_pipeline.py`** | Spec → **`.amxd`**, deploy, Ableton load |

@@ -106,7 +106,7 @@ def launch_ableton_macos() -> bool:
     return False
 
 
-def preflight(skip_imports: bool) -> int:
+def preflight(skip_imports: bool, *, repo_only: bool = False) -> int:
     ok = True
     rs = abc.user_library_remote_scripts()
     osc = rs / "AbletonOSC"
@@ -132,9 +132,44 @@ def preflight(skip_imports: bool) -> int:
             ok = False
             print("[preflight] FAIL: python-osc not installed (activate venv / pip install -r requirements.txt)")
 
-    if not osc.is_dir() or not mcp.is_dir():
-        ok = False
-        print("[preflight] FAIL: Remote scripts missing — run bootstrap.sh")
+    if repo_only:
+        print(
+            "[preflight] --repo-only: skipping Remote Scripts presence / MCP "
+            "create_audio_track-on-disk checks (use full --preflight on a machine with Ableton installed)."
+        )
+    else:
+        if not osc.is_dir() or not mcp.is_dir():
+            ok = False
+            print("[preflight] FAIL: Remote scripts missing — run bootstrap.sh")
+
+        init_py = mcp / "__init__.py"
+        if mcp.is_dir():
+            if init_py.is_file():
+                txt = init_py.read_text(encoding="utf-8", errors="replace")
+                has_audio = (
+                    "create_audio_track" in txt
+                    and "_create_audio_track" in txt
+                    and "def _create_audio_track" in txt
+                )
+                print(
+                    f"[preflight] AbletonMCP create_audio_track patch present (on disk): {has_audio}"
+                )
+                if not has_audio:
+                    ok = False
+                    print(
+                        "[preflight] FAIL: reinstall/patch AbletonMCP — "
+                        "scripts/install_remote_scripts.py (needed for audio_effect devices)."
+                    )
+                has_health = "get_device_health" in txt and "def _get_device_health" in txt
+                print(f"[preflight] AbletonMCP get_device_health patch present (optional): {has_health}")
+                if not has_health:
+                    print(
+                        "[preflight] NOTE: optional get_device_health not found — "
+                        "re-run scripts/install_remote_scripts.py for docs/MCP_DEVICE_HEALTH_SPIKE.md features."
+                    )
+            else:
+                ok = False
+                print(f"[preflight] FAIL: missing {init_py}")
 
     tooling_dir = REPO_ROOT / "tooling"
     if tooling_dir.is_dir():
@@ -176,6 +211,14 @@ def main() -> int:
         help="Filesystem + imports only (no Ableton TCP/OSC). Exit 1 if installs missing.",
     )
     ap.add_argument(
+        "--repo-only",
+        action="store_true",
+        help=(
+            "With --preflight: skip User Library Remote Scripts checks — for CI or clones without "
+            "Ableton installed; still validates python-osc + pipeline donor .amxd paths."
+        ),
+    )
+    ap.add_argument(
         "--skip-import-check",
         action="store_true",
         help='With --preflight: do not verify "import pythonosc".',
@@ -190,12 +233,24 @@ def main() -> int:
     ap.add_argument(
         "--launch-ableton",
         action="store_true",
-        help="macOS: try `open -a 'Ableton Live …'` once before waiting (best-effort).",
+        help="macOS only: try ``open -a`` on a guessed Live bundle before MCP checks.",
+    )
+    ap.add_argument(
+        "--assert-create-audio-track",
+        action="store_true",
+        help=(
+            "After MCP connects: send create_audio_track once. Fails if Live runs an old AbletonMCP "
+            "(requires restart after install_remote_scripts). Creates one empty audio track on success."
+        ),
     )
     args = ap.parse_args()
 
+    if args.repo_only and not args.preflight:
+        print("ERROR: --repo-only requires --preflight", file=sys.stderr)
+        return 2
+
     if args.preflight:
-        return preflight(skip_imports=args.skip_import_check)
+        return preflight(skip_imports=args.skip_import_check, repo_only=args.repo_only)
 
     if args.launch_ableton and launch_ableton_macos():
         time.sleep(3.0)
@@ -225,6 +280,27 @@ def main() -> int:
     if status != "success":
         print(f"[verify] Full payload: {pong}")
         return 2
+
+    if args.assert_create_audio_track:
+        print("[verify] Probing create_audio_track (creates one audio track if OK)…")
+        probe = _ableton_cmd("create_audio_track", {"index": -1})
+        if probe.get("status") != "success":
+            print(
+                "[verify] FAIL: create_audio_track unavailable — Live is likely running an old "
+                "AbletonMCP. Quit Live completely, reopen, then retry.\n"
+                f"  Raw reply: {probe}",
+                file=sys.stderr,
+            )
+            return 5
+        inner = probe.get("result")
+        if isinstance(inner, str):
+            inner = json.loads(inner)
+        idx = (inner or {}).get("index")
+        print(
+            f"[verify] create_audio_track OK (new audio track index={idx!r}). "
+            "Delete the empty track in Live if you do not want it."
+        )
+        print("M4L_AUDIO_MCP_OK")
 
     try:
         if not _live_test_udp():

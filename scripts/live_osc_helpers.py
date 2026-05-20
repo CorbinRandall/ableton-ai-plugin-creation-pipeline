@@ -11,6 +11,34 @@ ABLETON_MCP_PORT = 9877
 OSC_SEND = ("127.0.0.1", 11000)
 OSC_RECV_BIND = ("127.0.0.1", 11001)
 
+# Default UDP port in tooling/templates/midi_effect_selftest_ping.json — keep in sync with template `udpsend`.
+DEFAULT_SELFTEST_UDP_PORT = 39129
+
+
+def udp_selftest_bind(port: int, bind_host: str = ABLETON_HOST) -> socket.socket:
+    """Open and bind a UDP socket — call **before** triggering Live so Max pings are not dropped."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind((bind_host, port))
+    sock.settimeout(0.2)
+    return sock
+
+
+def udp_selftest_receive_until(
+    sock: socket.socket,
+    marker: bytes,
+    deadline_monotonic: float,
+) -> bool:
+    """Receive until ``marker`` appears in a datagram or ``deadline_monotonic`` passes."""
+    while time.monotonic() < deadline_monotonic:
+        try:
+            data, _ = sock.recvfrom(8192)
+        except socket.timeout:
+            continue
+        if marker in data:
+            return True
+    return False
+
 
 def ableton_cmd(cmd_type: str, params: dict, timeout: float = 25.0) -> dict:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

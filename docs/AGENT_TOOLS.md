@@ -27,6 +27,7 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 
 | User intent | Command |
 |-------------|---------|
+| First validated custom device (Gain dial, audio FX shell) | `scripts/validate_spec.py examples/simple_gain_audio_spec.json` then `tooling/m4l_pipeline.py all examples/simple_gain_audio_spec.json --with-adv` |
 | Validate spec (schema + UI + layout) | `scripts/validate_spec.py path/to/spec.json` |
 | UI only | `scripts/check_spec_ui.py …` |
 | Layout overlaps | `scripts/check_spec_layout.py …` |
@@ -37,8 +38,9 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 | Same, no Live | `… all spec.json --no-live` |
 | Include `.adv` | `… all spec.json --with-adv` or `M4L_BUILD_ADV=1` |
 | Skip validation | `… --skip-validate` or `M4L_SKIP_VALIDATE=1` |
-| Preflight | `scripts/verify_setup.py --preflight` |
 | Wait for MCP | `scripts/verify_setup.py --wait-mcp 120` |
+| Confirm MCP can create **audio** tracks (after Live restart post-install) | `scripts/verify_setup.py --wait-mcp 120 --assert-create-audio-track` |
+| Preflight | `scripts/verify_setup.py --preflight` |
 | Live verify | `scripts/m4l_verify.py` (see [`VERIFY_GUIDE.md`](VERIFY_GUIDE.md)) |
 | Parameter sweep | `scripts/m4l_parameter_sweep.py --track N --device D` |
 | Audio checklist (manual) | [`AUDIO_SMOKE_TEST.md`](AUDIO_SMOKE_TEST.md) |
@@ -62,6 +64,7 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 | `SCAFFOLD_OK` | Workspace project created |
 | `EXPORT_SPEC_OK` | Export from `.amxd` done |
 | `M4L_VERIFY_OK` | Live verify passed |
+| `M4L_AUDIO_MCP_OK` | `verify_setup.py --assert-create-audio-track` succeeded |
 | `M4L_PARAM_SWEEP_OK` | Parameter OSC read/write OK |
 
 ## Environment
@@ -72,6 +75,7 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 | `M4L_SKIP_LIVE=1` | Skip MCP load in `all` |
 | `M4L_SKIP_VALIDATE=1` | Skip spec validation before build |
 | `M4L_BUILD_ADV=1` | Generate/deploy `.adv` with `all` |
+| `M4L_ALLOW_AUDIO_ON_MIDI=1` | Debug only: load `audio_effect` on MIDI if MCP lacks `create_audio_track` (usually breaks in Live) |
 | `ABLETON_HOME` | Override Ableton user folder |
 
 ## Templates
