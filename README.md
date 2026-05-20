@@ -3,23 +3,25 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Sanity CI](https://github.com/CorbinRandall/ableton-ai-plugin-creation-pipeline/actions/workflows/sanity.yml/badge.svg)](https://github.com/CorbinRandall/ableton-ai-plugin-creation-pipeline/actions/workflows/sanity.yml)
 
-The **`sanity`** workflow exercises roughly [**T0**](./docs/VERIFICATION_TIERS.md) (validate spec + compile Python + offline **`m4l_pipeline.py build`**). It does **not** run Ableton Live and **cannot** prove that a device loads cleanly or sounds correct — use **`scripts/m4l_verify.py`** on your Mac or Windows machine when Live + MCP + OSC are enabled ([**T2**](./docs/VERIFICATION_TIERS.md) onward).
+**Make your own Ableton devices by describing them in normal words.**
 
-Use this repo with an **agent-style IDE** (Cursor, Claude Code, Antigravity, Copilot in agent mode, etc.) to **describe Max for Live devices in plain language** and turn them into **`.amxd`** files: validated JSON specs → build → deploy to your **Ableton User Library** → load on a **new track** via **[AbletonMCP](https://github.com/ahujasid/ableton-mcp)** (optional **[AbletonOSC](https://github.com/ideoforms/AbletonOSC)** for checks and automation).
+You do not need to know coding, GitHub, or what an “IDE” is. You open this project in an **AI chat app** (we recommend **Cursor**), tell it what you want — like *“an effect with a volume knob”* — and it handles the boring setup: checking your idea, building the device, putting it in Ableton’s browser, and loading it on a track so you can **hear it and turn the knobs**. First-time setup is mostly automated: you say **“run”**, click a couple of settings in Ableton when the AI tells you to, say **“continue”**, and you’re connected. After that you just **describe → listen in Live → tell the AI to fix or improve** until it feels right. The AI is simply the easiest way to drive the same tools a developer could run by hand — nothing different happens under the hood.
+
+**New here?** Step-by-step with zero jargon: **[`docs/START_HERE.md`](docs/START_HERE.md)**
 
 ---
 
-## Five-minute setup
+## Five-minute setup (you talk — the AI runs)
 
-| Step | Ableton Live | What you do |
-|------|----------------|-------------|
+| Step | Ableton Live | What **you** do |
+|------|----------------|-----------------|
 | **1** | **Quit** | Close Live completely. |
-| **2** | **Closed** | Clone this repo → open the folder in your IDE → tell the agent **`run`** (or run **`./run`** yourself). |
-| **3** | **Open** | Follow the agent’s steps to enable **AbletonOSC** and **AbletonMCP** under **Preferences → Link, Tempo & MIDI → Control Surface** (two rows, like picking MIDI controllers). When both are on, tell the agent **`continue`**. |
-| **4** | **Open** | Agent runs **`./run --live`** — bootstrap finishes and the **tutorial** device loads on a **new track**. |
-| **5** | **Open** | **Pipeline ready** — describe what you want next, e.g. *“Build the simple gain audio effect from `examples/simple_gain_audio_spec.json` and load it.”* |
+| **2** | **Closed** | Open this folder in **Cursor** (or similar) → tell the AI **`run`**. |
+| **3** | **Open** | AI tells you what to click in Live (**AbletonOSC** + **AbletonMCP**). Say **`continue`**. |
+| **4** | **Open** | AI connects — tutorial device appears on a track. |
+| **5** | **Open** | Describe your device: *“Build a volume knob effect and load it for me to try.”* |
 
-Steps **2–4** match **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)** and **[`AGENTS.md`](AGENTS.md)** in more detail.
+Details: **[`docs/START_HERE.md`](docs/START_HERE.md)** · **[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)** · **[`AGENTS.md`](AGENTS.md)** (for the AI)
 
 ---
 
@@ -110,7 +112,8 @@ Pipeline behavior: versioned **`projects/<Plugin>/<Plugin X.Y>/`** (or **`projec
 
 | Doc | Purpose |
 |-----|---------|
-| [**`docs/GETTING_STARTED.md`**](docs/GETTING_STARTED.md) | **Start here (humans)** — phases 1–4, what to open when |
+| [**`docs/START_HERE.md`**](docs/START_HERE.md) | **Total beginners** — no Git/terminal; AI does setup; plain language |
+| [**`docs/GETTING_STARTED.md`**](docs/GETTING_STARTED.md) | Setup checklist (agent-first; same steps as START_HERE) |
 | [**`docs/AGENTIC_IDES.md`**](docs/AGENTIC_IDES.md) | Any agentic IDE — same workflow |
 | [**`docs/CROSS_PLATFORM.md`**](docs/CROSS_PLATFORM.md) | macOS, Windows, Linux commands |
 | [**`docs/VERIFY_GUIDE.md`**](docs/VERIFY_GUIDE.md) | Live verify + parameter sweep |

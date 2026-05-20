@@ -1,91 +1,38 @@
-# First-time setup with an agentic IDE
+# First-time setup — use the AI for everything
 
-**Quit Ableton → clone → “run” → agent guides Live setup → “continue” → pipeline ready → describe your plugin.**
+**→ Main guide for total beginners: [`START_HERE.md`](START_HERE.md)**
 
-Works the same in **Cursor, Claude Code, GitHub Copilot, Windsurf, Zed**, or any tool that can run terminal commands in the project folder.
+You do **not** need GitHub jargon, a terminal, or coding experience. Open this project in **Cursor** (or similar), chat with the AI, and say **“run”** then **“continue”**.
 
-**Full checklist:** [`GETTING_STARTED.md`](GETTING_STARTED.md) · **By editor:** [`AGENTIC_IDES.md`](AGENTIC_IDES.md) · **Commands:** [`AGENT_TOOLS.md`](AGENT_TOOLS.md)
+The pipeline is the **same** whether the AI or a developer runs the commands — the AI is just the easiest remote control.
 
----
-
-## Steps
-
-| Step | Ableton | Who |
-|------|---------|-----|
-| **1** | **Closed** | You quit Live |
-| **2** | **Closed** | You clone + **“Run”**; agent runs **`./run`** |
-| **3** | Open (you) | **Agent** explains OSC/MCP in Live; you say **“continue”** |
-| **4** | **Open** | Agent runs **`./run --live`** |
-| **5** | **Open** | Agent asks what **`.amxd`** you want |
+**Checklist:** [`GETTING_STARTED.md`](GETTING_STARTED.md) · **By app:** [`AGENTIC_IDES.md`](AGENTIC_IDES.md)
 
 ---
 
-## Step 1 — Close Ableton
+## The five things you say
 
-Quit Live fully before step 2.
+| When | Say this |
+|------|----------|
+| First time, Live **closed** | **“Run”** or **“Run first-time setup”** |
+| After clicking OSC + MCP in Live | **“Continue”** |
+| Ready to make a device | **“Build [describe it] and load it on a track for me to test”** |
+| Something broke | Paste the error, or **“Diagnose this”** |
+| It works / doesn’t work | **“Sounds good”** or **“The knob doesn’t change volume — fix and reload”** |
 
----
-
-## Step 2 — Clone and “run”
-
-1. Clone → open **repo root** in your editor (folder with **`run`** and **`AGENTS.md`**).  
-2. Open the **agent / chat** panel (name varies by IDE).  
-3. Say **“Run”** or **“Run `./run` from the repo root.”**  
-4. Wait for **`M4L_RUN_OK`**.
-
----
-
-## Step 3 — Agent guides Control Surfaces
-
-The agent should **not** run terminal commands here. It walks you through:
-
-- Quit/reopen Live  
-- **Preferences → Link / Tempo / MIDI**  
-- **AbletonOSC**, then **AbletonMCP** (I/O blank)  
-- Keep Live open  
-
-When finished, reply: **“Continue — OSC and MCP are enabled.”**
+That’s the whole loop: **setup once → describe → AI builds & tests → you listen → AI iterates**.
 
 ---
 
-## Step 4 — Say “continue”
+## Cursor (recommended for noobs)
 
-The agent runs **`./run --live`**. Tutorial device loads on a new track.
+1. Install [Cursor](https://cursor.com).
+2. **File → Open Folder** → the downloaded project folder (contains `README.md` and `run`).
+3. Open **Chat**.
+4. First message: **“I’m new. Follow START_HERE and run setup.”**
+5. When Cursor asks to run terminal commands, **Allow** — that’s the AI doing step 2 for you.
 
-Look for **`M4L_PIPELINE_READY`**.
-
----
-
-## Step 5 — Build your plugin
-
-The agent should confirm the pipeline is connected and ask what device type you want.
-
-Use **`projects/workspace/`** for personal work — [`PRIVATE_PLUGINS.md`](PRIVATE_PLUGINS.md).
-
----
-
-## Tips by IDE
-
-### Cursor
-
-- **File → Open Folder** → repo root.  
-- Rules load from [`.cursor/rules/m4l-pipeline.mdc`](../.cursor/rules/m4l-pipeline.mdc).  
-- Approve terminal when the agent runs **`./run`**.
-
-### Claude Code
-
-- Open repo root; [`CLAUDE.md`](../CLAUDE.md) points to **`AGENTS.md`**.
-
-### GitHub Copilot (VS Code, etc.)
-
-- Open repo root; see [`.github/copilot-instructions.md`](../.github/copilot-instructions.md).  
-- Use integrated terminal or let Copilot run commands.
-
-### Other agents
-
-Paste once if needed:
-
-> Read `AGENTS.md` and run `./run` from the repo root. Ableton should be quit first.
+Rules for the AI load automatically from this project — you don’t configure anything.
 
 ---
 
@@ -93,8 +40,19 @@ Paste once if needed:
 
 | Mistake | Fix |
 |---------|-----|
-| Opened a subfolder only (`projects/…`) | Open **repo root** |
-| Confused **Cursor MCP** with **AbletonMCP** | Enable **AbletonMCP** in **Live** Preferences |
-| Ran `--live` before Control Surfaces | Finish step 3, then **Continue** |
+| Opened a subfolder only | Open the **top-level** project folder |
+| Confused Cursor settings with Ableton | **AbletonMCP** is enabled **inside Ableton**, not in Cursor |
+| Skipped “continue” after Live setup | Finish both Control Surfaces, then say **continue** |
+| Expected magic without Live open | Keep Ableton running from step 3 onward |
 
-No passwords needed for the tutorial.
+---
+
+## After setup
+
+Ask for devices in normal words. Examples:
+
+- *“Simple gain knob on an audio track.”*
+- *“MIDI effect that messes with tempo slightly.”*
+- *“Use the gain recipe and leave it on a track.”*
+
+See [`examples/recipes/`](../examples/recipes/) — or ask the AI *“what recipes do we have?”*

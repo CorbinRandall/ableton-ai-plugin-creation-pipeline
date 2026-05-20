@@ -1,6 +1,10 @@
 # Agentic IDEs — setup by editor
 
+**Total beginners:** [`START_HERE.md`](START_HERE.md) — chat with the AI only; it runs setup.
+
 This repo works with **any agentic coding environment** that can run terminal commands in the project folder. You do **not** need a specific IDE or IDE MCP server to build Max for Live devices.
+
+**Same pipeline** whether the human types commands or the agent does — beginners should **never** need the terminal.
 
 **Shared contract:** [`AGENTS.md`](../AGENTS.md) · **Commands:** [`AGENT_TOOLS.md`](AGENT_TOOLS.md) · **OS notes:** [`CROSS_PLATFORM.md`](CROSS_PLATFORM.md)
 

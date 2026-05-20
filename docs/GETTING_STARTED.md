@@ -1,6 +1,8 @@
-# Getting started (humans) — clone to device on a Live track
+# Getting started
 
-Step-by-step with an **agentic IDE** (Cursor, Claude Code, Copilot, Windsurf, …) or on your own.
+**Never coded before?** → **[`START_HERE.md`](START_HERE.md)** (plain language, AI does everything)
+
+**Same pipeline whether you or the AI runs commands** — the agent is just the recommended interface for beginners.
 
 Technical reference: **[`RUN.md`](RUN.md)** · Agent rules: **[`AGENTS.md`](../AGENTS.md)** · **By editor:** **[`AGENTIC_IDES.md`](AGENTIC_IDES.md)**
 
@@ -11,10 +13,12 @@ Technical reference: **[`RUN.md`](RUN.md)** · Agent rules: **[`AGENTS.md`](../A
 | Step | Ableton | Who | What happens |
 |------|---------|-----|----------------|
 | **1** | **Closed** | You | **Quit Live** completely |
-| **2** | **Closed** | You + agent | **Clone** → open repo in IDE → say **“run”** → agent runs **`./run`** |
-| **3** | Open (you) | **Agent guides you** | Agent walks you through **AbletonOSC** + **AbletonMCP**; you reply when ready |
-| **4** | **Open** | Agent | You say **“continue”** (or similar) → agent runs **`./run --live`** |
-| **5** | **Open** | Agent + you | **Pipeline connected** — agent asks what **`.amxd`** you want to build |
+| **2** | **Closed** | **AI agent** (you say **“run”**) | Agent runs **`./run`** — first-time install |
+| **3** | Open (you) | **Agent guides you** | You enable **AbletonOSC** + **AbletonMCP** in Live; reply **“continue”** |
+| **4** | **Open** | **Agent** | Agent runs **`./run --live`** → tutorial device on a track |
+| **5** | **Open** | **You + agent** | Describe your device in plain language; agent builds, tests, iterates |
+
+You do **not** need to type terminal commands yourself. Say **“run”**, **“continue”**, and describe what you want.
 
 ---
 
@@ -22,11 +26,11 @@ Technical reference: **[`RUN.md`](RUN.md)** · Agent rules: **[`AGENTS.md`](../A
 
 | You need | Why |
 |----------|-----|
-| **Ableton Live** opened **at least once** on this account | Creates `User Library` and prefs folders |
-| **Suite**, or **Standard + Max for Live add-on** | Lite/Intro cannot run M4L devices |
-| **Terminal permission** + write **`venv/`** in the repo | Bootstrap |
-| **Write access** to `~/Music/Ableton` (macOS) or `~/Documents/Ableton` (Windows) | Remote Scripts + deploy |
-| **Network** (first time) | Downloads tools and deps |
+| **Ableton Live** opened **at least once** | Creates User Library folders |
+| **Suite**, or **Standard + Max for Live** | Lite/Intro cannot run M4L |
+| **An agentic IDE** (Cursor, etc.) with this **folder** open | Agent runs setup for you |
+| **Write access** to your Ableton User Library folder | Deploys devices there |
+| **Network** (first time) | Downloads tools |
 
 No API keys for the tutorial pipeline.
 
@@ -34,73 +38,53 @@ No API keys for the tutorial pipeline.
 
 ## Step 1 — Close Ableton
 
-**Quit Live completely** (Cmd+Q on Mac — not only closing a set).
-
-| App | Open? |
-|-----|-------|
-| **Ableton Live** | **No** |
+Quit Live completely (Cmd+Q on Mac — not only closing a set).
 
 ---
 
-## Step 2 — Clone, open in IDE, say “run”
+## Step 2 — Open project in your AI app, say “run”
 
-| App | Open? |
-|-----|-------|
-| **Agentic IDE** (repo root) | Yes — [Cursor, Claude, Copilot, …](AGENTIC_IDES.md) |
-| **Ableton Live** | **No** |
-
-1. Clone the repository.  
-2. **Open folder** in your editor → repo root (contains **`run`**, **`AGENTS.md`**).  
-3. Tell the agent: **“Run”** or **“Run `./run` from the repo root.”**
+1. Get the project folder ([`START_HERE.md`](START_HERE.md) — download ZIP or clone).
+2. **Open the folder** in Cursor (or similar) — the whole folder, not a subfolder.
+3. Tell the agent: **“Run”** or **“Run first-time setup.”**
 
 Wait for **`M4L_RUN_OK`**. The agent should **not** run **`--live`** yet.
+
+*(Developers may run `./run` manually — same result.)*
 
 ---
 
 ## Step 3 — Ableton Control Surfaces (agent guides you)
 
-**The agent does not run commands in this step.** It should give you clear instructions, then wait.
+**The agent should not run terminal commands here.** It walks you through Live:
 
-### What the agent should tell you
-
-1. **Quit Live completely**, then **reopen** it (picks up Remote Scripts from step 2).  
+1. Quit/reopen Live  
 2. **Preferences → Link / Tempo / MIDI**  
-3. **Control Surface** (first row) → **AbletonOSC** — Input / Output: **None** (blank).  
-4. **Control Surface** (second row) → **AbletonMCP**  
-5. **Leave Live open.**
+3. **Control Surface** row 1 → **AbletonOSC** (Input/Output blank)  
+4. **Control Surface** row 2 → **AbletonMCP**  
+5. Leave Live open  
 
-### What you say when finished
-
-Reply with something like:
-
-> **Continue** — AbletonOSC and AbletonMCP are enabled and Live is open.
-
-Other phrases work: **“ready”**, **“surfaces are set”**, **“OSC and MCP are on.”**
-
-The agent should **wait** for that before step 4.
+Reply: **“Continue”** (or **“ready”**).
 
 ---
 
-## Step 4 — Connect and load the tutorial (agent runs `--live`)
+## Step 4 — Agent connects (`./run --live`)
 
-After you confirm step 3, tell the agent:
+After you confirm step 3, say **“continue”**. The agent runs **`./run --live`**.
 
-> **Continue**  
-> or: **Run `./run --live`**
-
-The agent runs **`./run --live`** with Live open. You should get a **new MIDI track** with the tutorial device — no Finder drag-and-drop.
-
-Success: **`M4L_RUN_OK`** and **`M4L_PIPELINE_READY`** in the terminal.
+Success: **`M4L_RUN_OK`** and **`M4L_PIPELINE_READY`** — tutorial device on a new track.
 
 ---
 
-## Step 5 — Pipeline ready — describe your plugin
+## Step 5 — Describe your plugin
 
-When step 4 succeeds, the agent should say the **pipeline is connected** and ask what you want to build, for example:
+Tell the agent what you want in plain language, e.g.:
 
-> What type of Max for Live device do you want to create — **MIDI effect**, **audio effect**, or **instrument**?
+> Build an audio effect with a volume knob 0–100 and load it on a track for me to try.
 
-Personal builds go under **`projects/workspace/`** (see **[`PRIVATE_PLUGINS.md`](PRIVATE_PLUGINS.md)**).
+The agent validates, builds, deploys, loads, and can **iterate** when you report what you hear in Live.
+
+Personal builds: **`projects/workspace/`** — see **[`PRIVATE_PLUGINS.md`](PRIVATE_PLUGINS.md)**.
 
 ---
 
@@ -110,37 +94,17 @@ Personal builds go under **`projects/workspace/`** (see **[`PRIVATE_PLUGINS.md`]
 Step 1: Quit Ableton
        │
        ▼
-Step 2: Clone → IDE → "run" → ./run  (Live closed) → M4L_RUN_OK
+Step 2: Open folder in AI app → "run" → ./run  (Live closed) → M4L_RUN_OK
        │
        ▼
-Step 3: Agent explains OSC + MCP in Live → you: "continue" when done
+Step 3: Agent explains OSC + MCP in Live → you: "continue"
        │
        ▼
-Step 4: Agent → ./run --live  (Live open) → M4L_PIPELINE_READY
+Step 4: Agent → ./run --live  → M4L_PIPELINE_READY
        │
        ▼
-Step 5: Agent asks what .amxd you want → specs / workspace builds
+Step 5: You describe device → agent builds, tests, reloads until you confirm in Live
 ```
-
----
-
-## Step 5 — Build your plugin
-
-After **`M4L_PIPELINE_READY`**, tell the agent the device type (**MIDI effect**, **audio effect**, **instrument**).
-
-Typical commands (repo root):
-
-```bash
-# macOS/Linux — use ./venv/bin/python; Windows: .\venv\Scripts\python.exe
-python scripts/scaffold_plugin.py --name MyPlugin --type midi_effect
-python scripts/validate_spec.py projects/workspace/my_plugin/my_plugin_spec.json
-export M4L_PROJECTS_PREFIX=workspace   # Windows: $env:M4L_PROJECTS_PREFIX = "workspace"
-python tooling/m4l_pipeline.py all projects/workspace/my_plugin/my_plugin_spec.json
-```
-
-See **[`CROSS_PLATFORM.md`](CROSS_PLATFORM.md)** for platform-specific commands.
-
-See **[`AGENT_TOOLS.md`](AGENT_TOOLS.md)**, **[`MAX_TO_SPEC.md`](MAX_TO_SPEC.md)**, **[`PRIVATE_PLUGINS.md`](PRIVATE_PLUGINS.md)**.
 
 ---
 
@@ -148,19 +112,20 @@ See **[`AGENT_TOOLS.md`](AGENT_TOOLS.md)**, **[`MAX_TO_SPEC.md`](MAX_TO_SPEC.md)
 
 | Question | Answer |
 |----------|--------|
-| **Open Ableton before first “run”?** | **No** — step 1 first, then step 2. |
-| **Who sets Control Surfaces?** | **You**, guided by the agent in **step 3**. |
-| **What do I say after surfaces are on?** | **“Continue”** (or **“ready”**) → step 4. |
-| **Coding-only Mac?** | Stop after step 2; do 3–5 on a machine with Live. |
+| Do I need to use the terminal? | **No** — the agent runs commands. |
+| Same if I run commands myself? | **Yes** — identical pipeline. |
+| Open Ableton before first “run”? | **No** |
+| Who sets Control Surfaces? | **You**, guided by the agent |
+| What after surfaces are on? | **“Continue”** |
 
 ---
 
 ## Troubleshooting
 
-| Problem | Fix |
-|---------|-----|
-| **`./run`** fails on Python | Let bootstrap install Python |
-| Live never connects | Redo step 3; confirm both surfaces; Live still open for step 4 |
-| Port **9877** refused | **AbletonMCP** not selected, or Live not restarted after step 2 |
+| Problem | Tell the agent |
+|---------|----------------|
+| `./run` fails | Paste the error |
+| Live never connects | Redo step 3; both surfaces on; Live open |
+| Empty tracks, no device | “Load [device] on a track and leave it with --no-cleanup” |
 
-More: **[`SETUP_AUTOMATED.md`](SETUP_AUTOMATED.md)**.
+More: **[`SETUP_AUTOMATED.md`](SETUP_AUTOMATED.md)** · **[`TROUBLESHOOTING_M4L.md`](TROUBLESHOOTING_M4L.md)**
