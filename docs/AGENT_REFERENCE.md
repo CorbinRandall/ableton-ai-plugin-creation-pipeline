@@ -38,7 +38,7 @@ Or use **`tooling/spec_builder.py`** + **`examples/recipes/`** — see [`AGENT_I
 | Live verify | `./venv/bin/python scripts/m4l_verify.py` |
 | Pipeline MCP server | `./venv/bin/python tooling/m4l_mcp_server.py` (optional IDE MCP) |
 
-Add **`--json`** to any script above for machine-readable last-line JSON (marker still prints).
+Add **`--json`** to supported scripts for machine-readable stdout (one JSON object only; markers print without `--json`).
 
 ## Pipeline MCP server (optional IDE MCP)
 
