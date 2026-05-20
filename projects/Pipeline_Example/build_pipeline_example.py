@@ -3,7 +3,8 @@
 
 Each run allocates the next version folder under ``projects/Pipeline_Example/``, e.g.
 ``Pipeline_Example 1.2/``, copies ``spec.json`` + ``VERSION.txt``, builds the ``.amxd``,
-deploys to Ableton User Library ``Imported/``, then (unless ``--no-live``) creates a **new**
+deploys to Ableton User Library ``Imported/`` via ``deploy_artifact_for_device_type`` (inside
+``build_deploy_load``), then (unless ``--no-live``) creates a **new**
 Live track (MIDI vs audio follows ``device_type`` in ``pipeline_example_spec.json``) and loads
 the device there via AbletonMCP so you do not have to drag from Finder.
 

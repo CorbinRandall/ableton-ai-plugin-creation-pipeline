@@ -42,20 +42,29 @@ def validate_structure(spec: dict) -> tuple[list[str], list[str]]:
         errors.append(f"{path}: {err.message}")
 
     device_type = spec.get("device_type", "midi_effect")
+    explicit_device_type = "device_type" in spec
     hints = _DEVICE_IO_HINTS.get(device_type)
     if hints:
         expected_in, expected_out = hints
         classes = _box_classes(spec)
         if not classes & expected_in:
-            warnings.append(
+            msg = (
                 f"device_type={device_type}: no typical input object "
                 f"({', '.join(sorted(expected_in))}) — patch may not route I/O correctly"
             )
+            if explicit_device_type:
+                errors.append(msg)
+            else:
+                warnings.append(msg)
         if not classes & expected_out:
-            warnings.append(
+            msg = (
                 f"device_type={device_type}: no typical output object "
                 f"({', '.join(sorted(expected_out))})"
             )
+            if explicit_device_type:
+                errors.append(msg)
+            else:
+                warnings.append(msg)
 
     box_ids: set[str] = set()
     for entry in spec.get("boxes") or []:

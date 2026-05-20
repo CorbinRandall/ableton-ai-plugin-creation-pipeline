@@ -15,6 +15,7 @@ Follow **[`AGENTS.md`](../../AGENTS.md)**. Same flow on macOS/Windows: **[`docs/
 3. **Then:** **`./run --live`** → grep **`M4L_PIPELINE_READY`**.
 4. **Step 5:** ask MIDI effect / audio effect / instrument; use **`scripts/scaffold_plugin.py`**, **`scripts/validate_spec.py`**, **`tooling/m4l_pipeline.py all`** — see **[`docs/AGENT_TOOLS.md`](../../docs/AGENT_TOOLS.md)**.
 5. **Do not open a PR** unless the user asks.
+6. **Never commit** `projects/workspace/*` except `README.md`; never put private plugin names in tracked docs, CI, branches, tags, PR titles, or commit subjects.
 
 ## MCP naming
 

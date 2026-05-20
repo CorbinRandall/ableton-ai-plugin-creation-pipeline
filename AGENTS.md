@@ -105,6 +105,8 @@ Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 | Scaffold workspace | `./venv/bin/python scripts/scaffold_plugin.py --name X --type midi_effect` |
 | Export `.amxd` → spec | `./venv/bin/python scripts/export_spec_from_amxd.py device.amxd -o spec.json` |
 | Build + deploy + load | `./venv/bin/python tooling/m4l_pipeline.py all spec.json` |
+| Offline verify | `./venv/bin/python tooling/m4l_pipeline.py verify spec.json` |
+| Patch UI (Max-first) | `./venv/bin/python tooling/m4l_pipeline.py patch device.amxd --bgcolor 0,0,0,1` |
 | Live verify (OSC + MCP) | `./venv/bin/python scripts/m4l_verify.py` |
 | Verify helpers unit tests (no Live) | `./venv/bin/python scripts/test_verification_helpers.py` |
 | Templates | [`tooling/templates/`](tooling/templates/) |
@@ -127,6 +129,9 @@ Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 - Skip step 3 instructions after step 2 — always guide them and wait for **continue**.  
 - Commit under **`projects/`** except public tutorial sources.  
 - Put **private plugin names** in tracked files — use **`projects/workspace/`**.  
+- Put private plugin names in **branch names, tag names, PR titles, or commit message subjects** on this public repo.  
+- Stage paths under **`projects/workspace/`** except **`projects/workspace/README.md`** (run **`scripts/install_workspace_pre_commit.py`** locally).  
+- When documenting fixes learned from private work, use **bug-class descriptions** only in tracked files (see **`docs/TROUBLESHOOTING_M4L.md`**).  
 - Tell the user an **`audio_effect`** is “loaded and working” in Live **without** either (a) **`scripts/m4l_verify.py`** / pipeline **`all`** succeeding **after** AbletonMCP exposes **`create_audio_track`**, or (b) the user confirming in Live. Agents **cannot see the Ableton UI** — after **`install_remote_scripts`**, remind them to **quit Live fully** before **`create_audio_track`** works.
 
 ## Key paths

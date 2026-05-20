@@ -53,6 +53,11 @@ def amxd_to_spec(
         spec["openinpresentation"] = patcher["openinpresentation"]
     if patcher.get("bgcolor") is not None:
         spec["bgcolor"] = patcher["bgcolor"]
+        print(
+            "WARN: bgcolor exported — for UI-only edits consider "
+            "`tooling/m4l_pipeline.py patch` to preserve trailing Max embeds.",
+            file=sys.stderr,
+        )
     if patcher.get("parameters") is not None and not minimal:
         spec["parameters"] = patcher["parameters"]
 

@@ -198,6 +198,19 @@ def preflight(skip_imports: bool, *, repo_only: bool = False) -> int:
             if inserted and sys.path[:1] == [tpath]:
                 sys.path.pop(0)
 
+    donor_check = REPO_ROOT / "scripts" / "check_donor_consistency.py"
+    if donor_check.is_file():
+        import subprocess
+
+        rc = subprocess.run(
+            [sys.executable, str(donor_check)],
+            cwd=REPO_ROOT,
+            check=False,
+        ).returncode
+        if rc != 0:
+            ok = False
+            print("[preflight] FAIL: donor appversion consistency (see scripts/check_donor_consistency.py)")
+
     print("SETUP_PREFLIGHT_" + ("OK" if ok else "FAIL"))
     print(abc.MAX_FOR_LIVE_EDITION_NOTICE.strip())
     return 0 if ok else 1

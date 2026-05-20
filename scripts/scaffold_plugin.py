@@ -148,6 +148,16 @@ Validate spec (use venv Python — see docs/CROSS_PLATFORM.md):
 ```bash
 python scripts/validate_spec.py projects/workspace/{slug}/{spec_path.name}
 ```
+
+## Quick UI tweak (Max-first)
+
+After editing presentation in Max, or to change background/title without rebuilding the graph:
+
+```bash
+./venv/bin/python tooling/m4l_pipeline.py patch path/to/device.amxd --bgcolor 0,0,0,1 --deploy {args.type}
+```
+
+See [`docs/TROUBLESHOOTING_M4L.md`](../../docs/TROUBLESHOOTING_M4L.md).
 """
 
     if args.dry_run:
