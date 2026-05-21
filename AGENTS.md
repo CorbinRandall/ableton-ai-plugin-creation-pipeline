@@ -28,11 +28,20 @@ Pipeline v2 plan (DSL, MCP, recipes): **[`docs/AGENT_IMPLEMENTATION_PLAN.md`](do
 
 ---
 
+## Hard rules — every build, every iteration
+
+1. **ALWAYS use `m4l_pipeline.py all spec.json --with-adv`** — never `build` alone. `all` builds, deploys, AND loads the device on a new track in Ableton. `build` only writes a file — the user would have to drag it into Ableton manually.
+2. **ALWAYS pass `--with-adv`** — generates the `.adv` preset so parameters appear in Live.
+3. **Every change = new version.** The pipeline auto-increments (1.1 → 1.2 → 1.3). Never overwrite a previous version.
+4. **Every version lands on a new track automatically.** The user never drags anything from the browser.
+5. **Only use `--no-live` when Ableton is explicitly closed.**
+6. **Use `M4L_PROJECTS_PREFIX=workspace`** for user devices — keeps them gitignored.
+
 ## Must do
 
 - Use **`./run`** for first setup; **`./run --live`** only after Control Surfaces are enabled.
 - Put personal plugins in **`projects/workspace/`** (gitignored).
-- After T3, say **“ready for you to verify in Live”** — not **“confirmed working”** until human T5 ack ([`docs/VERIFICATION_TIERS.md`](docs/VERIFICATION_TIERS.md)).
+- After T3, say **”ready for you to verify in Live”** — not **”confirmed working”** until human T5 ack ([`docs/VERIFICATION_TIERS.md`](docs/VERIFICATION_TIERS.md)).
 
 ## Never do
 
@@ -40,6 +49,8 @@ Pipeline v2 plan (DSL, MCP, recipes): **[`docs/AGENT_IMPLEMENTATION_PLAN.md`](do
 - Commit **`projects/workspace/`** contents or private plugin names in public branch/PR/commit text.
 - Run **`--live`** before step 3 is confirmed (unless user says surfaces are already on).
 - Claim an **`audio_effect`** works without **`m4l_verify.py`** T3+ or user confirmation in Live.
+- Use `m4l_pipeline.py build` instead of `all` — `build` alone skips deploy and Live loading.
+- Run `all` without `--with-adv` — parameters won't register in Live without the preset.
 
 ---
 
