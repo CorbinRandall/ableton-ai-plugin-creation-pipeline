@@ -8,19 +8,29 @@ alwaysApply: true
 
 Follow **[`AGENTS.md`](../../AGENTS.md)**. Same flow on macOS/Windows: **[`docs/CROSS_PLATFORM.md`](../../docs/CROSS_PLATFORM.md)**.
 
-## Quick rules
+## Hard rules — every build, every iteration
 
-1. **First “run” after clone:** execute **`./run`** from repo root (Ableton **quit**). Do **not** use `--live` yet.
+1. **ALWAYS use `m4l_pipeline.py all spec.json --with-adv`** — never `build` alone. `all` builds, deploys, AND loads the device on a new track in Ableton. `build` only writes a file.
+2. **ALWAYS pass `--with-adv`** — generates the `.adv` preset so parameters appear in Live.
+3. **Every change = new version.** The pipeline auto-increments (1.1 → 1.2 → 1.3). Never overwrite a previous version.
+4. **Every version lands on a new track automatically.** The user never drags anything from the browser.
+5. **Only use `--no-live` when Ableton is explicitly closed.**
+6. **After automated checks (T3), say "ready for you to verify in Live"** — never "confirmed working" until the user confirms (T5).
+7. **Use `M4L_PROJECTS_PREFIX=workspace`** for user devices — keeps them gitignored.
+8. **Never commit `projects/workspace/`** contents or private plugin names in tracked docs, CI, branches, tags, PR titles, or commit subjects.
+
+## Setup flow
+
+1. **First "run" after clone:** execute **`./run`** from repo root (Ableton **quit**). Do **not** use `--live` yet.
 2. **After `M4L_RUN_OK`:** send the user the **step 3** Ableton Control Surface instructions; **wait** for **Continue** / **Ready**.
 3. **Then:** **`./run --live`** → grep **`M4L_PIPELINE_READY`**.
 4. **Step 5:** ask MIDI effect / audio effect / instrument; use **`scripts/scaffold_plugin.py`**, **`scripts/validate_spec.py`**, **`tooling/m4l_pipeline.py all`** — see **[`docs/AGENT_TOOLS.md`](../../docs/AGENT_TOOLS.md)**.
 5. **Do not open a PR** unless the user asks.
-6. **Never commit** `projects/workspace/*` except `README.md`; never put private plugin names in tracked docs, CI, branches, tags, PR titles, or commit subjects.
 
 ## MCP naming
 
 - **AbletonMCP** = Live Control Surface (TCP 9877). Required in Ableton Preferences.
-- **Cursor MCP** (`~/.cursor/mcp.json`) = optional; **not** required for this repo’s Python tools.
+- **Cursor MCP** (`~/.cursor/mcp.json`) = optional; **not** required for this repo's Python tools.
 
 ## IDE-agnostic docs
 
