@@ -191,6 +191,7 @@ def build_deploy_load(
     skip_live: bool = False,
     skip_validate: bool = False,
     with_adv: bool = False,
+    bump_major: bool = False,
 ) -> dict:
     """Build into ``projects/<slug>/{name X.Y}/``, deploy to Imported/, load in Live.
 
@@ -211,7 +212,7 @@ def build_deploy_load(
     device_type = spec.get("device_type", "midi_effect")
     name = spec.get("name", "Untitled")
 
-    vdir, ver = allocate_version_directory(spec)
+    vdir, ver = allocate_version_directory(spec, bump_major=bump_major)
     amxd_file = amxd_filename_for_spec(name)
     built = vdir / amxd_file
     build_amxd(spec, built, skip_validate=skip_validate)

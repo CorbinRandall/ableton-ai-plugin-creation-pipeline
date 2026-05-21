@@ -28,7 +28,7 @@ export M4L_PROJECTS_PREFIX=workspace
 Then **`tooling/m4l_pipeline.py`** / **`build_deploy_load`** create version folders **and**, unless you use **`all --no-live`** / **`M4L_SKIP_LIVE`**, **insert the device on a new Live track** via AbletonMCP (Live must be running with AbletonMCP enabled):
 
 ```text
-projects/workspace/<PluginSlug>/<Plugin Name> 1.1/
+projects/workspace/<PluginSlug>/<Plugin Name> 1.1/   # patch bumps: 1.2, 1.3, … (see docs/VERSIONING.md)
 ```
 
 instead of **`projects/<PluginSlug>/`** when the prefix is unset.

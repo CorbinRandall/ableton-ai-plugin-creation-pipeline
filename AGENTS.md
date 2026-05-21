@@ -32,7 +32,7 @@ Pipeline v2 plan (DSL, MCP, recipes): **[`docs/AGENT_IMPLEMENTATION_PLAN.md`](do
 
 1. **ALWAYS use `m4l_pipeline.py all spec.json --with-adv`** — never `build` alone. `all` builds, deploys, AND loads the device on a new track in Ableton. `build` only writes a file — the user would have to drag it into Ableton manually.
 2. **ALWAYS pass `--with-adv`** — generates the `.adv` preset so parameters appear in Live.
-3. **Every change = new version.** The pipeline auto-increments (1.1 → 1.2 → 1.3). Never overwrite a previous version.
+3. **Every change = new patch version.** Default bump is **minor/patch** on the same major line (1.1 → 1.2 → 1.3). **Never** jump to `2.x` unless the user asks or you pass **`--bump-major`** — see [`docs/VERSIONING.md`](docs/VERSIONING.md). Never overwrite a previous version folder.
 4. **Every version lands on a new track automatically.** The user never drags anything from the browser.
 5. **Only use `--no-live` when Ableton is explicitly closed.**
 6. **Use `M4L_PROJECTS_PREFIX=workspace`** for user devices — keeps them gitignored.
@@ -51,6 +51,7 @@ Pipeline v2 plan (DSL, MCP, recipes): **[`docs/AGENT_IMPLEMENTATION_PLAN.md`](do
 - Claim an **`audio_effect`** works without **`m4l_verify.py`** T3+ or user confirmation in Live.
 - Use `m4l_pipeline.py build` instead of `all` — `build` alone skips deploy and Live loading.
 - Run `all` without `--with-adv` — parameters won't register in Live without the preset.
+- Bump to `2.x` without user direction or `--bump-major` — default is patch (`1.2` → `1.3`). See [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
 ---
 

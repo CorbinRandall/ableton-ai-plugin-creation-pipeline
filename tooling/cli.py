@@ -154,6 +154,7 @@ def _cli():
         skip_live = False
         skip_validate = False
         with_adv = False
+        bump_major = False
         filtered: list[str] = []
         for a in argv_tail:
             if a in ("--no-live", "--skip-live"):
@@ -162,12 +163,14 @@ def _cli():
                 skip_validate = True
             elif a == "--with-adv":
                 with_adv = True
+            elif a == "--bump-major":
+                bump_major = True
             else:
                 filtered.append(a)
         if not filtered:
             print(
                 "usage: m4l_pipeline.py all <spec.json> [track_index|new] "
-                "[--no-live] [--skip-validate] [--with-adv]",
+                "[--no-live] [--skip-validate] [--with-adv] [--bump-major]",
                 file=sys.stderr,
             )
             sys.exit(1)
@@ -184,6 +187,7 @@ def _cli():
             skip_live=skip_live,
             skip_validate=skip_validate,
             with_adv=with_adv,
+            bump_major=bump_major,
         )
         print(json.dumps(result, indent=2, default=str))
         if not skip_live:

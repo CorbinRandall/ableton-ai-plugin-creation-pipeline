@@ -3,8 +3,10 @@
 M4L Pipeline — Build, deploy, and load Max for Live devices programmatically.
 
 Versioning: each ``build_deploy_load`` run creates ``{plugin_projects_base()}/<slug>/{name X.Y}/`` with
-``spec.json``, ``VERSION.txt``, and the ``.amxd``. With **M4L_PROJECTS_PREFIX=workspace**, that is under
-``projects/workspace/<slug>/`` (gitignored local sandboxes — safe across ``git pull``).
+``spec.json``, ``VERSION.txt``, and the ``.amxd``. Default bump is **patch** (``1.1`` → ``1.2`` → ``1.3``).
+Use ``--bump-major`` or ``M4L_VERSION_BUMP=major`` only when starting a new major line (``2.1``). See
+``docs/VERSIONING.md``. With **M4L_PROJECTS_PREFIX=workspace**, builds land under
+``projects/workspace/<slug>/`` (gitignored).
 Then deploys to User Library ``Imported/`` and loads the device in Live on a **new track** (unless you pass an existing **track index**, set **M4L_SKIP_LIVE**, or use **`all --no-live`**). Track type follows ``device_type``: **MIDI** for ``midi_effect`` / ``instrument``, **audio** for ``audio_effect``.
 
 The **`build`** command only writes an ``.amxd`` — it does **not** open Live. Use **`all`** (default: create track + load) or **`deploy`** then **`load`**.
@@ -29,8 +31,8 @@ Usage:
     python3 m4l_pipeline.py load    track_index device_name [device_type]
     python3 m4l_pipeline.py info    track_index
     python3 m4l_pipeline.py session
-    python3 m4l_pipeline.py all     spec.json [track_index|new] [--no-live] [--skip-validate] [--with-adv]
-        # Default: versioned build → deploy → NEW Live track + load (AbletonMCP).
+    python3 m4l_pipeline.py all     spec.json [track_index|new] [--no-live] [--skip-validate] [--with-adv] [--bump-major]
+        # Default: patch version bump (1.1 → 1.2). --bump-major → new line (e.g. 2.1).
         # Omit track or pass ``new`` for a new track; pass ``0`` etc. for an existing track.
         # ``--no-live``: skip MCP (artifacts + deploy only). Env ``M4L_SKIP_LIVE=1`` same effect.
         # ``--with-adv``: build/deploy .adv (preset) alongside .amxd; also copied next to .amxd under Imported/.

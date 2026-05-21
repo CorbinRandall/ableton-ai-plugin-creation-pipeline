@@ -40,6 +40,8 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 | Build + deploy + load | `tooling/m4l_pipeline.py all spec.json` |
 | Same, no Live | `… all spec.json --no-live` |
 | Include `.adv` | `… all spec.json --with-adv` or `M4L_BUILD_ADV=1` |
+| Start new major line (2.1) | `… all spec.json --bump-major` or `M4L_VERSION_BUMP=major` (only when user asks) |
+| Versioning policy | [`VERSIONING.md`](VERSIONING.md) |
 | Skip validation | `… --skip-validate` or `M4L_SKIP_VALIDATE=1` |
 | Wait for MCP | `scripts/verify_setup.py --wait-mcp 120` |
 | Confirm MCP can create **audio** tracks (after Live restart post-install) | `scripts/verify_setup.py --wait-mcp 120 --assert-create-audio-track` |
@@ -84,6 +86,7 @@ Commands run from the **repository root** after `./run` (step 2). Same flow in *
 | `M4L_SKIP_LIVE=1` | Skip MCP load in `all` |
 | `M4L_SKIP_VALIDATE=1` | Skip spec validation before build |
 | `M4L_BUILD_ADV=1` | Generate/deploy `.adv` with `all` |
+| `M4L_VERSION_BUMP=major` | Next `all` uses major bump (default: patch — see [`VERSIONING.md`](VERSIONING.md)) |
 | `M4L_APPVERSION=9.1.4` | Override Max appversion stamp on build (default: preserve donor) |
 | `M4L_APPVERSION_JSON_FILE=/path` | Full appversion dict override (rare) |
 | `M4L_ALLOW_AUDIO_ON_MIDI=1` | Debug only: load `audio_effect` on MIDI if MCP lacks `create_audio_track` (usually breaks in Live) |
