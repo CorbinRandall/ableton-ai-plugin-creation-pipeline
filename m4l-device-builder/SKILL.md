@@ -42,9 +42,11 @@ These rules apply to every build, every iteration, no exceptions:
 2. **Always pass `--with-adv`.** This generates the `.adv` preset file that registers
    parameters in Live. Without it, knobs/dials may not appear in Live's device view.
 
-3. **Every change creates a new version.** The pipeline auto-increments: 1.1 → 1.2 →
-   1.3 for each `all` run. Each version gets its own directory under `projects/` with
+3. **Every change creates a new patch version.** Default bump: **1.1 → 1.2 → 1.3**
+   (same major line). Each version gets its own directory under `projects/` with
    `spec.json`, `VERSION.txt`, and the `.amxd`. Never overwrite a previous version.
+   **Do not** jump to `2.x` unless the user explicitly asks — then add **`--bump-major`**
+   to `m4l_pipeline.py all`. See `$PIPELINE/docs/VERSIONING.md`.
 
 4. **Every version lands on a new track.** The pipeline creates a fresh track (MIDI or
    audio, matching `device_type`) and names it with the device name + version. The user
@@ -169,8 +171,8 @@ When the user wants changes:
 
 1. Modify the spec (edit JSON or regenerate via DSL)
 2. Re-validate (`validate_spec.py`)
-3. Re-run `m4l_pipeline.py all ... --with-adv` — this auto-increments the version
-   (1.1 → 1.2) and loads on a fresh track
+3. Re-run `m4l_pipeline.py all ... --with-adv` — patch-bumps the version (1.1 → 1.2)
+   and loads on a fresh track. Add `--bump-major` only if the user wants a new major line (2.1).
 4. Tell the user: "Version 1.2 is loaded on a new track — ready for you to verify"
 5. Repeat until the user is happy
 
@@ -208,4 +210,5 @@ touches the browser.
 | `M4L_PROJECTS_PREFIX=workspace` | Build into gitignored `projects/workspace/` |
 | `M4L_SKIP_LIVE=1` | Skip Ableton loading (same as `--no-live`) |
 | `M4L_BUILD_ADV=1` | Always generate .adv preset |
+| `M4L_VERSION_BUMP=major` | Next `all` starts major line (e.g. 2.1); rare — prefer `--bump-major` |
 | `ABLETON_HOME` | Override Ableton user folder location |

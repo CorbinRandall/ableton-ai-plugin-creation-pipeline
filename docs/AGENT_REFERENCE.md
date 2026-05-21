@@ -66,6 +66,9 @@ Requires `pip install 'mcp>=1.2.0'`.
 | `all --no-live` | Build + deploy only |
 | `all --with-adv` | Also build/deploy `.adv` preset |
 | `all --skip-validate` | Skip spec validation |
+| `all --bump-major` | New major version line (e.g. 2.1) — only when user asks; default is patch (1.2 → 1.3) |
+
+Versioning: [`VERSIONING.md`](VERSIONING.md).
 
 ## Do not
 

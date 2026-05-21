@@ -12,6 +12,10 @@ if str(WORKSPACE) not in sys.path:
     sys.path.insert(0, str(WORKSPACE))
 REPO_ROOT = WORKSPACE.parent
 
+VERSION_BUMP_PATCH = "patch"
+VERSION_BUMP_MAJOR = "major"
+_VALID_VERSION_BUMPS = frozenset({VERSION_BUMP_PATCH, VERSION_BUMP_MAJOR})
+
 
 def plugin_slug_from_name(name: str) -> str:
     """Filesystem-safe folder slug under projects/."""
@@ -55,6 +59,24 @@ def plugin_projects_base() -> Path:
     return (base / extra) if extra else base
 
 
+def resolve_version_bump(bump: str | None = None, *, bump_major: bool = False) -> str:
+    """Resolve bump mode: CLI ``bump_major`` wins, then explicit ``bump``, then env."""
+
+    if bump_major:
+        return VERSION_BUMP_MAJOR
+    if bump is not None:
+        b = bump.strip().lower()
+        if b not in _VALID_VERSION_BUMPS:
+            raise ValueError(f"version bump must be 'patch' or 'major', got {bump!r}")
+        return b
+    env = (os.environ.get("M4L_VERSION_BUMP") or VERSION_BUMP_PATCH).strip().lower()
+    if env not in _VALID_VERSION_BUMPS:
+        raise ValueError(
+            f"M4L_VERSION_BUMP must be 'patch' or 'major', got {os.environ.get('M4L_VERSION_BUMP')!r}"
+        )
+    return env
+
+
 def _parse_existing_versions(project_parent: Path, spec_name: str) -> list[tuple[int, int]]:
     pat = re.compile(r"^" + re.escape(spec_name) + r" (\d+)\.(\d+)$")
     found: list[tuple[int, int]] = []
@@ -69,21 +91,66 @@ def _parse_existing_versions(project_parent: Path, spec_name: str) -> list[tuple
     return found
 
 
-def next_plugin_version(spec_name: str) -> str:
-    slug = plugin_slug_from_name(spec_name)
-    parent = plugin_projects_base() / slug
-    vers = _parse_existing_versions(parent, spec_name)
-    if not vers:
+def compute_next_version(
+    existing: list[tuple[int, int]],
+    bump: str = VERSION_BUMP_PATCH,
+) -> str:
+    """Next ``major.minor`` label from prior builds.
+
+    **patch** (default): increment the minor on the highest line — ``1.3`` → ``1.4``.
+    First build with no history: ``1.1``.
+
+    **major** (only when user/agent passes ``--bump-major`` or ``M4L_VERSION_BUMP=major``):
+    start a new major line — ``1.9`` → ``2.1`` (not ``2.0``; matches first-build convention).
+    """
+
+    if bump not in _VALID_VERSION_BUMPS:
+        raise ValueError(f"version bump must be 'patch' or 'major', got {bump!r}")
+    if not existing:
         return "1.1"
-    maj, mi = max(vers, key=lambda t: (t[0], t[1]))
+    maj, mi = max(existing, key=lambda t: (t[0], t[1]))
+    if bump == VERSION_BUMP_MAJOR:
+        return f"{maj + 1}.1"
     return f"{maj}.{mi + 1}"
 
 
-def allocate_version_directory(spec: dict) -> tuple[Path, str]:
+def parse_version_label(label: str) -> tuple[int, int]:
+    """Parse ``major.minor`` from a version string."""
+
+    m = re.fullmatch(r"(\d+)\.(\d+)", label.strip())
+    if not m:
+        raise ValueError(f"expected major.minor version label, got {label!r}")
+    return int(m.group(1)), int(m.group(2))
+
+
+def next_plugin_version(
+    spec_name: str,
+    bump: str | None = None,
+    *,
+    bump_major: bool = False,
+    extra_versions: list[tuple[int, int]] | None = None,
+) -> str:
+    """Next version folder label for ``{spec_name} X.Y``."""
+
+    slug = plugin_slug_from_name(spec_name)
+    parent = plugin_projects_base() / slug
+    vers = _parse_existing_versions(parent, spec_name)
+    if extra_versions:
+        vers = vers + list(extra_versions)
+    mode = resolve_version_bump(bump, bump_major=bump_major)
+    return compute_next_version(vers, mode)
+
+
+def allocate_version_directory(
+    spec: dict,
+    bump: str | None = None,
+    *,
+    bump_major: bool = False,
+) -> tuple[Path, str]:
     """Create ``{plugin_projects_base()}/<slug>/{spec_name X.Y}/`` for this build."""
 
     name = spec.get("name", "Untitled")
-    ver = next_plugin_version(name)
+    ver = next_plugin_version(name, bump, bump_major=bump_major)
     slug = plugin_slug_from_name(name)
     proj_parent = plugin_projects_base() / slug
     proj_parent.mkdir(parents=True, exist_ok=True)
