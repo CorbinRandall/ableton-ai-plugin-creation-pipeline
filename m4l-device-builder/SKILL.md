@@ -179,6 +179,26 @@ When the user wants changes:
 Each iteration is a new version, a new track, immediately audible. The user never
 touches the browser.
 
+## When the MCP server is configured
+
+If `tooling/m4l_mcp_server.py` is wired as an IDE MCP server (see `$PIPELINE/docs/AGENT_TOOLS.md`),
+use native tool calls instead of shell commands for a tighter loop:
+
+| Shell command | MCP tool call |
+|---|---|
+| `m4l_pipeline.py all spec.json --with-adv` | `live_build_and_verify(spec)` |
+| `m4l_verify.py --spec ...` | included in `live_build_and_verify` |
+| `m4l_pipeline.py session` | `live_session_state()` |
+| `m4l_parameter_sweep.py --track N --device D` | `live_track_devices(N)` |
+| (not available via shell) | `live_set_param(track, device, "Gain", -6.0)` |
+| (not available via shell) | `live_transport("play")` |
+| (not available via shell) | `live_create_midi_clip(track, slot, notes)` |
+| (not available via shell) | `live_delete_track(index)` |
+
+`live_build_and_verify(spec)` respects `M4L_PROJECTS_PREFIX=workspace` when set in the MCP server's `env` config. It returns `{ok, track_index, device_index, params, errors}` so you can immediately inspect Live's view of the device without a second round-trip.
+
+The hard rules (always `--with-adv`, always new track, `projects/workspace/` for user devices, never "confirmed working" until T5) still apply when using MCP tool calls.
+
 ## Other useful commands
 
 | Task | Command |

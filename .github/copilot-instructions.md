@@ -20,3 +20,23 @@ When helping with this repository, follow **[`AGENTS.md`](../AGENTS.md)** and **
 - **AbletonMCP** (Live Control Surface, port 9877) is required for Live load; it is separate from GitHub Copilot or IDE MCP products.
 
 Human walkthrough: **[`docs/GETTING_STARTED.md`](../docs/GETTING_STARTED.md)** · All IDEs: **[`docs/AGENTIC_IDES.md`](../docs/AGENTIC_IDES.md)**.
+
+## MCP server (optional)
+
+`tooling/m4l_mcp_server.py` exposes the full pipeline plus Live control tools (`live_session_state`, `live_build_and_verify`, `live_track_devices`, `live_set_param`, `live_transport`, `live_create_midi_clip`, `live_delete_track`, etc.) as an IDE MCP server.
+
+Config template:
+
+````json
+{
+  "mcpServers": {
+    "m4l-pipeline": {
+      "command": "/abs/path/to/repo/venv/bin/python",
+      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"],
+      "env": { "M4L_PROJECTS_PREFIX": "workspace" }
+    }
+  }
+}
+````
+
+Full tool list: **[`docs/AGENT_TOOLS.md`](../docs/AGENT_TOOLS.md)**.

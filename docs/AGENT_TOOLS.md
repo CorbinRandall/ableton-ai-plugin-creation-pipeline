@@ -111,27 +111,67 @@ See [`examples/README.md`](../examples/README.md).
 
 **AbletonMCP** in Live (Control Surface, TCP 9877) is **not** this server.
 
+`tooling/m4l_mcp_server.py` is a **FastMCP stdio server** exposing the full pipeline plus direct Live control. When wired as an IDE MCP server, you use tool calls instead of shell commands.
+
+### Build + recipe tools
 | Tool | Purpose |
 |------|---------|
-| `tooling/m4l_mcp_server.py` | stdio MCP — validate, build, deploy, load, recipes, diagnose |
-| `tooling/spec_builder.py` | Python DSL for specs |
-| `examples/recipes/` | Named device patterns |
-| `tooling/spec_to_svg.py` | Presentation preview without Live |
+| `list_recipes` | Browse built-in device examples |
+| `read_recipe_spec(slug)` | Get spec dict for a named recipe |
+| `compose_spec_from_dsl(python_source)` | Build spec from Python DSL snippet |
+| `validate_spec(spec)` | Validate spec dict |
+| `spec_to_svg(spec)` | Render UI preview as SVG |
+| `build_amxd_tool(spec, out_path?)` | Build `.amxd` file (no Live) |
+| `deploy(amxd_path, device_type)` | Copy `.amxd` to User Library Imported/ |
+| `load_in_live(spec, with_adv?)` | Build + deploy + load on a new track |
+| `diagnose(error_text)` | Map error text to known fixes |
 
-Install: `pip install 'mcp>=1.2.0'` (in `requirements.txt`).
+### Live-control tools (require Live + AbletonMCP + AbletonOSC running)
+| Tool | Purpose |
+|------|---------|
+| `live_session_state()` | Full session snapshot: all tracks, devices, tempo |
+| `live_track_devices(track_index)` | Devices + param names/values/ranges on one track |
+| `live_set_param(track, device, param, value)` | Set device parameter by name or index |
+| `live_transport(action, bpm?)` | `"play"` / `"stop"` / `"set_tempo"` |
+| `live_create_midi_clip(track, slot, notes, length_beats?)` | Create MIDI clip with notes |
+| `live_fire_clip(track, slot)` | Launch a clip slot |
+| `live_stop_clip(track, slot)` | Stop a clip slot |
+| `live_delete_track(track_index)` | Delete a track |
+| `live_rename_track(track_index, name)` | Rename a track |
+| `live_clear_track(track_index)` | Remove all devices from a track |
+| `live_build_and_verify(spec, with_adv?)` | Full build→deploy→load→OSC verify in one call |
 
-Example config (use absolute paths):
+### Install
+
+```bash
+pip install 'mcp>=1.2.0'   # already in requirements.txt
+```
+
+### Config (use absolute paths)
 
 ```json
 {
   "mcpServers": {
     "m4l-pipeline": {
       "command": "/abs/path/to/repo/venv/bin/python",
-      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"]
+      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"],
+      "env": { "M4L_PROJECTS_PREFIX": "workspace" }
     }
   }
 }
 ```
+
+Place this in your editor's MCP settings file (`~/.cursor/mcp.json`, `~/.claude/claude_code_config.json`, Claude Desktop `claude_desktop_config.json`, etc.).
+
+### Typical AI workflow via MCP
+
+1. `live_session_state()` — see all tracks and devices before acting
+2. `compose_spec_from_dsl(...)` → `validate_spec(...)` — design the device
+3. `live_build_and_verify(spec)` — one call: build + load + verify; returns track index + params
+4. `live_track_devices(track_index)` — inspect params with current values and ranges
+5. `live_set_param(track, device, "Gain", -6.0)` — real-time tweak
+6. `live_transport("play")` / `live_create_midi_clip(...)` / `live_fire_clip(...)` — perform
+7. `live_delete_track(index)` / `live_clear_track(index)` — clean up test tracks
 
 Full v2 plan: [`docs/AGENT_IMPLEMENTATION_PLAN.md`](AGENT_IMPLEMENTATION_PLAN.md).
 
