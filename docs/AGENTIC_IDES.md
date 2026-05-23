@@ -67,6 +67,6 @@ No IDE required — see [`CROSS_PLATFORM.md`](CROSS_PLATFORM.md).
 
 ## What we do not ship
 
-- No required IDE MCP manifest in this repo.
+- No required IDE MCP manifest — but `tooling/m4l_mcp_server.py` is a ready-to-wire stdio server with build + Live control tools (see [`AGENT_TOOLS.md`](AGENT_TOOLS.md)).
 - No editor-specific lock-in for build/deploy.
 - Optional automation: [`examples/sdk-run-setup/`](../examples/sdk-run-setup/) (shell + optional Cursor SDK).

@@ -44,20 +44,25 @@ Add **`--json`** to supported scripts for machine-readable stdout (one JSON obje
 
 **AbletonMCP** (Live Control Surface, TCP 9877) is **not** the same as this server.
 
-Example Cursor / Claude Desktop config:
+`tooling/m4l_mcp_server.py` — FastMCP stdio server with build-side tools and full Live control.
+
+**All tools:** `list_recipes`, `read_recipe_spec`, `compose_spec_from_dsl`, `validate_spec`, `spec_to_svg`, `build_amxd_tool`, `deploy`, `load_in_live`, `diagnose`, `live_session_state`, `live_track_devices`, `live_set_param`, `live_transport`, `live_create_midi_clip`, `live_fire_clip`, `live_stop_clip`, `live_delete_track`, `live_rename_track`, `live_clear_track`, `live_build_and_verify`
+
+Example Cursor / Claude Code / Claude Desktop config:
 
 ```json
 {
   "mcpServers": {
     "m4l-pipeline": {
       "command": "/abs/path/to/repo/venv/bin/python",
-      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"]
+      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"],
+      "env": { "M4L_PROJECTS_PREFIX": "workspace" }
     }
   }
 }
 ```
 
-Requires `pip install 'mcp>=1.2.0'`.
+Requires `pip install 'mcp>=1.2.0'`. Full tool table: [`AGENT_TOOLS.md`](AGENT_TOOLS.md).
 
 ## Other flags
 

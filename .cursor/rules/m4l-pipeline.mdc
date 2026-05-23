@@ -32,6 +32,24 @@ Follow **[`AGENTS.md`](../../AGENTS.md)**. Same flow on macOS/Windows: **[`docs/
 - **AbletonMCP** = Live Control Surface (TCP 9877). Required in Ableton Preferences.
 - **Cursor MCP** (`~/.cursor/mcp.json`) = optional; **not** required for this repo's Python tools.
 
+## MCP server (optional IDE tool calls)
+
+`tooling/m4l_mcp_server.py` can be wired as an MCP server in `~/.cursor/mcp.json`:
+
+````json
+{
+  "mcpServers": {
+    "m4l-pipeline": {
+      "command": "/abs/path/to/repo/venv/bin/python",
+      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"],
+      "env": { "M4L_PROJECTS_PREFIX": "workspace" }
+    }
+  }
+}
+````
+
+When available, prefer `live_build_and_verify(spec)` over `m4l_pipeline.py all` — it returns structured results. Use `live_session_state()` to orient before any build. See **[`docs/AGENT_TOOLS.md`](../../docs/AGENT_TOOLS.md)** for all 20 tools.
+
 ## IDE-agnostic docs
 
 Other editors: **[`docs/AGENTIC_IDES.md`](../../docs/AGENTIC_IDES.md)**.

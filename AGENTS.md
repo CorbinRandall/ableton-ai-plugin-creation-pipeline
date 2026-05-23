@@ -10,7 +10,7 @@ Automated Max for Live **build + deploy + Live load** pipeline. Prefer **`./run`
 
 Human checklist: [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md).
 
-**Two MCPs:** **AbletonMCP** = Live Control Surface (TCP 9877, required for `./run --live`). **IDE MCP servers** (Cursor `~/.cursor/mcp.json`, etc.) = optional — this repo also ships **`tooling/m4l_mcp_server.py`**.
+**Two MCPs:** **AbletonMCP** = Live Control Surface (TCP 9877, required for `./run --live`). **IDE MCP servers** (Cursor `~/.cursor/mcp.json`, etc.) = optional — this repo also ships **`tooling/m4l_mcp_server.py`** (build + deploy + full Live control).
 
 ---
 
@@ -52,6 +52,36 @@ Pipeline v2 plan (DSL, MCP, recipes): **[`docs/AGENT_IMPLEMENTATION_PLAN.md`](do
 - Use `m4l_pipeline.py build` instead of `all` — `build` alone skips deploy and Live loading.
 - Run `all` without `--with-adv` — parameters won't register in Live without the preset.
 - Bump to `2.x` without user direction or `--bump-major` — default is patch (`1.2` → `1.3`). See [`docs/VERSIONING.md`](docs/VERSIONING.md).
+
+---
+
+## MCP server — AI-native Live control (optional)
+
+When **`tooling/m4l_mcp_server.py`** is wired as an IDE MCP server (see **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**), you have direct tool calls for the full pipeline:
+
+- **Orient:** `live_session_state()` → all tracks, devices, tempo
+- **Build + load + verify:** `live_build_and_verify(spec)` → one call, returns track index + params
+- **Inspect:** `live_track_devices(track_index)` → param names/values/ranges
+- **Tweak:** `live_set_param(track, device, "Gain", -6.0)`
+- **Transport:** `live_transport("play"/"stop"/"set_tempo", bpm=120)`
+- **Clips:** `live_create_midi_clip(track, slot, notes)` · `live_fire_clip(track, slot)`
+- **Cleanup:** `live_delete_track(index)` · `live_rename_track(index, "name")`
+
+Config template (absolute paths, inside editor's MCP settings):
+
+````json
+{
+  "mcpServers": {
+    "m4l-pipeline": {
+      "command": "/abs/path/to/repo/venv/bin/python",
+      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"],
+      "env": { "M4L_PROJECTS_PREFIX": "workspace" }
+    }
+  }
+}
+````
+
+Requires `pip install 'mcp>=1.2.0'` (already in `requirements.txt`). Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 
 ---
 
