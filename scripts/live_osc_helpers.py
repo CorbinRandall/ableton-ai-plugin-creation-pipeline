@@ -157,3 +157,72 @@ def expected_param_names_from_spec(spec: dict) -> tuple[str, ...]:
         if ln:
             names.append(str(ln))
     return tuple(names)
+
+
+# ---------------------------------------------------------------------------
+# Fire-and-forget OSC helpers (no response expected)
+# ---------------------------------------------------------------------------
+
+def osc_send(address: str, args: list) -> None:
+    """Fire-and-forget UDP OSC message to AbletonOSC (no response binding)."""
+    from pythonosc import udp_client
+    udp_client.SimpleUDPClient(*OSC_SEND).send_message(address, args)
+
+
+def osc_song_start() -> None:
+    """Start song playback via AbletonOSC."""
+    osc_send("/live/song/start_playing", [])
+
+
+def osc_song_stop() -> None:
+    """Stop song playback via AbletonOSC."""
+    osc_send("/live/song/stop_playing", [])
+
+
+def osc_delete_track(track_index: int) -> None:
+    """Delete a track by index via AbletonOSC (fire-and-forget; allow brief settle)."""
+    osc_send("/live/song/delete_track", [int(track_index)])
+    time.sleep(0.08)
+
+
+# ---------------------------------------------------------------------------
+# OSC parameter range helpers
+# ---------------------------------------------------------------------------
+
+def osc_device_parameter_min(track: int, device: int, wait: float = 5.0) -> tuple[float, ...]:
+    """Return minimum values for all automatable parameters on a device."""
+    params = _osc_request("/live/device/get/parameters/min", [int(track), int(device)], wait)
+    if len(params) < 3:
+        return ()
+    return tuple(float(p) for p in params[2:])
+
+
+def osc_device_parameter_max(track: int, device: int, wait: float = 5.0) -> tuple[float, ...]:
+    """Return maximum values for all automatable parameters on a device."""
+    params = _osc_request("/live/device/get/parameters/max", [int(track), int(device)], wait)
+    if len(params) < 3:
+        return ()
+    return tuple(float(p) for p in params[2:])
+
+
+def osc_device_parameter_info(track: int, device: int, wait: float = 5.0) -> list[dict]:
+    """Return a list of dicts with name/value/min/max for each automatable parameter.
+
+    Example::
+
+        [{"name": "Gain", "value": 0.0, "min": -70.0, "max": 6.0}, ...]
+    """
+    names = osc_device_parameter_names(track, device, wait)
+    values = osc_device_parameter_values(track, device, wait)
+    mins = osc_device_parameter_min(track, device, wait)
+    maxs = osc_device_parameter_max(track, device, wait)
+    n = len(names)
+    return [
+        {
+            "name": names[i] if i < len(names) else f"param_{i}",
+            "value": values[i] if i < len(values) else None,
+            "min": mins[i] if i < len(mins) else None,
+            "max": maxs[i] if i < len(maxs) else None,
+        }
+        for i in range(n)
+    ]
