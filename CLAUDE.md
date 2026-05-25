@@ -51,34 +51,13 @@ Other IDEs: **`docs/AGENTIC_IDES.md`**.
 
 ### Configure in Claude Code (CLI)
 
-**One-liner (recommended):**
-
 ```bash
 claude mcp add m4l-pipeline \
   --env M4L_PROJECTS_PREFIX=workspace \
-  -- /path/to/repo/venv/bin/python /path/to/repo/tooling/m4l_mcp_server.py
+  -- /abs/path/to/repo/venv/bin/python /abs/path/to/repo/tooling/m4l_mcp_server.py
 ```
 
-Replace `/path/to/repo` with the absolute repo root (e.g. `/Users/cp/ableton-ai-plugin-creation-pipeline`). Restart Claude Code after adding.
-
-**Or edit `~/.claude.json` directly** (under the top-level `mcpServers` key):
-
-```json
-{
-  "mcpServers": {
-    "m4l-pipeline": {
-      "type": "stdio",
-      "command": "/path/to/repo/venv/bin/python",
-      "args": ["/path/to/repo/tooling/m4l_mcp_server.py"],
-      "env": { "M4L_PROJECTS_PREFIX": "workspace" }
-    }
-  }
-}
-```
-
-> **Note:** Claude Code CLI does **not** read `mcpServers` from `.claude/settings.json` or `~/.claude/settings.json`. MCP servers must be registered in `~/.claude.json` (global) or `.mcp.json` at the project root. Putting them anywhere else fails silently.
-
-For Claude Desktop / Cursor / other IDEs, see [`docs/AGENT_REFERENCE.md`](docs/AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp).
+Restart Claude Code after adding. Full per-IDE matrix (Claude Desktop, Cursor, Gemini, Copilot, etc.) + critical warnings about which files Claude Code does **NOT** read: **[`docs/AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp`](docs/AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp)** — single source of truth, do not duplicate config blocks here.
 
 ### Typical AI workflow via MCP
 

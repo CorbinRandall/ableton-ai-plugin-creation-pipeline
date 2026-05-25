@@ -34,21 +34,9 @@ Follow **[`AGENTS.md`](../../AGENTS.md)**. Same flow on macOS/Windows: **[`docs/
 
 ## MCP server (optional IDE tool calls)
 
-`tooling/m4l_mcp_server.py` can be wired as an MCP server in `~/.cursor/mcp.json`:
+`tooling/m4l_mcp_server.py` can be wired as an MCP server in `~/.cursor/mcp.json`. Full install matrix (Cursor + every other IDE): **[`docs/AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp`](../../docs/AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp)** — single source of truth, do not paste a generic JSON block elsewhere.
 
-````json
-{
-  "mcpServers": {
-    "m4l-pipeline": {
-      "command": "/abs/path/to/repo/venv/bin/python",
-      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"],
-      "env": { "M4L_PROJECTS_PREFIX": "workspace" }
-    }
-  }
-}
-````
-
-When available, prefer `live_build_and_verify(spec)` over `m4l_pipeline.py all` — it returns structured results. Use `live_session_state()` to orient before any build. See **[`docs/AGENT_TOOLS.md`](../../docs/AGENT_TOOLS.md)** for all 20 tools.
+When the MCP server is wired, prefer `live_build_and_verify(spec)` over `m4l_pipeline.py all` — it returns structured results. Use `live_session_state()` to orient before any build. See **[`docs/AGENT_TOOLS.md`](../../docs/AGENT_TOOLS.md)** for all 20 tools.
 
 ## IDE-agnostic docs
 

@@ -46,9 +46,16 @@ Add **`--json`** to supported scripts for machine-readable stdout (one JSON obje
 
 `tooling/m4l_mcp_server.py` — FastMCP stdio server with build-side tools and full Live control.
 
-**All tools:** `list_recipes`, `read_recipe_spec`, `compose_spec_from_dsl`, `validate_spec`, `spec_to_svg`, `build_amxd_tool`, `deploy`, `load_in_live`, `diagnose`, `live_session_state`, `live_track_devices`, `live_set_param`, `live_transport`, `live_create_midi_clip`, `live_fire_clip`, `live_stop_clip`, `live_delete_track`, `live_rename_track`, `live_clear_track`, `live_build_and_verify`
+> **Single source of truth — do not duplicate this section elsewhere.**
+> Per-IDE files (`CLAUDE.md`, `GEMINI.md`, `AGENTS.md`, `.cursor/rules/*.mdc`,
+> `.github/copilot-instructions.md`) should LINK here, not repeat the config.
+> When the right path for an IDE changes, only this section should need editing.
 
-**Claude Code CLI** — register via `claude mcp add` (or edit `~/.claude.json`, NOT `settings.json`):
+Requires `pip install 'mcp>=1.2.0'` (already in `requirements.txt`).
+
+### Per-IDE install — pick your editor
+
+#### Claude Code (CLI)
 
 ```bash
 claude mcp add m4l-pipeline \
@@ -56,9 +63,26 @@ claude mcp add m4l-pipeline \
   -- /abs/path/to/repo/venv/bin/python /abs/path/to/repo/tooling/m4l_mcp_server.py
 ```
 
-> Claude Code ignores the `mcpServers` key in `~/.claude/settings.json` and `.claude/settings.json` — that surface is for permissions/hooks only. MCP servers live in `~/.claude.json` (global) or `.mcp.json` (project root).
+Or edit `~/.claude.json` directly (top-level `mcpServers` key):
 
-**Cursor / Claude Desktop / other IDEs** — JSON config under their `mcpServers` key:
+```json
+{
+  "mcpServers": {
+    "m4l-pipeline": {
+      "type": "stdio",
+      "command": "/abs/path/to/repo/venv/bin/python",
+      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"],
+      "env": { "M4L_PROJECTS_PREFIX": "workspace" }
+    }
+  }
+}
+```
+
+> ⚠ **Claude Code does NOT read `mcpServers` from `~/.claude/settings.json`, `.claude/settings.json`, or `~/.claude/claude_code_config.json`.** Those files are silently ignored for MCP registration — `settings.json` is permissions/hooks only. Use `~/.claude.json` (global), `.mcp.json` at project root, or the `claude mcp add` CLI. Restart Claude Code after adding.
+
+#### Cursor
+
+Edit `~/.cursor/mcp.json`:
 
 ```json
 {
@@ -72,7 +96,21 @@ claude mcp add m4l-pipeline \
 }
 ```
 
-Requires `pip install 'mcp>=1.2.0'` (already in `requirements.txt`). Full tool table: [`AGENT_TOOLS.md`](AGENT_TOOLS.md).
+#### Claude Desktop
+
+Edit `claude_desktop_config.json` (macOS: `~/Library/Application Support/Claude/`, Windows: `%APPDATA%\Claude\`). Same JSON shape as Cursor above.
+
+#### Gemini CLI
+
+Edit `~/.gemini/settings.json` (`mcpServers` key). Same JSON shape.
+
+#### GitHub Copilot (VS Code) / Continue / Windsurf / Zed / Cody
+
+Editor-specific MCP settings UI — supply the same `command` / `args` / `env`.
+
+### Tool list
+
+`list_recipes`, `read_recipe_spec`, `compose_spec_from_dsl`, `validate_spec`, `spec_to_svg`, `build_amxd_tool`, `deploy`, `load_in_live`, `diagnose`, `live_session_state`, `live_track_devices`, `live_set_param`, `live_transport`, `live_create_midi_clip`, `live_fire_clip`, `live_stop_clip`, `live_delete_track`, `live_rename_track`, `live_clear_track`, `live_build_and_verify`. Full table: [`AGENT_TOOLS.md`](AGENT_TOOLS.md).
 
 ## Other flags
 

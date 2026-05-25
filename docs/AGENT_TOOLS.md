@@ -147,21 +147,9 @@ See [`examples/README.md`](../examples/README.md).
 pip install 'mcp>=1.2.0'   # already in requirements.txt
 ```
 
-### Config (use absolute paths)
+### Config — per IDE
 
-```json
-{
-  "mcpServers": {
-    "m4l-pipeline": {
-      "command": "/abs/path/to/repo/venv/bin/python",
-      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"],
-      "env": { "M4L_PROJECTS_PREFIX": "workspace" }
-    }
-  }
-}
-```
-
-Place this in your editor's MCP settings file (`~/.cursor/mcp.json`, `~/.claude/claude_code_config.json`, Claude Desktop `claude_desktop_config.json`, etc.).
+The right config file differs per editor and **Claude Code in particular requires a non-obvious location** (`~/.claude.json` or `claude mcp add`, NOT `settings.json`). The full matrix lives in **[`AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp`](AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp)** — single source of truth. Do not paste a generic JSON template here; agents will pick the wrong file and config will silently fail to load.
 
 ### Typical AI workflow via MCP
 
