@@ -48,7 +48,17 @@ Add **`--json`** to supported scripts for machine-readable stdout (one JSON obje
 
 **All tools:** `list_recipes`, `read_recipe_spec`, `compose_spec_from_dsl`, `validate_spec`, `spec_to_svg`, `build_amxd_tool`, `deploy`, `load_in_live`, `diagnose`, `live_session_state`, `live_track_devices`, `live_set_param`, `live_transport`, `live_create_midi_clip`, `live_fire_clip`, `live_stop_clip`, `live_delete_track`, `live_rename_track`, `live_clear_track`, `live_build_and_verify`
 
-Example Cursor / Claude Code / Claude Desktop config:
+**Claude Code CLI** — register via `claude mcp add` (or edit `~/.claude.json`, NOT `settings.json`):
+
+```bash
+claude mcp add m4l-pipeline \
+  --env M4L_PROJECTS_PREFIX=workspace \
+  -- /abs/path/to/repo/venv/bin/python /abs/path/to/repo/tooling/m4l_mcp_server.py
+```
+
+> Claude Code ignores the `mcpServers` key in `~/.claude/settings.json` and `.claude/settings.json` — that surface is for permissions/hooks only. MCP servers live in `~/.claude.json` (global) or `.mcp.json` (project root).
+
+**Cursor / Claude Desktop / other IDEs** — JSON config under their `mcpServers` key:
 
 ```json
 {
@@ -62,7 +72,7 @@ Example Cursor / Claude Code / Claude Desktop config:
 }
 ```
 
-Requires `pip install 'mcp>=1.2.0'`. Full tool table: [`AGENT_TOOLS.md`](AGENT_TOOLS.md).
+Requires `pip install 'mcp>=1.2.0'` (already in `requirements.txt`). Full tool table: [`AGENT_TOOLS.md`](AGENT_TOOLS.md).
 
 ## Other flags
 
