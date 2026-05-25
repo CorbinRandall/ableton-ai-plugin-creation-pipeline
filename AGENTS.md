@@ -67,21 +67,7 @@ When **`tooling/m4l_mcp_server.py`** is wired as an IDE MCP server (see **[`docs
 - **Clips:** `live_create_midi_clip(track, slot, notes)` · `live_fire_clip(track, slot)`
 - **Cleanup:** `live_delete_track(index)` · `live_rename_track(index, "name")`
 
-Config template (absolute paths, inside editor's MCP settings):
-
-````json
-{
-  "mcpServers": {
-    "m4l-pipeline": {
-      "command": "/abs/path/to/repo/venv/bin/python",
-      "args": ["/abs/path/to/repo/tooling/m4l_mcp_server.py"],
-      "env": { "M4L_PROJECTS_PREFIX": "workspace" }
-    }
-  }
-}
-````
-
-Requires `pip install 'mcp>=1.2.0'` (already in `requirements.txt`). Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
+**Install — per IDE:** see **[`docs/AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp`](docs/AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp)** for the per-editor matrix (Claude Code CLI, Cursor, Claude Desktop, Gemini, Copilot, etc.). **Do not copy-paste a generic JSON block** — Claude Code in particular requires `~/.claude.json` or `claude mcp add` and silently ignores `settings.json`. Requires `pip install 'mcp>=1.2.0'` (already in `requirements.txt`). Full tool list: **[`docs/AGENT_TOOLS.md`](docs/AGENT_TOOLS.md)**.
 
 ---
 

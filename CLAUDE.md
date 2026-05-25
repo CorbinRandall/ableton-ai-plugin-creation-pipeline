@@ -49,23 +49,15 @@ Other IDEs: **`docs/AGENTIC_IDES.md`**.
 | **`live_clear_track`** | **Remove all devices from a track** |
 | **`live_build_and_verify`** | **Full pipeline + OSC verify in one call** |
 
-### Configure in Claude Code (`~/.claude/claude_code_config.json` or `settings.json`)
+### Configure in Claude Code (CLI)
 
-```json
-{
-  "mcpServers": {
-    "m4l-pipeline": {
-      "command": "/path/to/repo/venv/bin/python",
-      "args": ["/path/to/repo/tooling/m4l_mcp_server.py"],
-      "env": {
-        "M4L_PROJECTS_PREFIX": "workspace"
-      }
-    }
-  }
-}
+```bash
+claude mcp add m4l-pipeline \
+  --env M4L_PROJECTS_PREFIX=workspace \
+  -- /abs/path/to/repo/venv/bin/python /abs/path/to/repo/tooling/m4l_mcp_server.py
 ```
 
-Replace `/path/to/repo` with the absolute repo root (e.g. `/Users/cp/ableton-ai-plugin-creation-pipeline`).
+Restart Claude Code after adding. Full per-IDE matrix (Claude Desktop, Cursor, Gemini, Copilot, etc.) + critical warnings about which files Claude Code does **NOT** read: **[`docs/AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp`](docs/AGENT_REFERENCE.md#pipeline-mcp-server-optional-ide-mcp)** — single source of truth, do not duplicate config blocks here.
 
 ### Typical AI workflow via MCP
 
